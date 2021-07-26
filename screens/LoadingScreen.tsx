@@ -7,7 +7,7 @@ const LoadingScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ActivityIndicator />
       <View style={styles.textContainer}>
-        <Text>Carregando...</Text>
+        <Text>Carregando</Text>
       </View>
     </SafeAreaView>
   );

@@ -2,7 +2,7 @@ import { UIAction, UIState } from "../../types";
 
 const initialState: UIState = {
   isGlobalLoading: false,
-  globalLoadingText: "Carregando...",
+  globalLoadingText: "Carregando",
 };
 
 const uiReducer = (state = initialState, action: UIAction) => {
