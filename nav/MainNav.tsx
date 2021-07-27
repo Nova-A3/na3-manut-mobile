@@ -21,7 +21,7 @@ const Nav: React.FC = () => {
           name="allTicketsTab"
           component={AllTicketsStack}
           options={{
-            tabBarLabel: "Todas as OS",
+            tabBarLabel: "Minhas OS",
             tabBarIcon: ({ focused, color, size }) => {
               return focused ? (
                 <Ionicons name="list-circle" size={size} color={color} />

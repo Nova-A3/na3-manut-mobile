@@ -22,7 +22,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.novaa3.manut",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,18 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import moment from "moment";
 import * as React from "react";
-import {
-  PlatformColor,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Badge, Text, Title } from "react-native-paper";
+import { COLORS } from "../../constants";
 import Database from "../../db";
 import Firebase from "../../firebase";
 import { useDepartment } from "../../hooks";
 import { Ticket } from "../../types";
+import { formatTimestamp } from "../../utils";
 import TicketCardStatus from "./TicketCardStatus";
 
 type TicketCardProps = {
@@ -29,10 +25,10 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
 
   const getBadge = (): {
     text: string;
-    color: string | ReturnType<typeof PlatformColor>;
+    color: string;
   } => {
     if (Firebase.Firestore.checkTicketUrgency(data, department)) {
-      return { text: "AÇÃO NECESSÁRIA", color: PlatformColor("systemRed") };
+      return { text: "AÇÃO NECESSÁRIA", color: COLORS.SYSTEM.RED };
     } else {
       return {
         text: data.dpt,
@@ -70,7 +66,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
             <View style={styles.infoItem}>
               <Ionicons name="create-outline" size={18} color="#444" />
               <Text style={styles.infoItemText}>
-                {moment(data.createdAt).format("DD/MM")}
+                {formatTimestamp(data.createdAt, "DD/MM")}
               </Text>
             </View>
 
@@ -78,7 +74,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
               <Ionicons name="thumbs-up-outline" size={18} color="#444" />
               <Text style={styles.infoItemText}>
                 {data.acceptedAt
-                  ? moment(data.acceptedAt).format("DD/MM")
+                  ? formatTimestamp(data.acceptedAt, "DD/MM")
                   : "–––"}
               </Text>
             </View>
@@ -86,14 +82,18 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
             <View style={styles.infoItem}>
               <Ionicons name="checkmark-done-outline" size={18} color="#444" />
               <Text style={styles.infoItemText}>
-                {data.solvedAt ? moment(data.solvedAt).format("DD/MM") : "–––"}
+                {data.solvedAt
+                  ? formatTimestamp(data.solvedAt, "DD/MM")
+                  : "–––"}
               </Text>
             </View>
 
             <View style={styles.infoItem}>
               <Ionicons name="lock-closed-outline" size={18} color="#444" />
               <Text style={styles.infoItemText}>
-                {data.closedAt ? moment(data.closedAt).format("DD/MM") : "–––"}
+                {data.closedAt
+                  ? formatTimestamp(data.closedAt, "DD/MM")
+                  : "–––"}
               </Text>
             </View>
           </View>

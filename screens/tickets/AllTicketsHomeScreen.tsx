@@ -10,21 +10,21 @@ import {
   TicketCard,
 } from "../../components";
 import { useTickets } from "../../hooks";
-import { TicketStatus } from "../../types";
+import { Ticket } from "../../types";
 
-const filterItems: { value: TicketStatus | "ALL"; label: string }[] = [
-  { value: "ALL", label: "Todas" },
-  { value: "PENDING", label: "Pendentes" },
-  { value: "SOLVING", label: "Resolvendo" },
-  { value: "SOLVED", label: "Solucionadas" },
-  { value: "CLOSED", label: "Encerradas" },
-  { value: "REFUSED", label: "Recusadas" },
+const filterItems: { value: Ticket["status"] | "all"; label: string }[] = [
+  { value: "all", label: "Todas" },
+  { value: "pending", label: "Pendentes" },
+  { value: "solving", label: "Resolvendo" },
+  { value: "solved", label: "Solucionadas" },
+  { value: "closed", label: "Encerradas" },
+  { value: "refused", label: "Recusadas" },
 ];
 
 const AllTicketsHomeScreen: React.FC = () => {
-  const [view, setView] = React.useState<TicketStatus | "ALL">("ALL");
+  const [view, setView] = React.useState<Ticket["status"] | "all">("all");
   const { tickets, loadTickets, loading } = useTickets(
-    view === "ALL" ? undefined : view
+    view === "all" ? undefined : view
   );
 
   const nav = useNavigation();
@@ -55,7 +55,7 @@ const AllTicketsHomeScreen: React.FC = () => {
       <Dropdown
         label="Mostrar"
         items={filterItems}
-        onValueChange={(val) => setView(val as TicketStatus | "ALL")}
+        onValueChange={(val) => setView(val as Ticket["status"] | "all")}
       />
       <Divider style={styles.divider} />
 

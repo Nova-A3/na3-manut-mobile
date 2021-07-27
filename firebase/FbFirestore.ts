@@ -1,12 +1,17 @@
+import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import uuid from "react-native-uuid";
 import store from "../store";
 import { setDataLoading, setTickets } from "../store/actions";
 import { Department, Ticket } from "../types";
 import { sendNotification, timestamp, translatePriority } from "../utils";
-
 class FbFirestore {
+  collection(collectionId: "tickets" | "push-tokens") {
+    return firebase.firestore().collection(collectionId);
+  }
+
   async getTickets(department: Department): Promise<Ticket[]> {
     const collection = firebase.firestore().collection("tickets");
 
@@ -54,11 +59,13 @@ class FbFirestore {
       | "cause"
     >
   ) {
+    const event = this.buildTicketEvent("ticketCreated");
     const ticket: Ticket = {
       ...data,
       id,
-      createdAt: timestamp(),
+      createdAt: event.timestamp,
       status: "pending",
+      events: [event],
     };
 
     await firebase.firestore().collection("tickets").doc(id).set(ticket);
@@ -66,7 +73,7 @@ class FbFirestore {
     await sendNotification({
       to: await this.getPushTokens("manutencao"),
       title: `[AÇÃO NECESSÁRIA] Nova OS – nº ${ticket.id}`,
-      body: `Acesse o app para aceitar: "${ticket.description}".`,
+      body: `Acesse o app para aceitar: "${ticket.description}"`,
     });
   }
 
@@ -81,12 +88,17 @@ class FbFirestore {
         priority: data.priority,
       });
 
+      await this.pushTicketEvents(ticket.id, {
+        type: "ticketConfirmed",
+        payload: { priority: data.priority },
+      });
+
       await sendNotification({
         to: await this.getPushTokens(ticket.username),
         title: `OS #${ticket.id}`,
-        body: `A OS foi reconhecida pela Manutenção e já está sendo resolvida. Prioridade definida: ${translatePriority(
+        body: `A OS está sendo resolvida: prioridade ${translatePriority(
           data.priority
-        )}.`,
+        )}`,
       });
 
       return { error: null };
@@ -103,7 +115,7 @@ class FbFirestore {
 
   async transmitTicketSolution(
     ticket: Ticket,
-    data: { solution: Exclude<Ticket["solution"], undefined> }
+    data: { solution: Exclude<Ticket["solution"], undefined | null> }
   ): Promise<{ error: { title: string; description: string } | null }> {
     if (!data.solution.trim()) {
       return {
@@ -121,10 +133,15 @@ class FbFirestore {
         solution: data.solution,
       });
 
+      await this.pushTicketEvents(ticket.id, {
+        type: "solutionTransmitted",
+        payload: { solution: data.solution },
+      });
+
       await sendNotification({
         to: await this.getPushTokens(ticket.username),
         title: `[AÇÃO NECESSÁRIA] OS #${ticket.id} solucionada`,
-        body: `Acesse o app para aceitar a solução: "${data.solution}".`,
+        body: `Acesse o app para aceitar a solução: "${data.solution}"`,
       });
 
       return { error: null };
@@ -148,10 +165,15 @@ class FbFirestore {
         status: "closed",
       });
 
+      await this.pushTicketEvents(ticket.id, [
+        { type: "solutionAccepted" },
+        { type: "ticketClosed" },
+      ]);
+
       await sendNotification({
         to: await this.getPushTokens("manutencao"),
         title: `OS #${ticket.id}`,
-        body: `OS encerrada pelo solicitante (${ticket.dpt}).`,
+        body: `OS encerrada pelo solicitante (${ticket.dpt})`,
       });
 
       return { error: null };
@@ -164,6 +186,96 @@ class FbFirestore {
         },
       };
     }
+  }
+
+  async refuseTicketSolution(
+    ticket: Ticket,
+    data: { refusalReason: Exclude<Ticket["refusalReason"], undefined | null> }
+  ): Promise<{ error: { title: string; description: string } | null }> {
+    try {
+      await firebase.firestore().collection("tickets").doc(ticket.id).update({
+        status: "pending",
+        refusalReason: data.refusalReason,
+        acceptedAt: null,
+        solvedAt: null,
+        reopenedAt: timestamp(),
+        priority: null,
+        solution: null,
+      });
+
+      await this.pushTicketEvents(ticket.id, [
+        {
+          type: "solutionRefused",
+          payload: { refusalReason: data.refusalReason },
+        },
+        { type: "ticketReopened" },
+      ]);
+
+      await sendNotification({
+        to: await this.getPushTokens("manutencao"),
+        title: `[AÇÃO NECESSÁRIA] OS #${ticket.id}`,
+        body: `Solução recusada pelo solicitante (${ticket.dpt})`,
+      });
+
+      return { error: null };
+    } catch (e) {
+      return {
+        error: {
+          title: "Erro ao recusar a solução da OS",
+          description:
+            "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+        },
+      };
+    }
+  }
+
+  buildTicketEvent<T extends Ticket["events"][0]["type"]>(
+    type: T,
+    payload?: Ticket["events"][0]["payload"]
+  ): Ticket["events"][0] {
+    return {
+      id: uuid.v4() as string,
+      type,
+      timestamp: timestamp(),
+      device: {
+        name: Device.deviceName,
+        model: Device.modelName,
+        os: { name: Device.osName, version: Device.osVersion },
+      },
+      payload: payload ? payload : null,
+    };
+  }
+
+  async pushTicketEvents(
+    ticketId: Ticket["id"],
+    events:
+      | {
+          type: Ticket["events"][0]["type"];
+          payload?: Ticket["events"][0]["payload"];
+        }
+      | {
+          type: Ticket["events"][0]["type"];
+          payload?: Ticket["events"][0]["payload"];
+        }[]
+  ) {
+    if (!Array.isArray(events)) {
+      events = [events];
+    }
+
+    const newEvents = events.map((e) =>
+      this.buildTicketEvent(e.type, e.payload)
+    );
+    const registeredEvents = (
+      await this.collection("tickets").doc(ticketId).get()
+    ).data()!.events as Ticket["events"] | undefined | null;
+
+    await this.collection("tickets")
+      .doc(ticketId)
+      .update({
+        events: registeredEvents
+          ? [...registeredEvents, ...newEvents]
+          : newEvents,
+      });
   }
 
   checkTicketUrgency(ticket: Ticket, department: Department) {

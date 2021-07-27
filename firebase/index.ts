@@ -15,9 +15,10 @@ const FIREBASE_CONFIG = {
   measurementId: "G-04P7RVKWBN",
 };
 
-class Fb {
+export class Fb {
   static Auth = new FbAuth();
   static Firestore = new FbFirestore();
+  static Fs = Fb.Firestore;
 
   static init() {
     if (firebase.apps.length === 0) {

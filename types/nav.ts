@@ -1,3 +1,4 @@
+import { RouteProp } from "@react-navigation/native";
 import { Ticket } from "./db/Ticket";
 
 export type AccountStackParamList = {
@@ -6,9 +7,8 @@ export type AccountStackParamList = {
 
 export type AllTicketsStackParamList = {
   allTicketsHome: undefined;
-  ticketDetails: {
-    ticket: Ticket;
-  };
+  ticketDetails: { ticket: Ticket };
+  ticketTimeline: TicketDependantRoute;
 };
 
 export type NewTicketStackParamList = {
@@ -22,7 +22,11 @@ export type SignInStackParamList = {
 
 export type UrgentTicketsStackParamList = {
   urgentTicketsHome: undefined;
-  ticketDetails: {
-    ticket: Ticket;
-  };
+  ticketDetails: { ticket: Ticket };
+  ticketTimeline: TicketDependantRoute;
 };
+
+export type TicketDependantRoute = RouteProp<
+  AllTicketsStackParamList,
+  "ticketDetails"
+>;

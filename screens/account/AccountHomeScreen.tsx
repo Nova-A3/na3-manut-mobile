@@ -9,12 +9,12 @@ import {
   ScreenContainer,
 } from "../../components";
 import Firebase from "../../firebase";
-import { useFlashMessage, useGlobalLoading, useDepartment } from "../../hooks";
+import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
 
 const AccountHomeScreen: React.FC = () => {
   const user = useDepartment();
   const nav = useNavigation();
-  const [_, setGlobalLoading] = useGlobalLoading();
+  const { execGlobalLoading } = useGlobalLoading();
   const msg = useFlashMessage();
 
   const onSignOut = () => {
@@ -23,11 +23,9 @@ const AccountHomeScreen: React.FC = () => {
         style: "destructive",
         text: "Sim, sair",
         onPress: async () => {
-          setGlobalLoading(true);
-
-          Firebase.Auth.signOut();
-
-          setGlobalLoading(false);
+          await execGlobalLoading(async () => {
+            await Firebase.Auth.signOut();
+          });
 
           msg.show({
             type: "warning",

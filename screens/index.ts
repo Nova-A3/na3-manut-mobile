@@ -5,4 +5,5 @@ export { default as NewTicketHomeScreen } from "./new-ticket/NewTicketHomeScreen
 export { default as SignInScreen } from "./SignInScreen";
 export { default as AllTicketsHomeScreen } from "./tickets/AllTicketsHomeScreen";
 export { default as TicketDetailsScreen } from "./tickets/TicketDetailsScreen";
+export { default as TicketTimelineScreen } from "./tickets/TicketTimelineScreen";
 export { default as UrgentTicketsScreen } from "./tickets/UrgentTicketsScreen";

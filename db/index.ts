@@ -46,7 +46,7 @@ class Department implements IDepartment {
   }
 }
 
-class Db {
+export class Db {
   private static departments = [
     new Department({
       type: "operator",

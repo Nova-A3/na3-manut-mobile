@@ -14,19 +14,21 @@ import { useFlashMessage, useGlobalLoading } from "../hooks";
 const SignInScreen: React.FC = () => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [isGlobalLoading, setGlobalLoading] = useGlobalLoading();
+  const { isGlobalLoading, execGlobalLoading } = useGlobalLoading();
   const msg = useFlashMessage();
 
   const onSignIn = async () => {
-    setGlobalLoading(true);
+    await execGlobalLoading(async () => {
+      const { error } = await Firebase.Auth.signIn({ username, password });
 
-    const { error } = await Firebase.Auth.signIn({ username, password });
-
-    if (error) {
-      msg.show({ type: "danger", title: error.title, text: error.description });
-    }
-
-    setGlobalLoading(false);
+      if (error) {
+        msg.show({
+          type: "danger",
+          title: error.title,
+          text: error.description,
+        });
+      }
+    });
   };
 
   return (

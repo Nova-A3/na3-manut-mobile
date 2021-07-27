@@ -29,7 +29,11 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({
           IconComponent={Ionicons}
           iconSize={23}
           color={
-            disabled ? systemColor("secondary") : color && systemColor(color)
+            disabled
+              ? systemColor("secondary")
+              : color
+              ? systemColor(color)
+              : systemColor("primary")
           }
           disabled={disabled}
           {...props}

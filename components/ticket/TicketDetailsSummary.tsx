@@ -1,18 +1,48 @@
+import { FontAwesome } from "@expo/vector-icons";
 import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { Caption, Divider } from "react-native-paper";
+import { COLORS } from "../../constants";
 import { Ticket } from "../../types";
-import { idToName } from "../../utils";
+import { idToName, translatePriority } from "../../utils";
 
 type TicketDetailsSummaryProps = {
   data: Ticket;
 };
 
 const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
-  data: { dpt, machine, team, maintenanceType, cause, interruptions },
+  data: { dpt, machine, team, maintenanceType, cause, interruptions, priority },
 }) => {
   return (
     <View style={styles.card}>
+      {priority && (
+        <>
+          <View style={styles.summaryItem}>
+            <Caption style={styles.itemKey}>Prioridade: </Caption>
+            <View style={styles.priority}>
+              <View style={styles.priorityIcon}>
+                <FontAwesome
+                  name="circle"
+                  size={16}
+                  color={
+                    {
+                      low: COLORS.TICKET_STATUS.REFUSED,
+                      medium: COLORS.TICKET_STATUS.PENDING,
+                      high: COLORS.TICKET_STATUS.CLOSED,
+                    }[priority]
+                  }
+                />
+              </View>
+              <Text style={styles.priorityText}>
+                {translatePriority(priority)}
+              </Text>
+            </View>
+          </View>
+
+          <Divider style={styles.divider} />
+        </>
+      )}
+
       <View style={styles.summaryItem}>
         <Caption style={styles.itemKey}>Setor: </Caption>
         <Text>{dpt}</Text>
@@ -53,8 +83,8 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    paddingHorizontal: 15,
-    paddingVertical: 15,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
     borderRadius: 12,
     backgroundColor: "white",
   },
@@ -72,6 +102,16 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 10,
     backgroundColor: "#333",
+  },
+  priority: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  priorityIcon: {
+    marginRight: 5,
+  },
+  priorityText: {
+    paddingTop: Platform.OS === "ios" ? 2 : 0,
   },
 });
 

@@ -7,21 +7,15 @@ import {
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
 import Firebase from "../../firebase";
-import {
-  useDepartment,
-  useFlashMessage,
-  useGlobalLoading,
-  useTickets,
-} from "../../hooks";
+import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
 
 const NewTicketFormScreen: React.FC = () => {
   const department = useDepartment()!;
-  const { loadTickets } = useTickets();
 
   const [dpt, setDpt] = React.useState(department!.displayName);
   const [machine, setMachine] = React.useState("1");
@@ -33,7 +27,7 @@ const NewTicketFormScreen: React.FC = () => {
   const [cause, setCause] = React.useState("mecanica");
 
   const nav = useNavigation();
-  const [_, setGlobalLoading] = useGlobalLoading();
+  const { execGlobalLoading } = useGlobalLoading();
   const msg = useFlashMessage();
 
   const onSubmit = async () => {
@@ -46,11 +40,9 @@ const NewTicketFormScreen: React.FC = () => {
       return;
     }
 
-    setGlobalLoading(true);
-
-    const nextTicketId = await Firebase.Firestore.getNextTicketId();
-
-    setGlobalLoading(false);
+    const nextTicketId = await execGlobalLoading(
+      Firebase.Firestore.getNextTicketId
+    );
 
     Alert.alert(
       `OS #${nextTicketId}`,
@@ -60,27 +52,24 @@ const NewTicketFormScreen: React.FC = () => {
         {
           text: "Sim, abrir OS",
           onPress: async () => {
-            setGlobalLoading(true);
+            await execGlobalLoading(async () => {
+              await Firebase.Firestore.postTicket(nextTicketId, {
+                username: department!.username,
+                dpt,
+                machine,
+                description,
+                interruptions: {
+                  line: stoppedLine,
+                  equipment: stoppedEquipment,
+                },
+                team,
+                maintenanceType,
+                cause,
+              });
 
-            await Firebase.Firestore.postTicket(nextTicketId, {
-              username: department!.username,
-              dpt,
-              machine,
-              description,
-              interruptions: {
-                line: stoppedLine,
-                equipment: stoppedEquipment,
-              },
-              team,
-              maintenanceType,
-              cause,
+              nav.goBack();
+              nav.navigate("allTicketsTab");
             });
-
-            await loadTickets();
-
-            nav.goBack();
-            nav.navigate("allTicketsTab");
-            setGlobalLoading(false);
 
             msg.show({
               type: "success",

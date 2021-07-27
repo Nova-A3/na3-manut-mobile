@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import * as React from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import {
   Badge,
   Headline,
@@ -12,23 +12,14 @@ import {
   Button,
   Dropdown,
   FormModal,
-  HeaderButton,
+  HeaderOverflowMenu,
   TicketDetailsButton,
   TicketDetailsSummary,
 } from "../../components";
 import Database from "../../db";
 import { default as Firebase } from "../../firebase";
-import {
-  useDepartment,
-  useFlashMessage,
-  useGlobalLoading,
-  useTickets,
-} from "../../hooks";
-import {
-  AllTicketsStackParamList,
-  TicketPriority,
-  TicketStatus,
-} from "../../types";
+import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
+import { AllTicketsStackParamList, Ticket } from "../../types";
 import { getTicketStatusStyles, translatePriority } from "../../utils";
 
 type TicketDetailsScreenRouteProp = RouteProp<
@@ -43,14 +34,14 @@ const TicketDetailsScreen: React.FC = () => {
   } = useRoute<TicketDetailsScreenRouteProp>();
 
   const department = useDepartment()!;
-  const [_, setGlobalLoading] = useGlobalLoading();
-  const { loadTickets } = useTickets();
+  const { execGlobalLoading } = useGlobalLoading();
   const msg = useFlashMessage();
 
   const [showFormModal, setShowFormModal] = React.useState(false);
   const [ticketPriority, setTicketPriority] =
-    React.useState<TicketPriority>("low");
+    React.useState<Exclude<Ticket["priority"], undefined | null>>("low");
   const [ticketSolution, setTicketSolution] = React.useState("");
+  const [refusalReason, setRefusalReason] = React.useState("");
 
   const statusStyles = getTicketStatusStyles(ticket.status);
 
@@ -70,97 +61,148 @@ const TicketDetailsScreen: React.FC = () => {
     }
   };
 
-  const onAcceptTicketSolution = async () => {
-    setGlobalLoading(true);
+  const onConfirmTicket = async (
+    priority: Exclude<Ticket["priority"], undefined | null>
+  ) => {
+    setShowFormModal(false);
 
-    const { error } = await Firebase.Firestore.acceptTicketSolution(ticket);
-
-    if (error) {
-      msg.show({
-        type: "warning",
-        title: error.title,
-        text: error.description,
-      });
-    } else {
-      msg.show({
-        type: "success",
-        title: "OS encerrada",
-        text: `OS nº ${ticket.id} encerrada com sucesso!`,
+    await execGlobalLoading(async () => {
+      const { error } = await Firebase.Firestore.confirmTicket(ticket, {
+        priority,
       });
 
-      await loadTickets();
-      nav.goBack();
-    }
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
+      } else {
+        msg.show({
+          type: "success",
+          title: "OS aceita",
+          text: `OS nº ${ticket.id} aceita com sucesso!`,
+        });
 
-    setGlobalLoading(false);
+        nav.goBack();
+      }
+    });
   };
 
   const onTransmitTicketSolution = async (solution: string) => {
-    setGlobalLoading(true);
+    setShowFormModal(false);
 
-    const { error } = await Firebase.Firestore.transmitTicketSolution(ticket, {
-      solution,
+    await execGlobalLoading(async () => {
+      const { error } = await Firebase.Firestore.transmitTicketSolution(
+        ticket,
+        { solution }
+      );
+
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
+
+        setShowFormModal(true);
+      } else {
+        msg.show({
+          type: "success",
+          title: "OS solucionada",
+          text: `OS nº ${ticket.id} solucionada com sucesso!`,
+        });
+
+        nav.goBack();
+      }
     });
-
-    if (error) {
-      msg.show({
-        type: "warning",
-        title: error.title,
-        text: error.description,
-      });
-    } else {
-      msg.show({
-        type: "success",
-        title: "OS solucionada",
-        text: `OS nº ${ticket.id} solucionada com sucesso!`,
-      });
-
-      setShowFormModal(false);
-      await loadTickets();
-      nav.goBack();
-    }
-
-    setGlobalLoading(false);
   };
 
-  const onConfirmTicket = async (priority: TicketPriority) => {
-    setGlobalLoading(true);
+  const onAcceptTicketSolution = async () => {
+    setShowFormModal(false);
 
-    const { error } = await Firebase.Firestore.confirmTicket(ticket, {
-      priority,
+    await execGlobalLoading(async () => {
+      const { error } = await Firebase.Firestore.acceptTicketSolution(ticket);
+
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
+      } else {
+        msg.show({
+          type: "success",
+          title: "OS encerrada",
+          text: `OS nº ${ticket.id} encerrada com sucesso!`,
+        });
+
+        nav.goBack();
+      }
     });
+  };
 
-    if (error) {
-      msg.show({
-        type: "warning",
-        title: error.title,
-        text: error.description,
-      });
-    } else {
-      msg.show({
-        type: "success",
-        title: "OS aceita",
-        text: `OS nº ${ticket.id} aceita com sucesso!`,
+  const onRefuseTicketSolution = async (
+    reason: Exclude<Ticket["refusalReason"], undefined | null>
+  ) => {
+    setShowFormModal(false);
+
+    await execGlobalLoading(async () => {
+      const { error } = await Firebase.Firestore.refuseTicketSolution(ticket, {
+        refusalReason: reason,
       });
 
-      setShowFormModal(false);
-      await loadTickets();
-      nav.goBack();
-    }
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
 
-    setGlobalLoading(false);
+        setShowFormModal(true);
+      } else {
+        msg.show({
+          type: "success",
+          title: "Solução recusada",
+          text: `Solução recusada – a Manutenção revisará a OS nº ${ticket.id}.`,
+        });
+
+        nav.goBack();
+      }
+    });
   };
 
   React.useLayoutEffect(() => {
     nav.setOptions({
       headerRight: () => (
-        <HeaderButton
-          title="Enviar"
-          icon="document-text-outline"
-          onPress={() =>
-            Alert.alert(`Solução OS #${ticket.id}`, ticket.solution)
-          }
-          disabled={!ticket.solution}
+        <HeaderOverflowMenu
+          items={[
+            {
+              title: "Histórico",
+              onPress: () => {
+                nav.navigate("ticketTimeline", { ticket });
+              },
+            },
+            {
+              title: "Estatísticas",
+              onPress: () => Alert.alert("Estatísticas"),
+            },
+            {
+              title: "Ver solução",
+              onPress: () => {
+                Alert.alert(
+                  `Solução OS #${ticket.id}`,
+                  ticket.solution
+                    ? ticket.solution
+                    : "Nenhuma solução disponível"
+                );
+              },
+            },
+            {
+              title: "Editar OS",
+              onPress: () => Alert.alert("Editar OS"),
+            },
+          ]}
         />
       ),
     });
@@ -168,7 +210,7 @@ const TicketDetailsScreen: React.FC = () => {
 
   return (
     <>
-      <View>
+      <ScrollView>
         <View
           style={{
             ...styles.header,
@@ -200,7 +242,7 @@ const TicketDetailsScreen: React.FC = () => {
         <View style={styles.body}>
           <TicketDetailsSummary data={ticket} />
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.statusContainer}>
         <View style={styles.currStage}>
@@ -271,7 +313,11 @@ const TicketDetailsScreen: React.FC = () => {
                 { value: "medium", label: translatePriority("medium") },
                 { value: "high", label: translatePriority("high") },
               ]}
-              onValueChange={(val) => setTicketPriority(val as TicketPriority)}
+              onValueChange={(val) =>
+                setTicketPriority(
+                  val as Exclude<Ticket["priority"], undefined | null>
+                )
+              }
             />
           </FormModal>
         ) : ticket.status === "solving" ? (
@@ -294,7 +340,31 @@ const TicketDetailsScreen: React.FC = () => {
               numberOfLines={3}
               label="Descrição da solução"
               value={ticketSolution}
-              onChangeText={setTicketSolution}
+              onChangeText={(val) => setTicketSolution(val)}
+            />
+          </FormModal>
+        ) : ticket.status === "solved" ? (
+          <FormModal
+            title="Motivo da recusa"
+            show={showFormModal}
+            onDismiss={() => setShowFormModal(false)}
+            footer={
+              <Button
+                label="Recusar Solução"
+                onPress={() => onRefuseTicketSolution(refusalReason)}
+                icon="arrow-right"
+                color="danger"
+                iconRight
+              />
+            }
+          >
+            <TextInput
+              mode="outlined"
+              multiline
+              numberOfLines={3}
+              label="Motivo"
+              value={refusalReason}
+              onChangeText={(val) => setRefusalReason(val)}
             />
           </FormModal>
         ) : null
@@ -375,7 +445,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const currStage = (status: TicketStatus) => {
+const currStage = (status: Ticket["status"]) => {
   switch (status) {
     case "pending":
       return "AGUARDANDO MANUTENÇÃO";

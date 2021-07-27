@@ -1,6 +1,10 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
-import { TicketDetailsScreen, UrgentTicketsScreen } from "../../screens";
+import {
+  TicketDetailsScreen,
+  TicketTimelineScreen,
+  UrgentTicketsScreen,
+} from "../../screens";
 import { UrgentTicketsStackParamList } from "../../types";
 
 const Stack = createStackNavigator<UrgentTicketsStackParamList>();
@@ -21,6 +25,13 @@ const UrgentTicketsStack: React.FC = () => {
         options={({ route }) => ({
           headerTitle: `OS #${route.params?.ticket.id}`,
         })}
+      />
+      <Stack.Screen
+        name="ticketTimeline"
+        component={TicketTimelineScreen}
+        options={{
+          headerTitle: "Histórico",
+        }}
       />
     </Stack.Navigator>
   );

@@ -1,7 +1,8 @@
 import * as React from "react";
-import { PlatformColor, View, ViewStyle } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { TextInput } from "react-native-paper";
 import MdDropdown from "react-native-paper-dropdown";
+import { COLORS } from "../../constants";
 
 type DropdownProps = {
   label: string;
@@ -19,7 +20,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   onValueChange,
   style,
 }) => {
-  const [val, setVal] = React.useState(items[0].value);
+  const [val, setVal] = React.useState(items[0]!.value);
   const [show, setShow] = React.useState(false);
 
   const handleValueChange = (newVal: string) => {
@@ -41,7 +42,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         inputProps={{
           right: <TextInput.Icon name="menu-down" />,
         }}
-        activeColor={PlatformColor("systemBlue") as unknown as string}
+        activeColor={COLORS.SYSTEM.BLUE}
         dropDownContainerMaxHeight={400}
       />
     </View>

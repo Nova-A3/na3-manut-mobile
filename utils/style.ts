@@ -1,29 +1,27 @@
-import { PlatformColor } from "react-native";
-import { TicketStatus } from "../types";
+import { COLORS } from "../constants";
+import { Ticket } from "../types";
 
 export type ColorType = "primary" | "secondary" | "success" | "danger";
 
-export const systemColor = (
-  colorType?: ColorType
-): ReturnType<typeof PlatformColor> => {
+export const systemColor = (colorType?: ColorType): string => {
   if (!colorType) {
-    return PlatformColor("systemBlue");
+    return COLORS.SYSTEM.BLUE;
   }
 
   switch (colorType) {
     case "primary":
-      return PlatformColor("systemBlue");
+      return COLORS.SYSTEM.BLUE;
     case "secondary":
-      return PlatformColor("systemGray");
+      return COLORS.SYSTEM.GRAY;
     case "success":
-      return PlatformColor("systemGreen");
+      return COLORS.SYSTEM.GREEN;
     case "danger":
-      return PlatformColor("systemRed");
+      return COLORS.SYSTEM.RED;
   }
 };
 
 export const getTicketStatusStyles = (
-  status: TicketStatus
+  status: Ticket["status"]
 ): { text: string; bgColor: string; color: string } => {
   switch (status) {
     case "pending":

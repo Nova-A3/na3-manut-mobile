@@ -6,13 +6,13 @@ import {
   setDataLoading,
   setTickets,
 } from "../store/actions";
-import { Ticket, TicketStatus } from "../types";
+import { Ticket } from "../types";
 import useDepartment from "./useDepartment";
 import useFlashMessage from "./useFlashMessage";
 import useStateSlice from "./useStateSlice";
 
 const useTickets = (
-  filterStatus?: TicketStatus | ((ticket: Ticket) => boolean)
+  filterStatus?: Ticket["status"] | ((ticket: Ticket) => boolean)
 ) => {
   const { tickets, loading, didFirstLoad } = useStateSlice("data");
   const department = useDepartment()!;

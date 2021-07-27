@@ -2,11 +2,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Caption } from "react-native-paper";
-import { TicketStatus } from "../../types";
+import { Ticket } from "../../types";
 import { getTicketStatusStyles } from "../../utils";
 
 type TicketCardStatusProps = {
-  status: TicketStatus;
+  status: Ticket["status"];
 };
 
 const TicketCardStatus: React.FC<TicketCardStatusProps> = ({ status }) => {

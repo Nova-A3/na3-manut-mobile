@@ -5,8 +5,8 @@ import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 import { ColorType, systemColor } from "../../utils";
 
 type ButtonProps = {
-  label: string;
   onPress: () => void;
+  label?: string;
   icon?: IconSource;
   type?: "text" | "outlined" | "contained";
   color?: ColorType;
