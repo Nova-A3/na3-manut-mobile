@@ -1,5 +1,6 @@
 export { default as HeaderButton } from "./nav/HeaderButton";
 export { default as HeaderOverflowMenu } from "./nav/HeaderOverflowMenu";
+export { default as MultipleHeaderButtons } from "./nav/MultipleHeaderButtons";
 export { default as ScreenContainer } from "./ScreenContainer";
 export { default as TicketCard } from "./ticket/TicketCard";
 export { default as TicketDetailsButton } from "./ticket/TicketDetailsButton";
