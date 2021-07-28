@@ -3,81 +3,188 @@ import * as React from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { Caption, Divider } from "react-native-paper";
 import { COLORS } from "../../constants";
+import Fb from "../../firebase";
+import {
+  useDepartment,
+  useFlashMessage,
+  useGlobalLoading,
+  useTickets,
+} from "../../hooks";
 import { Ticket } from "../../types";
-import { idToName, translatePriority } from "../../utils";
+import { idToName, systemColor, translatePriority } from "../../utils";
+import Button from "../ui/Button";
+import Dropdown from "../ui/Dropdown";
+import FormModal from "../ui/FormModal";
+import IoniconsIconButton from "../ui/IoniconsIconButton";
 
 type TicketDetailsSummaryProps = {
   data: Ticket;
 };
 
 const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
-  data: { dpt, machine, team, maintenanceType, cause, interruptions, priority },
+  data: { id: ticketId },
 }) => {
+  const { tickets } = useTickets((t) => t.id === ticketId);
+  const {
+    id,
+    status,
+    dpt,
+    machine,
+    team,
+    maintenanceType,
+    cause,
+    interruptions,
+    priority,
+  } = tickets[0]!;
+  const department = useDepartment();
+  const { execGlobalLoading } = useGlobalLoading();
+  const msg = useFlashMessage();
+
+  const [newPriority, setNewPriority] =
+    React.useState<Ticket["priority"]>(priority);
+  const [showEditPriority, setShowEditPriority] = React.useState(false);
+
+  const onEditPriority = async (editedPriority: Ticket["priority"]) => {
+    setNewPriority(priority);
+    setShowEditPriority(false);
+
+    await execGlobalLoading(async () => {
+      const { error } = await Fb.Fs.editTicketPriority(id, {
+        priority: editedPriority!,
+      });
+
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
+      } else {
+        msg.show({
+          type: "success",
+          title: "Prioridade redefinida",
+          text: `Prioridade da OS nº ${id} redefinida para "${translatePriority(
+            editedPriority
+          )}"`,
+        });
+        setNewPriority(editedPriority);
+      }
+    });
+  };
+
   return (
-    <View style={styles.card}>
-      {priority && (
-        <>
-          <View style={styles.summaryItem}>
-            <Caption style={styles.itemKey}>Prioridade: </Caption>
-            <View style={styles.priority}>
-              <View style={styles.priorityIcon}>
-                <FontAwesome
-                  name="circle"
-                  size={16}
-                  color={
-                    {
-                      low: COLORS.TICKET_STATUS.REFUSED,
-                      medium: COLORS.TICKET_STATUS.PENDING,
-                      high: COLORS.TICKET_STATUS.CLOSED,
-                    }[priority]
-                  }
-                />
+    <>
+      <View style={styles.card}>
+        {newPriority && (
+          <>
+            <View style={styles.summaryItem}>
+              <Caption style={styles.itemKey}>Prioridade: </Caption>
+              <View style={styles.priorityContainer}>
+                <View style={styles.priority}>
+                  <View style={styles.priorityIcon}>
+                    <FontAwesome
+                      name="circle"
+                      size={16}
+                      color={
+                        {
+                          low: COLORS.TICKET_STATUS.REFUSED,
+                          medium: COLORS.TICKET_STATUS.PENDING,
+                          high: COLORS.TICKET_STATUS.CLOSED,
+                        }[newPriority]
+                      }
+                    />
+                  </View>
+
+                  <Text style={styles.priorityText}>
+                    {translatePriority(newPriority)}
+                  </Text>
+                </View>
+
+                {department?.isMaintenance() && status === "solving" && (
+                  <IoniconsIconButton
+                    icon="pencil"
+                    onPress={() => {
+                      setShowEditPriority(true);
+                    }}
+                    color={systemColor("primary")}
+                    size={14}
+                    style={{ margin: 0, padding: 0 }}
+                  />
+                )}
               </View>
-              <Text style={styles.priorityText}>
-                {translatePriority(priority)}
-              </Text>
             </View>
-          </View>
 
-          <Divider style={styles.divider} />
-        </>
+            <Divider style={styles.divider} />
+          </>
+        )}
+
+        <View style={[styles.summaryItem, styles.bottomMargined]}>
+          <Caption style={styles.itemKey}>Setor: </Caption>
+          <Text>{dpt}</Text>
+        </View>
+        <View style={styles.summaryItem}>
+          <Caption style={styles.itemKey}>Máquina: </Caption>
+          <Text>{machine}</Text>
+        </View>
+
+        <Divider style={styles.divider} />
+
+        <View style={styles.summaryItem}>
+          <Caption style={styles.itemKey}>Equipe responsável: </Caption>
+          <Text>{idToName(team)}</Text>
+        </View>
+        <View style={[styles.summaryItem, styles.middleItem]}>
+          <Caption style={styles.itemKey}>Tipo de manutenção: </Caption>
+          <Text>{idToName(maintenanceType)}</Text>
+        </View>
+        <View style={styles.summaryItem}>
+          <Caption style={styles.itemKey}>Tipo de causa: </Caption>
+          <Text>{idToName(cause)}</Text>
+        </View>
+
+        <Divider style={styles.divider} />
+
+        <View style={[styles.summaryItem, styles.bottomMargined]}>
+          <Caption style={styles.itemKey}>Parou linha: </Caption>
+          <Text>{interruptions.line ? "SIM" : "NÃO"}</Text>
+        </View>
+        <View style={styles.summaryItem}>
+          <Caption style={styles.itemKey}>Parou máquina: </Caption>
+          <Text>{interruptions.equipment ? "SIM" : "NÃO"}</Text>
+        </View>
+      </View>
+
+      {department?.isMaintenance() && status === "solving" && (
+        <FormModal
+          show={showEditPriority}
+          onDismiss={() => setShowEditPriority(false)}
+          title="Editar prioridade"
+          footer={
+            <Button
+              label="Redefinir prioridade"
+              onPress={() => onEditPriority(newPriority)}
+              icon="arrow-right"
+              iconRight
+            />
+          }
+        >
+          <Dropdown
+            label="Nova prioridade"
+            items={[
+              { value: "low", label: translatePriority("low") },
+              { value: "medium", label: translatePriority("medium") },
+              { value: "high", label: translatePriority("high") },
+            ]}
+            value={newPriority!}
+            onValueChange={(val) =>
+              setNewPriority(
+                val as Exclude<Ticket["priority"], undefined | null>
+              )
+            }
+          />
+        </FormModal>
       )}
-
-      <View style={styles.summaryItem}>
-        <Caption style={styles.itemKey}>Setor: </Caption>
-        <Text>{dpt}</Text>
-      </View>
-      <View style={[styles.summaryItem, styles.middleItem]}>
-        <Caption style={styles.itemKey}>Máquina: </Caption>
-        <Text>{machine}</Text>
-      </View>
-
-      <Divider style={styles.divider} />
-
-      <View style={styles.summaryItem}>
-        <Caption style={styles.itemKey}>Equipe responsável: </Caption>
-        <Text>{idToName(team)}</Text>
-      </View>
-      <View style={[styles.summaryItem, styles.middleItem]}>
-        <Caption style={styles.itemKey}>Tipo de manutenção: </Caption>
-        <Text>{idToName(maintenanceType)}</Text>
-      </View>
-      <View style={styles.summaryItem}>
-        <Caption style={styles.itemKey}>Tipo de causa: </Caption>
-        <Text>{idToName(cause)}</Text>
-      </View>
-
-      <Divider style={styles.divider} />
-
-      <View style={styles.summaryItem}>
-        <Caption style={styles.itemKey}>Parou linha: </Caption>
-        <Text>{interruptions.line ? "SIM" : "NÃO"}</Text>
-      </View>
-      <View style={[styles.summaryItem, styles.middleItem]}>
-        <Caption style={styles.itemKey}>Parou máquina: </Caption>
-        <Text>{interruptions.equipment ? "SIM" : "NÃO"}</Text>
-      </View>
-    </View>
+    </>
   );
 };
 
@@ -99,9 +206,18 @@ const styles = StyleSheet.create({
   middleItem: {
     marginVertical: 4,
   },
+  bottomMargined: {
+    marginBottom: 4,
+  },
   divider: {
     marginVertical: 10,
     backgroundColor: "#333",
+  },
+  priorityContainer: {
+    flexGrow: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   priority: {
     flexDirection: "row",
