@@ -6,6 +6,7 @@ import {
   HiddenItem,
   OverflowMenu,
 } from "react-navigation-header-buttons";
+import { systemColor } from "../../utils";
 
 type HeaderOverflowMenuProps = {
   items: React.ComponentProps<typeof HiddenItem>[];
@@ -24,7 +25,11 @@ const HeaderOverflowMenu: React.FC<HeaderOverflowMenuProps> = ({ items }) => {
     >
       <OverflowMenu
         OverflowIcon={({ color }) => (
-          <Ionicons name="ellipsis-horizontal" size={23} color={color} />
+          <Ionicons
+            name="ellipsis-horizontal-circle-outline"
+            size={23}
+            color={color ? color : systemColor("primary")}
+          />
         )}
         style={{ marginHorizontal: 10 }}
       >
