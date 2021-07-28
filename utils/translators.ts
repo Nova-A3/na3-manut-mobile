@@ -32,8 +32,29 @@ export const translateEventType = (
     case "ticketReopened":
       return "OS REABERTA";
     case "priorityChanged":
-      return "PRIORIDADE ALTERADA";
+      return "PRIORIDADE REDEFINIDA";
     case "ticketEdited":
       return "OS EDITADA";
+  }
+};
+
+export const translateTicketKey = (key: string) => {
+  switch (key) {
+    case "machine":
+      return "Máquina";
+    case "description":
+      return "Descrição do problema";
+    case "line":
+      return "Interrupções • Linha";
+    case "equipment":
+      return "Interrupções • Máquina";
+    case "team":
+      return "Equipe responsável";
+    case "maintenanceType":
+      return "Tipo de manutenção";
+    case "cause":
+      return "Tipo de causa";
+    default:
+      return key;
   }
 };

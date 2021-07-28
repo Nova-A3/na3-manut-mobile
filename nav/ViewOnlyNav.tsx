@@ -4,11 +4,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import * as React from "react";
 import Firebase from "../firebase";
 import { useDepartment, useTickets } from "../hooks";
-import { AccountStack, AllTicketsStack, NewTicketStack } from "./stacks";
+import { AccountStack, AllTicketsStack } from "./stacks";
 
 const Tabs = createBottomTabNavigator();
 
-const Nav: React.FC = () => {
+const ViewOnlyNav: React.FC = () => {
   const department = useDepartment()!;
   const { tickets } = useTickets((ticket) =>
     Firebase.Firestore.checkTicketUrgency(ticket, department)
@@ -21,7 +21,7 @@ const Nav: React.FC = () => {
           name="allTicketsTab"
           component={AllTicketsStack}
           options={{
-            tabBarLabel: "Minhas OS",
+            tabBarLabel: "Todas as OS",
             tabBarIcon: ({ focused, color, size }) => {
               return focused ? (
                 <Ionicons name="list-circle" size={size} color={color} />
@@ -30,21 +30,6 @@ const Nav: React.FC = () => {
               );
             },
             tabBarBadge: tickets.length > 0 ? tickets.length : undefined,
-          }}
-        />
-
-        <Tabs.Screen
-          name="newTicketTab"
-          component={NewTicketStack}
-          options={{
-            tabBarLabel: "Nova OS",
-            tabBarIcon: ({ focused, color, size }) => {
-              return focused ? (
-                <Ionicons name="add-circle" size={size} color={color} />
-              ) : (
-                <Ionicons name="add-circle-outline" size={size} color={color} />
-              );
-            },
           }}
         />
 
@@ -71,4 +56,4 @@ const Nav: React.FC = () => {
   );
 };
 
-export default Nav;
+export default ViewOnlyNav;

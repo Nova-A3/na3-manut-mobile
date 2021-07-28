@@ -2,12 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { TextInput } from "react-native-paper";
-import {
-  Button,
-  Header,
-  HeaderButton,
-  ScreenContainer,
-} from "../../components";
+import { Button, HeaderButton, ScreenContainer } from "../../components";
 import Firebase from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
 
@@ -38,6 +33,17 @@ const AccountHomeScreen: React.FC = () => {
     ]);
   };
 
+  const displayAccountType = () => {
+    switch (user!.type) {
+      case "operator":
+        return "OPERADOR";
+      case "maintenance":
+        return "MANUTENÇÃO";
+      case "viewOnly":
+        return "VISUALIZADOR";
+    }
+  };
+
   React.useLayoutEffect(() => {
     nav.setOptions({
       headerRight: () => (
@@ -55,9 +61,21 @@ const AccountHomeScreen: React.FC = () => {
     <ScreenContainer>
       <View style={styles.container}>
         <View>
-          <Header title="Logado como" />
-          <TextInput mode="outlined" value={user?.displayName} disabled />
+          <TextInput
+            mode="outlined"
+            label="Logado como"
+            value={user?.displayName}
+            disabled
+            style={styles.accountInfo}
+          />
+          <TextInput
+            mode="outlined"
+            label="Tipo de conta"
+            value={displayAccountType()}
+            disabled
+          />
         </View>
+
         <Button label="Sair" color="danger" onPress={onSignOut} />
       </View>
     </ScreenContainer>
@@ -68,6 +86,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
+  },
+  accountInfo: {
+    marginBottom: 12,
   },
 });
 

@@ -2,6 +2,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
 import {
   TicketDetailsScreen,
+  TicketEditScreen,
+  TicketStatsScreen,
   TicketTimelineScreen,
   UrgentTicketsScreen,
 } from "../../screens";
@@ -31,6 +33,20 @@ const UrgentTicketsStack: React.FC = () => {
         component={TicketTimelineScreen}
         options={{
           headerTitle: "Histórico",
+        }}
+      />
+      <Stack.Screen
+        name="ticketStats"
+        component={TicketStatsScreen}
+        options={{
+          headerTitle: "Estatísticas",
+        }}
+      />
+      <Stack.Screen
+        name="ticketEdit"
+        component={TicketEditScreen}
+        options={{
+          headerTitle: "Editar",
         }}
       />
     </Stack.Navigator>

@@ -30,8 +30,6 @@ const Dropdown: React.FC<DropdownProps> = ({
     onValueChange(newVal);
   };
 
-  console.log("DROP", value);
-
   return (
     <View style={style}>
       <MdDropdown

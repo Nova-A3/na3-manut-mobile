@@ -3,21 +3,33 @@ import * as Notifications from "expo-notifications";
 import firebase from "firebase/app";
 import "firebase/firestore";
 import uuid from "react-native-uuid";
+import Db from "../db";
 import store from "../store";
 import { setDataLoading, setTickets } from "../store/actions";
 import { Department, Ticket } from "../types";
-import { sendNotification, timestamp, translatePriority } from "../utils";
+import {
+  getTicketChanges,
+  sendNotification,
+  timestamp,
+  translatePriority,
+} from "../utils";
 class FbFirestore {
   collection(collectionId: "tickets" | "push-tokens") {
     return firebase.firestore().collection(collectionId);
   }
 
+  async getTicketById(ticketId: Ticket["id"]): Promise<Ticket> {
+    const doc = await this.collection("tickets").doc(ticketId).get();
+    return doc.data() as Ticket;
+  }
+
   async getTickets(department: Department): Promise<Ticket[]> {
     const collection = firebase.firestore().collection("tickets");
 
-    const query = department.isMaintenance()
-      ? await collection.get()
-      : await collection.where("username", "==", department.username).get();
+    const query =
+      department.isMaintenance() || department.isViewOnly()
+        ? await collection.get()
+        : await collection.where("username", "==", department.username).get();
 
     const tickets = query.docs.map((doc) => ({ ...doc.data() } as Ticket));
 
@@ -70,10 +82,19 @@ class FbFirestore {
 
     await firebase.firestore().collection("tickets").doc(id).set(ticket);
 
-    await sendNotification({
+    sendNotification({
       to: await this.getPushTokens("manutencao"),
       title: `[AÇÃO NECESSÁRIA] Nova OS – nº ${ticket.id}`,
       body: `Acesse o app para aceitar: "${ticket.description}"`,
+    });
+    sendNotification({
+      to: await this.getPushTokens(
+        Db.getDepartments()
+          .filter((d) => d.isViewOnly())
+          .map((d) => d.username)
+      ),
+      title: `Nova OS – nº ${ticket.id} (${ticket.dpt})`,
+      body: ticket.description,
     });
   }
 
@@ -93,10 +114,21 @@ class FbFirestore {
         payload: { priority: data.priority },
       });
 
-      await sendNotification({
+      sendNotification({
         to: await this.getPushTokens(ticket.username),
         title: `OS #${ticket.id}`,
         body: `A OS está sendo resolvida: prioridade ${translatePriority(
+          data.priority
+        )}`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticket.id} (${ticket.dpt})`,
+        body: `Confirmada pela Manutenção: prioridade ${translatePriority(
           data.priority
         )}`,
       });
@@ -138,10 +170,19 @@ class FbFirestore {
         payload: { solution: data.solution },
       });
 
-      await sendNotification({
+      sendNotification({
         to: await this.getPushTokens(ticket.username),
         title: `[AÇÃO NECESSÁRIA] OS #${ticket.id} solucionada`,
         body: `Acesse o app para aceitar a solução: "${data.solution}"`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticket.id} (${ticket.dpt})`,
+        body: `Nova solução disponível: "${data.solution}"`,
       });
 
       return { error: null };
@@ -170,10 +211,19 @@ class FbFirestore {
         { type: "ticketClosed" },
       ]);
 
-      await sendNotification({
+      sendNotification({
         to: await this.getPushTokens("manutencao"),
         title: `OS #${ticket.id}`,
         body: `OS encerrada pelo solicitante (${ticket.dpt})`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticket.id} (${ticket.dpt})`,
+        body: `Encerrada pelo solicitante`,
       });
 
       return { error: null };
@@ -211,10 +261,19 @@ class FbFirestore {
         { type: "ticketReopened" },
       ]);
 
-      await sendNotification({
+      sendNotification({
         to: await this.getPushTokens("manutencao"),
         title: `[AÇÃO NECESSÁRIA] OS #${ticket.id}`,
         body: `Solução recusada pelo solicitante (${ticket.dpt})`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticket.id} (${ticket.dpt})`,
+        body: `Solução recusada pelo solicitante; OS retornando para a Manutenção`,
       });
 
       return { error: null };
@@ -247,12 +306,23 @@ class FbFirestore {
         payload: { priority: data.priority },
       });
 
-      await sendNotification({
+      sendNotification({
         to: await this.getPushTokens(ticket.data()!.username),
         title: `OS #${ticketId}`,
         body: `Prioridade da OS redefinida: ${translatePriority(
-          data.priority
-        )}`,
+          ticket.data()!.priority
+        )} -> ${translatePriority(data.priority)}`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticketId} (${ticket.data()!.dpt})`,
+        body: `Prioridade redefinida pela Manutenção:  ${translatePriority(
+          ticket.data()!.priority
+        )} -> ${translatePriority(data.priority)}`,
       });
 
       return { error: null };
@@ -260,6 +330,64 @@ class FbFirestore {
       return {
         error: {
           title: "Erro ao redefinir prioridade",
+          description:
+            "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+        },
+      };
+    }
+  }
+
+  async editTicket(
+    editedTicket: Pick<
+      Ticket,
+      | "id"
+      | "username"
+      | "dpt"
+      | "machine"
+      | "description"
+      | "interruptions"
+      | "team"
+      | "maintenanceType"
+      | "cause"
+    >
+  ): Promise<{ error: { title: string; description: string } | null }> {
+    try {
+      const ticketDoc = await firebase
+        .firestore()
+        .collection("tickets")
+        .doc(editedTicket.id)
+        .get();
+      const ticketData = ticketDoc.data() as Ticket;
+
+      const changes = getTicketChanges(editedTicket, ticketData);
+
+      await ticketDoc.ref.update(editedTicket);
+
+      await this.pushTicketEvents(ticketData.id, {
+        type: "ticketEdited",
+        payload: { changes },
+      });
+
+      sendNotification({
+        to: await this.getPushTokens("manutencao"),
+        title: `OS #${ticketData.id}`,
+        body: `ATENÇÃO: OS editada pelo solicitante (${ticketData.dpt})}`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticketData.id} (${ticketData.dpt})`,
+        body: `OS editada pelo solicitante`,
+      });
+
+      return { error: null };
+    } catch (e) {
+      return {
+        error: {
+          title: "Erro ao editar OS",
           description:
             "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
         },
@@ -319,23 +447,47 @@ class FbFirestore {
   checkTicketUrgency(ticket: Ticket, department: Department) {
     if (department.isMaintenance()) {
       return ["pending", "solving"].includes(ticket.status);
-    } else {
+    } else if (department.isOperator()) {
       return ticket.status === "solved";
+    } else {
+      return ["pending", "solving", "solved"].includes(ticket.status);
     }
   }
 
-  async getPushTokens(username: string): Promise<string[]> {
-    const doc = await firebase
-      .firestore()
-      .collection("push-tokens")
-      .doc(username)
-      .get();
-
-    if (!doc.exists) {
-      return [];
+  async getPushTokens(
+    usernamesOrGetter:
+      | string
+      | string[]
+      | (() => string | string[] | Promise<string | string[]>)
+  ): Promise<string[]> {
+    let usernames: string[] = [];
+    if (typeof usernamesOrGetter === "string") {
+      usernames = [usernamesOrGetter];
+    } else if (Array.isArray(usernamesOrGetter)) {
+      usernames = [...usernamesOrGetter];
+    } else {
+      const getterRes = await usernamesOrGetter();
+      if (typeof getterRes === "string") {
+        usernames = [getterRes];
+      } else {
+        usernames = getterRes;
+      }
     }
 
-    return doc.data()!.tokens;
+    const docs = await Promise.all(
+      usernames.map((uname) =>
+        firebase.firestore().collection("push-tokens").doc(uname).get()
+      )
+    );
+
+    let pushTokens: string[] = [];
+    docs.forEach((doc) => {
+      if (doc.exists) {
+        pushTokens = [...pushTokens, ...doc.data()!.tokens];
+      }
+    });
+
+    return pushTokens;
   }
 
   registerRefreshTicketsListener(department: Department) {

@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { Divider, Text } from "react-native-paper";
 import {
   DataLoading,
@@ -40,9 +40,8 @@ const AllTicketsHomeScreen: React.FC = () => {
         <HeaderButton
           title="Relatórios"
           icon="document-text-outline"
-          onPress={() => Alert.alert("Relatórios")}
+          onPress={() => nav.navigate("reportsHome")}
           left
-          disabled
         />
       ),
       headerRight: () => (
@@ -51,8 +50,7 @@ const AllTicketsHomeScreen: React.FC = () => {
             {
               title: "Filtros",
               iconName: "filter-outline",
-              onPress: () => Alert.alert("Filtros"),
-              disabled: true,
+              onPress: () => nav.navigate("filterTickets"),
             },
             {
               title: "Atualizar",

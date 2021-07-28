@@ -35,6 +35,7 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     cause,
     interruptions,
     priority,
+    refusalReason,
   } = tickets[0]!;
   const department = useDepartment();
   const { execGlobalLoading } = useGlobalLoading();
@@ -152,6 +153,16 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
           <Caption style={styles.itemKey}>Parou máquina: </Caption>
           <Text>{interruptions.equipment ? "SIM" : "NÃO"}</Text>
         </View>
+
+        {refusalReason && ["pending", "solving"].includes(status) && (
+          <>
+            <Divider style={styles.divider} />
+            <View style={styles.summaryItem}>
+              <Caption style={styles.itemKey}>Motivo da reabertura: </Caption>
+              <Text>{refusalReason}</Text>
+            </View>
+          </>
+        )}
       </View>
 
       {department?.isMaintenance() && status === "solving" && (

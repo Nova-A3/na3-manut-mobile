@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as React from "react";
 import {
   Alert,
@@ -11,13 +11,20 @@ import {
 } from "react-native";
 import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
-import Firebase from "../../firebase";
+import Fb from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
+import { TicketDependantRoute } from "../../types";
 
-const NewTicketFormScreen: React.FC = () => {
+const TicketEditScreen: React.FC = () => {
   const department = useDepartment()!;
+  const { execGlobalLoading } = useGlobalLoading();
+  const {
+    params: { ticket },
+  } = useRoute<TicketDependantRoute>();
+  const nav = useNavigation();
+  const msg = useFlashMessage();
 
-  const [dpt, setDpt] = React.useState(department!.displayName);
+  const [dpt, setDpt] = React.useState(department.displayName);
   const [machine, setMachine] = React.useState("1");
   const [description, setDescription] = React.useState("");
   const [stoppedLine, setStoppedLine] = React.useState(false);
@@ -26,9 +33,17 @@ const NewTicketFormScreen: React.FC = () => {
   const [maintenanceType, setMaintenanceType] = React.useState("preventiva");
   const [cause, setCause] = React.useState("mecanica");
 
-  const nav = useNavigation();
-  const { execGlobalLoading } = useGlobalLoading();
-  const msg = useFlashMessage();
+  const loadTicketData = () => {
+    execGlobalLoading(async () => {
+      setMachine(ticket.machine);
+      setDescription(ticket.description);
+      setStoppedLine(ticket.interruptions.line);
+      setStoppedEquipment(ticket.interruptions.equipment);
+      setTeam(ticket.team);
+      setMaintenanceType(ticket.maintenanceType);
+      setCause(ticket.cause);
+    });
+  };
 
   const onSubmit = async () => {
     if (description.trim().length === 0) {
@@ -40,20 +55,17 @@ const NewTicketFormScreen: React.FC = () => {
       return;
     }
 
-    const nextTicketId = await execGlobalLoading(
-      Firebase.Firestore.getNextTicketId
-    );
-
     Alert.alert(
-      `OS #${nextTicketId}`,
-      `Confirma a abertura da OS nº ${nextTicketId}: "${description}"?`,
+      `OS #${ticket.id}`,
+      `Confirma a edição da OS nº ${ticket.id}: "${description}"?`,
       [
         { style: "destructive", text: "Não, voltar" },
         {
-          text: "Sim, abrir OS",
+          text: "Sim, editar OS",
           onPress: async () => {
             await execGlobalLoading(async () => {
-              await Firebase.Firestore.postTicket(nextTicketId, {
+              await Fb.Fs.editTicket({
+                id: ticket.id,
                 username: department!.username,
                 dpt,
                 machine,
@@ -68,13 +80,12 @@ const NewTicketFormScreen: React.FC = () => {
               });
 
               nav.goBack();
-              nav.navigate("allTicketsTab");
             });
 
             msg.show({
               type: "success",
-              title: `OS aberta`,
-              text: `OS ${nextTicketId} — "${description}" registrada com sucesso.`,
+              title: `OS editada`,
+              text: `OS ${ticket.id} — "${description}" editada com sucesso.`,
             });
           },
         },
@@ -93,6 +104,10 @@ const NewTicketFormScreen: React.FC = () => {
       ),
     });
   });
+
+  React.useEffect(() => {
+    loadTicketData();
+  }, []);
 
   return (
     <KeyboardAvoidingView behavior="position" style={styles.container}>
@@ -114,6 +129,7 @@ const NewTicketFormScreen: React.FC = () => {
                 label,
                 value: (value + 1).toString(),
               }))}
+              value={machine}
               onValueChange={(val) => setMachine(val)}
               style={styles.formField}
             />
@@ -156,6 +172,7 @@ const NewTicketFormScreen: React.FC = () => {
                 { value: "eletrica", label: "Elétrica" },
                 { value: "predial", label: "Predial" },
               ]}
+              value={team}
               onValueChange={(val) => setTeam(val)}
               style={styles.formField}
             />
@@ -166,6 +183,7 @@ const NewTicketFormScreen: React.FC = () => {
                 { value: "corretiva", label: "Corretiva" },
                 { value: "preditiva", label: "Preditiva" },
               ]}
+              value={maintenanceType}
               onValueChange={(val) => setMaintenanceType(val)}
               style={styles.formField}
             />
@@ -176,6 +194,7 @@ const NewTicketFormScreen: React.FC = () => {
                 { value: "eletrica", label: "Elétrica" },
                 { value: "machineAdjustment", label: "Ajuste de máquina" },
               ]}
+              value={cause}
               onValueChange={(val) => setCause(val)}
               style={styles.formField}
             />
@@ -183,14 +202,14 @@ const NewTicketFormScreen: React.FC = () => {
 
           <View>
             <Button
-              label="Enviar"
+              label="Editar"
               icon="check-bold"
               onPress={onSubmit}
               style={styles.sendBtn}
               color="success"
             />
             <Divider />
-            <Text style={styles.footer}>Nova A3 • Manutenção</Text>
+            <Text style={styles.footer}>Editando OS: #{ticket.id}</Text>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
@@ -232,4 +251,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewTicketFormScreen;
+export default TicketEditScreen;

@@ -1,3 +1,4 @@
+export { default as FilterItem } from "./filters/FilterItem";
 export { default as HeaderButton } from "./nav/HeaderButton";
 export { default as HeaderOverflowMenu } from "./nav/HeaderOverflowMenu";
 export { default as MultipleHeaderButtons } from "./nav/MultipleHeaderButtons";

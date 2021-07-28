@@ -1,3 +1,15 @@
+export type TicketEditedEventChanges = {
+  machine?: { old: string; new: string };
+  description?: { old: string; new: string };
+  interruptions?: {
+    line?: { old: boolean; new: boolean };
+    equipment?: { old: boolean; new: boolean };
+  };
+  team?: { old: string; new: string };
+  maintenanceType?: { old: string; new: string };
+  cause?: { old: string; new: string };
+};
+
 export type Ticket = {
   id: string;
   username: string;
@@ -48,6 +60,7 @@ export type Ticket = {
       priority?: Ticket["priority"];
       solution?: Ticket["solution"];
       refusalReason?: Ticket["refusalReason"];
+      changes?: TicketEditedEventChanges;
     } | null;
   }[];
 };

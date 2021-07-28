@@ -8,8 +8,10 @@ import { Ticket } from "../../types";
 import {
   formatDeviceInfo,
   formatTimestamp,
+  idToName,
   translateEventType,
   translatePriority,
+  translateTicketKey,
 } from "../../utils";
 import IoniconsIconButton from "../ui/IoniconsIconButton";
 
@@ -20,26 +22,56 @@ type TicketTimelineItemProps = {
 const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
   data: { type, timestamp, device, payload },
 }) => {
-  let payloadAlert: { title: string; message: string } | undefined = undefined;
-
-  if (payload) {
-    if (payload.priority) {
-      payloadAlert = {
-        title: "Prioridade definida",
-        message: translatePriority(payload.priority),
-      };
-    } else if (payload.solution) {
-      payloadAlert = {
-        title: "Solução transmitida",
-        message: payload.solution,
-      };
-    } else if (payload.refusalReason) {
-      payloadAlert = {
-        title: "Motivo da recusa",
-        message: payload.refusalReason,
-      };
+  const payloadAlert = () => {
+    if (payload) {
+      switch (Object.keys(payload)[0]) {
+        case "priority":
+          return {
+            title:
+              type === "ticketConfirmed"
+                ? "Prioridade definida"
+                : "Nova prioridade",
+            message: translatePriority(payload.priority),
+          };
+        case "solution":
+          return {
+            title: "Solução transmitida",
+            message: payload.solution,
+          };
+        case "refusalReason":
+          return {
+            title: "Motivo da recusa",
+            message: payload.refusalReason,
+          };
+        case "changes":
+          return {
+            title: "Alterações na OS",
+            message: Object.entries(payload.changes!)
+              .map(([key, val]) => {
+                if (key === "interruptions") {
+                  return Object.entries(payload.changes!.interruptions!)
+                    .map(
+                      ([key, val]) =>
+                        `${translateTicketKey(key)}: ${
+                          val.old === true ? "SIM" : "NÃO"
+                        } -> ${val.new === true ? "SIM" : "NÃO"}`
+                    )
+                    .join("\n");
+                }
+                return `${translateTicketKey(key)}: ${idToName(
+                  // @ts-ignore
+                  val.old
+                  // @ts-ignore
+                )} -> ${idToName(val.new)}`;
+              })
+              .join("\n"),
+          };
+        default:
+          return;
+      }
     }
-  }
+    return;
+  };
 
   return (
     <View style={styles.container}>
@@ -68,11 +100,11 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
         </View>
 
         <View style={styles.btnRow}>
-          {payloadAlert && (
+          {payloadAlert() && (
             <IoniconsIconButton
               icon="document-text-outline"
               onPress={() =>
-                Alert.alert(payloadAlert!.title, payloadAlert!.message)
+                Alert.alert(payloadAlert()!.title, payloadAlert()!.message!)
               }
               style={{ marginRight: 0 }}
             />

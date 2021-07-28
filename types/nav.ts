@@ -7,8 +7,12 @@ export type AccountStackParamList = {
 
 export type AllTicketsStackParamList = {
   allTicketsHome: undefined;
+  filterTickets: undefined;
   ticketDetails: { ticket: Ticket };
   ticketTimeline: TicketDependantRoute;
+  ticketStats: TicketDependantRoute;
+  ticketEdit: TicketDependantRoute;
+  reportsHome: undefined;
 };
 
 export type NewTicketStackParamList = {
@@ -24,9 +28,15 @@ export type UrgentTicketsStackParamList = {
   urgentTicketsHome: undefined;
   ticketDetails: { ticket: Ticket };
   ticketTimeline: TicketDependantRoute;
+  ticketStats: TicketDependantRoute;
+  ticketEdit: TicketDependantRoute;
 };
 
 export type TicketDependantRoute = RouteProp<
   AllTicketsStackParamList,
   "ticketDetails"
 >;
+
+export type StatsStackParamList = {
+  statsHome: undefined;
+};

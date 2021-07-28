@@ -28,8 +28,16 @@ class Department implements IDepartment {
     return `manut-${this.username}@novaa3-app.com.br`;
   }
 
+  isOperator(): boolean {
+    return this.type === "operator";
+  }
+
   isMaintenance(): boolean {
     return this.type === "maintenance";
+  }
+
+  isViewOnly(): boolean {
+    return this.type === "viewOnly";
   }
 
   getMachineNames(): string[] {
@@ -123,6 +131,13 @@ export class Db {
       type: "maintenance",
       username: "manutencao",
       displayName: "MANUTENÇÃO",
+      color: "#333",
+    }),
+
+    new Department({
+      type: "viewOnly",
+      username: "gsantos",
+      displayName: "GLADSTONE J DOS SANTOS JR",
       color: "#333",
     }),
   ];

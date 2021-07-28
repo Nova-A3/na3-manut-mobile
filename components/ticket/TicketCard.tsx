@@ -28,13 +28,17 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
     color: string;
   } => {
     if (Firebase.Firestore.checkTicketUrgency(data, department)) {
-      return { text: "AÇÃO NECESSÁRIA", color: COLORS.SYSTEM.RED };
+      return {
+        text: department.isViewOnly() ? data.dpt : "AÇÃO NECESSÁRIA",
+        color: COLORS.SYSTEM.RED,
+      };
     } else {
       return {
         text: data.dpt,
-        color: department.isMaintenance()
-          ? Database.getDepartment(data.username)!.color
-          : department.color,
+        color:
+          department.isMaintenance() || department.isViewOnly()
+            ? Database.getDepartment(data.username)!.color
+            : department.color,
       };
     }
   };

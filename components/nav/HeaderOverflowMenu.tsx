@@ -4,31 +4,41 @@ import {
   HeaderButton as HeaderButtonComponent,
   HeaderButtons,
   HiddenItem,
+  Item,
   OverflowMenu,
 } from "react-navigation-header-buttons";
 import { systemColor } from "../../utils";
 
 type HeaderOverflowMenuProps = {
   items: React.ComponentProps<typeof HiddenItem>[];
+  buttons?: React.ComponentProps<typeof Item>[];
 };
 
-const HeaderOverflowMenu: React.FC<HeaderOverflowMenuProps> = ({ items }) => {
+const HeaderOverflowMenu: React.FC<HeaderOverflowMenuProps> = ({
+  items,
+  buttons,
+}) => {
   return (
     <HeaderButtons
       HeaderButtonComponent={(props) => (
         <HeaderButtonComponent
           IconComponent={Ionicons}
           iconSize={23}
+          color={
+            props.disabled ? systemColor("secondary") : systemColor("primary")
+          }
           {...props}
         />
       )}
     >
+      {buttons && buttons.map((btn) => <Item key={btn.title} {...btn} />)}
+
       <OverflowMenu
-        OverflowIcon={({ color }) => (
+        OverflowIcon={() => (
           <Ionicons
             name="ellipsis-horizontal-circle-outline"
             size={23}
-            color={color ? color : systemColor("primary")}
+            color={systemColor("primary")}
           />
         )}
         style={{ marginHorizontal: 10 }}

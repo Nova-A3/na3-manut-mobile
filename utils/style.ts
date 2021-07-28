@@ -31,20 +31,22 @@ export const getTicketStatusStyles = (
     case "solved":
       return { text: "Solucionada", bgColor: "#51E898", color: "black" };
     case "closed":
-      return { text: "Encerrada", bgColor: "#60BE4E", color: "black" };
+      return { text: "Encerrada", bgColor: "#60BE4E", color: "white" };
     case "refused":
       return { text: "Recusada", bgColor: "#EB5A46", color: "black" };
   }
 };
 
 export const idToName = (id: string) => {
-  return {
-    mecanica: "Mecânica",
-    eletrica: "Elétrica",
-    predial: "Predial",
-    preventiva: "Preventiva",
-    corretiva: "Corretiva",
-    preditiva: "Preditiva",
-    operacional: "Operacional",
-  }[id];
+  return (
+    {
+      mecanica: "Mecânica",
+      eletrica: "Elétrica",
+      predial: "Predial",
+      preventiva: "Preventiva",
+      corretiva: "Corretiva",
+      preditiva: "Preditiva",
+      machineAdjustment: "Ajuste de máquina",
+    }[id] || id
+  );
 };

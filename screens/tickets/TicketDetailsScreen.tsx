@@ -1,4 +1,5 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import moment from "moment-timezone";
 import * as React from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import {
@@ -18,7 +19,12 @@ import {
 } from "../../components";
 import Database from "../../db";
 import { default as Firebase } from "../../firebase";
-import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
+import {
+  useDepartment,
+  useFlashMessage,
+  useGlobalLoading,
+  useTickets,
+} from "../../hooks";
 import { AllTicketsStackParamList, Ticket } from "../../types";
 import { getTicketStatusStyles, translatePriority } from "../../utils";
 
@@ -30,8 +36,12 @@ type TicketDetailsScreenRouteProp = RouteProp<
 const TicketDetailsScreen: React.FC = () => {
   const nav = useNavigation();
   const {
-    params: { ticket },
+    params: {
+      ticket: { id: ticketId },
+    },
   } = useRoute<TicketDetailsScreenRouteProp>();
+  const { tickets } = useTickets((t) => t.id === ticketId);
+  const ticket = tickets[0]!;
 
   const department = useDepartment()!;
   const { execGlobalLoading } = useGlobalLoading();
@@ -176,6 +186,18 @@ const TicketDetailsScreen: React.FC = () => {
     nav.setOptions({
       headerRight: () => (
         <HeaderOverflowMenu
+          buttons={[
+            {
+              title: "Cutucar",
+              iconName: "alert-circle-outline",
+              onPress: () => {},
+              disabled:
+                moment().diff(
+                  moment(ticket.events[ticket.events.length - 1]!.timestamp),
+                  "days"
+                ) < 1,
+            },
+          ]}
           items={[
             {
               title: "Histórico",
@@ -185,7 +207,7 @@ const TicketDetailsScreen: React.FC = () => {
             },
             {
               title: "Estatísticas",
-              onPress: () => Alert.alert("Estatísticas"),
+              onPress: () => nav.navigate("ticketStats", { ticket }),
             },
             {
               title: "Ver solução",
@@ -200,7 +222,9 @@ const TicketDetailsScreen: React.FC = () => {
             },
             {
               title: "Editar OS",
-              onPress: () => Alert.alert("Editar OS"),
+              onPress: () => nav.navigate("ticketEdit", { ticket }),
+              disabled:
+                department.type !== "operator" || ticket.status === "closed",
             },
           ]}
         />
@@ -210,13 +234,14 @@ const TicketDetailsScreen: React.FC = () => {
 
   return (
     <>
-      <ScrollView>
+      <View>
         <View
           style={{
             ...styles.header,
-            backgroundColor: department.isMaintenance()
-              ? Database.getDepartment(ticket.username)!.color
-              : department.color,
+            backgroundColor:
+              department.isMaintenance() || department.isViewOnly()
+                ? Database.getDepartment(ticket.username)!.color
+                : department.color,
           }}
         >
           <Badge
@@ -233,16 +258,20 @@ const TicketDetailsScreen: React.FC = () => {
           <Headline style={styles.title}>{ticket.description}</Headline>
         </View>
 
-        <TicketDetailsButton
-          departmentType={department.type}
-          ticketStatus={ticket.status}
-          onPress={onDetailsBtnPress}
-        />
+        <ScrollView style={styles.content}>
+          {!department.isViewOnly() && (
+            <TicketDetailsButton
+              departmentType={department.type}
+              ticketStatus={ticket.status}
+              onPress={onDetailsBtnPress}
+            />
+          )}
 
-        <View style={styles.body}>
-          <TicketDetailsSummary data={ticket} />
-        </View>
-      </ScrollView>
+          <View style={styles.body}>
+            <TicketDetailsSummary data={ticket} />
+          </View>
+        </ScrollView>
+      </View>
 
       <View style={styles.statusContainer}>
         <View style={styles.currStage}>
@@ -391,23 +420,8 @@ const styles = StyleSheet.create({
   body: {
     padding: 20,
   },
-  interruptionsSection: {
-    flexDirection: "row",
-    marginTop: 16,
-  },
-  interruptionsItem: {
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#ccc",
-    paddingVertical: 12,
-  },
-  interruptionsText: {
-    color: "white",
-  },
-  interruptionsTextBold: {
-    color: "white",
-    fontWeight: "bold",
+  content: {
+    height: "100%",
   },
   statusContainer: {
     position: "absolute",
