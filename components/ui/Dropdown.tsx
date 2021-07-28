@@ -10,6 +10,7 @@ type DropdownProps = {
     label: string;
     value: string;
   }[];
+  value?: string;
   onValueChange: (newVal: string) => void;
   style?: ViewStyle;
 };
@@ -17,6 +18,7 @@ type DropdownProps = {
 const Dropdown: React.FC<DropdownProps> = ({
   label,
   items,
+  value,
   onValueChange,
   style,
 }) => {
@@ -28,12 +30,14 @@ const Dropdown: React.FC<DropdownProps> = ({
     onValueChange(newVal);
   };
 
+  console.log("DROP", value);
+
   return (
     <View style={style}>
       <MdDropdown
         label={label}
         mode="outlined"
-        value={val}
+        value={value ? value : val}
         setValue={(newVal) => handleValueChange(newVal as string)}
         list={items}
         visible={show}
