@@ -13,6 +13,7 @@ type HeaderButtonProps = {
   onPress: () => void;
   color?: ColorType;
   disabled?: boolean;
+  left?: boolean;
 };
 
 const HeaderButton: React.FC<HeaderButtonProps> = ({
@@ -21,6 +22,7 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({
   onPress,
   color,
   disabled,
+  left,
 }) => {
   return (
     <HeaderButtons
@@ -39,6 +41,7 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({
           {...props}
         />
       )}
+      left={left}
     >
       <Item title={title} iconName={icon} onPress={onPress} />
     </HeaderButtons>
