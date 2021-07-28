@@ -229,6 +229,44 @@ class FbFirestore {
     }
   }
 
+  async editTicketPriority(
+    ticketId: Ticket["id"],
+    data: { priority: Exclude<Ticket["priority"], undefined | null> }
+  ): Promise<{ error: { title: string; description: string } | null }> {
+    try {
+      const ticket = await firebase
+        .firestore()
+        .collection("tickets")
+        .doc(ticketId)
+        .get();
+
+      await ticket.ref.update({ priority: data.priority });
+
+      await this.pushTicketEvents(ticketId, {
+        type: "priorityChanged",
+        payload: { priority: data.priority },
+      });
+
+      await sendNotification({
+        to: await this.getPushTokens(ticket.data()!.username),
+        title: `OS #${ticketId}`,
+        body: `Prioridade da OS redefinida: ${translatePriority(
+          data.priority
+        )}`,
+      });
+
+      return { error: null };
+    } catch (e) {
+      return {
+        error: {
+          title: "Erro ao redefinir prioridade",
+          description:
+            "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+        },
+      };
+    }
+  }
+
   buildTicketEvent<T extends Ticket["events"][0]["type"]>(
     type: T,
     payload?: Ticket["events"][0]["payload"]

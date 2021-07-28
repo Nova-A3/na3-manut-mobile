@@ -1,11 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 import { Divider, Text } from "react-native-paper";
 import {
   DataLoading,
   Dropdown,
   HeaderButton,
+  MultipleHeaderButtons,
   ScreenContainer,
   TicketCard,
 } from "../../components";
@@ -35,12 +36,31 @@ const AllTicketsHomeScreen: React.FC = () => {
 
   React.useLayoutEffect(() => {
     nav.setOptions({
-      headerRight: () => (
+      headerLeft: () => (
         <HeaderButton
-          title="Atualizar"
-          icon="refresh-outline"
-          onPress={onRefresh}
-          disabled={loading}
+          title="Relatórios"
+          icon="document-text-outline"
+          onPress={() => Alert.alert("Relatórios")}
+          left
+          disabled
+        />
+      ),
+      headerRight: () => (
+        <MultipleHeaderButtons
+          items={[
+            {
+              title: "Filtros",
+              iconName: "filter-outline",
+              onPress: () => Alert.alert("Filtros"),
+              disabled: true,
+            },
+            {
+              title: "Atualizar",
+              iconName: "refresh-outline",
+              onPress: onRefresh,
+              disabled: loading,
+            },
+          ]}
         />
       ),
     });
