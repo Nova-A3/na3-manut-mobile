@@ -46,8 +46,10 @@ const AllTicketsHomeScreen: React.FC = () => {
         <HeaderButton
           title="Relatórios"
           icon="document-text-outline"
-          onPress={() => nav.navigate("reportsHome")}
+          // onPress={() => nav.navigate("reportsHome")}
+          onPress={() => {}}
           left
+          disabled
         />
       ),
       headerRight: () => (
