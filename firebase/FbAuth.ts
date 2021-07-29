@@ -35,22 +35,31 @@ class FbAuth {
 
       return { user, error: null };
     } catch (e) {
-      if (e.code === "auth/wrong-password") {
-        return {
-          error: {
-            title: "Senha inválida",
-            description: "Verifique se você digitou a senha corretamente.",
-          },
-          user: null,
-        };
-      } else {
-        return {
-          error: {
-            title: "Algo deu errado",
-            description: `Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações. Código do erro: ${e.code}`,
-          },
-          user: null,
-        };
+      switch (e.code) {
+        case "auth/wrong-password":
+          return {
+            error: {
+              title: "Senha inválida",
+              description: "Verifique se você digitou a senha corretamente.",
+            },
+            user: null,
+          };
+        case "auth/network-request-failed":
+          return {
+            error: {
+              title: "Sem conexão",
+              description: "Verifique se você está conectado à Internet.",
+            },
+            user: null,
+          };
+        default:
+          return {
+            error: {
+              title: "Algo deu errado",
+              description: `Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações. Código do erro: ${e.code}`,
+            },
+            user: null,
+          };
       }
     }
   }
