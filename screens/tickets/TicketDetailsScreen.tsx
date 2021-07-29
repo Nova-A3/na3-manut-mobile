@@ -17,7 +17,7 @@ import {
   TicketDetailsButton,
   TicketDetailsSummary,
 } from "../../components";
-import Database from "../../db";
+import Database, { Db } from "../../db";
 import { default as Firebase } from "../../firebase";
 import {
   useDepartment,
@@ -182,6 +182,56 @@ const TicketDetailsScreen: React.FC = () => {
     });
   };
 
+  const onPoke = () => {
+    execGlobalLoading(async () => {
+      const pokeTarget = (
+        ["pending", "solving"].includes(ticket.status)
+          ? Db.getDepartment("manutencao")
+          : Db.getDepartment(ticket.username)
+      )!;
+
+      const { error } = await Firebase.Firestore.pokeDepartment({
+        from: department,
+        to: pokeTarget,
+        ticket,
+      });
+
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
+      } else {
+        msg.show({
+          type: "success",
+          title: "Setor notificado",
+          text: `Você cutucou o setor "${pokeTarget.displayName}".`,
+        });
+      }
+    });
+  };
+
+  const checkPokeAvailability = (): boolean => {
+    if (
+      moment().diff(
+        moment(ticket.events[ticket.events.length - 1]!.timestamp),
+        "days"
+      ) < 1
+    ) {
+      return false;
+    }
+
+    switch (department.type) {
+      case "viewOnly":
+        return ticket.status !== "closed";
+      case "maintenance":
+        return ticket.status === "solved";
+      case "operator":
+        return ["pending", "solving"].includes(ticket.status);
+    }
+  };
+
   React.useLayoutEffect(() => {
     nav.setOptions({
       headerRight: () => (
@@ -190,12 +240,8 @@ const TicketDetailsScreen: React.FC = () => {
             {
               title: "Cutucar",
               iconName: "alert-circle-outline",
-              onPress: () => {},
-              disabled:
-                moment().diff(
-                  moment(ticket.events[ticket.events.length - 1]!.timestamp),
-                  "days"
-                ) < 1,
+              onPress: onPoke,
+              disabled: !checkPokeAvailability(),
             },
           ]}
           items={[

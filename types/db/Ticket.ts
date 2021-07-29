@@ -48,7 +48,8 @@ export type Ticket = {
       | "solutionRefused"
       | "ticketReopened"
       | "priorityChanged"
-      | "ticketEdited";
+      | "ticketEdited"
+      | "poke";
     timestamp: string;
     device: {
       name: string | null;
@@ -61,6 +62,7 @@ export type Ticket = {
       solution?: Ticket["solution"];
       refusalReason?: Ticket["refusalReason"];
       changes?: TicketEditedEventChanges;
+      poke?: { from: string; to: string };
     } | null;
   }[];
 };

@@ -395,6 +395,52 @@ class FbFirestore {
     }
   }
 
+  async pokeDepartment(config: {
+    from: Department;
+    to: Department;
+    ticket: Ticket;
+  }): Promise<{ error: { title: string; description: string } | null }> {
+    try {
+      await this.pushTicketEvents(config.ticket.id, {
+        type: "poke",
+        payload: {
+          poke: { from: config.from.username, to: config.to.username },
+        },
+      });
+
+      sendNotification({
+        to: await this.getPushTokens(config.to.username),
+        title: `[!] OS #${config.ticket.id}`,
+        body: `O ${config.from.isViewOnly() ? "usuário" : "setor"} "${
+          config.from.displayName
+        }" cutucou você – agilize sua parte da OS`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter(
+              (d) => d.isViewOnly() && d.username !== config.from.username
+            )
+            .map((d) => d.username)
+        ),
+        title: `OS #${config.ticket.id} (${config.ticket.dpt})`,
+        body: `O ${config.from.isViewOnly() ? "usuário" : "setor"} "${
+          config.from.displayName
+        }" cutucou "${config.to.displayName}"`,
+      });
+
+      return { error: null };
+    } catch (e) {
+      return {
+        error: {
+          title: `Erro ao notificar "${config.to.displayName}"`,
+          description:
+            "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+        },
+      };
+    }
+  }
+
   buildTicketEvent<T extends Ticket["events"][0]["type"]>(
     type: T,
     payload?: Ticket["events"][0]["payload"]
