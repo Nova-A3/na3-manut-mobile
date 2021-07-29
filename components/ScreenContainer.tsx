@@ -1,12 +1,16 @@
 import * as React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 
 type ScreenContainerProps = {
   children: React.ReactNode;
+  style?: ViewStyle;
 };
 
-const ScreenContainer: React.FC<ScreenContainerProps> = ({ children }) => {
-  return <View style={styles.container}>{children}</View>;
+const ScreenContainer: React.FC<ScreenContainerProps> = ({
+  children,
+  style,
+}) => {
+  return <View style={[styles.container, style]}>{children}</View>;
 };
 
 const styles = StyleSheet.create({

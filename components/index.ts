@@ -6,6 +6,7 @@ export { default as ScreenContainer } from "./ScreenContainer";
 export { default as TicketCard } from "./ticket/TicketCard";
 export { default as TicketDetailsButton } from "./ticket/TicketDetailsButton";
 export { default as TicketDetailsSummary } from "./ticket/TicketDetailsSummary";
+export { default as TicketStatsItem } from "./ticket/TicketStatsItem";
 export { default as TicketTimelineItem } from "./ticket/TicketTimelineItem";
 export { default as Button } from "./ui/Button";
 export { default as DataLoading } from "./ui/DataLoading";

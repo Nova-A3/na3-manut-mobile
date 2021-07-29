@@ -66,3 +66,24 @@ export type Ticket = {
     } | null;
   }[];
 };
+
+export type TicketStatsItem<T extends string | number> = {
+  data: T | string;
+  pos: number | string;
+  best: T | string;
+};
+
+export type TicketStats = {
+  // Tempo até 1a Confirmação
+  timeToFirstConfirmation: TicketStatsItem<string>;
+  // Tempo até 1a Solução
+  timeToFirstSolution: TicketStatsItem<string>;
+  // Tempo até 1a Resposta do Solicitante
+  timeToFirstAnswerToSolution: TicketStatsItem<string>;
+  // Tempo até Encerramento
+  timeToClosure: TicketStatsItem<string>;
+  // Qtd de Soluções Recusadas
+  solutionsRefused: TicketStatsItem<number>;
+  // Qtd de Cutucadas
+  pokes: TicketStatsItem<number>;
+};

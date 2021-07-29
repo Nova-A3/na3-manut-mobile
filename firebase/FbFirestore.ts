@@ -2,11 +2,12 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import moment from "moment";
 import uuid from "react-native-uuid";
 import Db from "../db";
 import store from "../store";
 import { setDataLoading, setTickets } from "../store/actions";
-import { Department, Ticket } from "../types";
+import { Department, Ticket, TicketStats, TicketStatsItem } from "../types";
 import {
   getTicketChanges,
   sendNotification,
@@ -439,6 +440,123 @@ class FbFirestore {
         },
       };
     }
+  }
+
+  async getTicketStats(ticket: Ticket): Promise<TicketStats> {
+    const calcTimeDiff = (a: string, b: string) => {
+      return moment(a).diff(b, "seconds");
+    };
+
+    const formatTimeDiff = (diff: number) => {
+      const days = diff >= 86400 ? Math.floor(diff / 86400) : 0;
+      diff -= days * 86400;
+      const hours = diff >= 3600 ? Math.floor((diff % 86400) / 3600) : 0;
+      diff -= hours * 3600;
+      const minutes = diff >= 60 ? Math.floor(diff / 60) : 0;
+      diff -= minutes * 60;
+      const seconds = diff;
+
+      return `${days > 0 ? `${days}d ` : ""}${days > 0 ? `${hours}h ` : ""}${
+        days > 0 || hours > 0 ? `${minutes}m ` : ""
+      }${seconds}s`;
+    };
+
+    const getAllTimeEventStats = async (
+      events: Ticket["events"][0]["type"] | Ticket["events"][0]["type"][]
+    ): Promise<Pick<TicketStatsItem<string>, "pos" | "best">> => {
+      if (typeof events === "string") {
+        events = [events];
+      }
+
+      const sortedTimeDiffs = (await this.collection("tickets").get()).docs
+        .map((d) => d.data().events as Ticket["events"])
+        .filter((e) => e.find((ee) => events.includes(ee.type)))
+        .map((e) =>
+          moment(e.find((ee) => events.includes(ee.type))!.timestamp).diff(
+            moment(e[0]!.timestamp),
+            "seconds"
+          )
+        )
+        .sort((a, b) => a - b);
+
+      return {
+        pos: ticket.events.find((e) => events.includes(e.type))
+          ? sortedTimeDiffs.findIndex(
+              (tD) =>
+                tD ===
+                calcTimeDiff(
+                  ticket.events.find((e) => events.includes(e.type))!.timestamp,
+                  ticket.events[0]!.timestamp
+                )
+            ) + 1
+          : "–––",
+        best: sortedTimeDiffs[0] ? formatTimeDiff(sortedTimeDiffs[0]) : "–––",
+      };
+    };
+
+    const creationTimestamp = ticket.events[0]!.timestamp;
+
+    const firstConfirmationEvent = ticket.events.find(
+      (ev) => ev.type === "ticketConfirmed"
+    );
+    const firstSolutionEvent = ticket.events.find(
+      (ev) => ev.type === "solutionTransmitted"
+    );
+    const firstAnswerEvent = ticket.events.find((ev) =>
+      ["solutionAccepted", "solutionRefused"].includes(ev.type)
+    );
+    const closureEvent = ticket.events.find((ev) => ev.type === "ticketClosed");
+
+    const stats: TicketStats = {
+      timeToFirstConfirmation: {
+        data: firstConfirmationEvent
+          ? formatTimeDiff(
+              calcTimeDiff(firstConfirmationEvent.timestamp, creationTimestamp)
+            )
+          : "–––",
+        ...(await getAllTimeEventStats("ticketConfirmed")),
+      },
+      timeToFirstSolution: {
+        data: firstSolutionEvent
+          ? formatTimeDiff(
+              calcTimeDiff(firstSolutionEvent.timestamp, creationTimestamp)
+            )
+          : "–––",
+        ...(await getAllTimeEventStats("solutionTransmitted")),
+      },
+      timeToFirstAnswerToSolution: {
+        data: firstAnswerEvent
+          ? formatTimeDiff(
+              calcTimeDiff(firstAnswerEvent.timestamp, creationTimestamp)
+            )
+          : "–––",
+        ...(await getAllTimeEventStats([
+          "solutionAccepted",
+          "solutionRefused",
+        ])),
+      },
+      timeToClosure: {
+        data: closureEvent
+          ? formatTimeDiff(
+              calcTimeDiff(closureEvent.timestamp, creationTimestamp)
+            )
+          : "–––",
+        ...(await getAllTimeEventStats("ticketClosed")),
+      },
+      solutionsRefused: {
+        data: ticket.events.filter((ev) => ev.type === "solutionRefused")
+          .length,
+        pos: "–––",
+        best: "–––",
+      },
+      pokes: {
+        data: ticket.events.filter((ev) => ev.type === "poke").length,
+        pos: "–––",
+        best: "–––",
+      },
+    };
+
+    return stats;
   }
 
   buildTicketEvent<T extends Ticket["events"][0]["type"]>(
