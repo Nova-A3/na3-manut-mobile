@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import * as MailComposer from "expo-mail-composer";
 import * as React from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { TextInput } from "react-native-paper";
@@ -11,6 +12,13 @@ const AccountHomeScreen: React.FC = () => {
   const nav = useNavigation();
   const { execGlobalLoading } = useGlobalLoading();
   const msg = useFlashMessage();
+
+  const onContact = () => {
+    MailComposer.composeAsync({
+      recipients: ["msantos@novaa3.com.br"],
+      subject: `[App: MANUTENÇÃO] `,
+    });
+  };
 
   const onSignOut = () => {
     Alert.alert("Sair?", "Tem certeza que deseja sair?", [
@@ -76,7 +84,15 @@ const AccountHomeScreen: React.FC = () => {
           />
         </View>
 
-        <Button label="Sair" color="danger" onPress={onSignOut} />
+        <View>
+          <Button
+            label="Falar com o Desenvolvedor"
+            color="primary"
+            onPress={onContact}
+            style={styles.devBtn}
+          />
+          <Button label="Sair" color="danger" onPress={onSignOut} />
+        </View>
       </View>
     </ScreenContainer>
   );
@@ -89,6 +105,9 @@ const styles = StyleSheet.create({
   },
   accountInfo: {
     marginBottom: 12,
+  },
+  devBtn: {
+    marginBottom: 15,
   },
 });
 
