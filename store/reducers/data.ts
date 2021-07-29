@@ -1,9 +1,19 @@
+import Db from "../../db";
 import { DataAction, DataState } from "../../types";
 
 const initialState: DataState = {
   tickets: [],
   loading: false,
   didFirstLoad: false,
+  filters: {
+    departments: Db.getDepartments()
+      .filter((d) => d.isOperator())
+      .map((d) => d.username),
+    problems: [],
+    teams: ["mecanica", "eletrica", "predial"],
+    maintenanceTypes: ["preventiva", "corretiva", "preditiva"],
+    causes: ["mecanica", "eletrica", "machineAdjustment"],
+  },
 };
 
 const dataReducer = (state = initialState, action: DataAction) => {
@@ -22,6 +32,23 @@ const dataReducer = (state = initialState, action: DataAction) => {
       return {
         ...state,
         didFirstLoad: true,
+      };
+    case "TOGGLE_FILTER":
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          [action.payload.filterKey]: state.filters[
+            action.payload.filterKey
+          ].includes(action.payload.filterValue)
+            ? state.filters[action.payload.filterKey].filter(
+                (f) => f !== action.payload.filterValue
+              )
+            : [
+                ...state.filters[action.payload.filterKey],
+                action.payload.filterValue,
+              ],
+        },
       };
     default:
       return state;

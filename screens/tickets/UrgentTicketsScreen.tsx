@@ -44,7 +44,7 @@ const UrgentTicketsScreen: React.FC = () => {
     <ScreenContainer>
       {tickets.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>Nenhuma OS para mostrar</Text>
+          <Text style={styles.emptyText}>Nenhuma OS urgente</Text>
         </View>
       ) : (
         <FlatList

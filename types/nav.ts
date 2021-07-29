@@ -1,5 +1,6 @@
 import { RouteProp } from "@react-navigation/native";
 import { Ticket } from "./db/Ticket";
+import { DataState } from "./state/Data";
 
 export type AccountStackParamList = {
   accountHome: undefined;
@@ -8,6 +9,10 @@ export type AccountStackParamList = {
 export type AllTicketsStackParamList = {
   allTicketsHome: undefined;
   filterTickets: undefined;
+  filterSelect: {
+    key: keyof DataState["filters"];
+    items: { label: string; value: string }[];
+  };
   ticketDetails: { ticket: Ticket };
   ticketTimeline: TicketDependantRoute;
   ticketStats: TicketDependantRoute;

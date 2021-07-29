@@ -2,6 +2,7 @@ import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { ActivityIndicator, Modal, Portal, Text } from "react-native-paper";
 import useStateSlice from "../../hooks/useStateSlice";
+import { systemColor } from "../../utils";
 
 const GlobalLoading: React.FC = () => {
   const { isGlobalLoading, globalLoadingText } = useStateSlice("ui");
@@ -10,7 +11,7 @@ const GlobalLoading: React.FC = () => {
     <Portal>
       <Modal visible={isGlobalLoading} contentContainerStyle={styles.modal}>
         <View style={styles.contentContainer}>
-          <ActivityIndicator />
+          <ActivityIndicator color={systemColor("primary")} />
 
           <View style={styles.textContainer}>
             <Text>{globalLoadingText}</Text>

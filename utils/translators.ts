@@ -35,6 +35,8 @@ export const translateEventType = (
       return "PRIORIDADE REDEFINIDA";
     case "ticketEdited":
       return "OS EDITADA";
+    case "poke":
+      return "SETOR CUTUCADO";
   }
 };
 

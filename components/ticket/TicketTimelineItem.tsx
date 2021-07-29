@@ -4,6 +4,7 @@ import { Alert, StyleSheet, View } from "react-native";
 import { Subheading, Text } from "react-native-paper";
 import { Divider } from "react-navigation-header-buttons";
 import { COLORS } from "../../constants";
+import Db from "../../db";
 import { Ticket } from "../../types";
 import {
   formatDeviceInfo,
@@ -65,6 +66,13 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
                 )} -> ${idToName(val.new)}`;
               })
               .join("\n"),
+          };
+        case "poke":
+          return {
+            title: "Cutucada",
+            message: `${Db.getDepartment(payload.poke!.from)!.displayName} -> ${
+              Db.getDepartment(payload.poke!.to)!.displayName
+            }`,
           };
         default:
           return;

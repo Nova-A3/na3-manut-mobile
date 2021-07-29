@@ -2,6 +2,8 @@ import {
   DataActionRegisterFirstLoad,
   DataActionSetLoading,
   DataActionSetTickets,
+  DataActionToggleFilter,
+  DataState,
 } from "../../types";
 
 export const setTickets = (
@@ -25,5 +27,15 @@ export const setDataLoading = (
 export const registerDataFirstLoad = (): DataActionRegisterFirstLoad => {
   return {
     type: "REGISTER_DATA_FIRST_LOAD",
+  };
+};
+
+export const toggleFilter = (
+  filterKey: keyof DataState["filters"],
+  filterValue: string
+): DataActionToggleFilter => {
+  return {
+    type: "TOGGLE_FILTER",
+    payload: { filterKey, filterValue },
   };
 };

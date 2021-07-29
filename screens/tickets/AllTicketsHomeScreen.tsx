@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { Divider, Text } from "react-native-paper";
+import { Button, Divider, Subheading } from "react-native-paper";
 import {
   DataLoading,
   Dropdown,
@@ -10,8 +10,9 @@ import {
   ScreenContainer,
   TicketCard,
 } from "../../components";
-import { useTickets } from "../../hooks";
+import { useFilters, useTickets } from "../../hooks";
 import { Ticket } from "../../types";
+import { systemColor } from "../../utils";
 
 const filterItems: { value: Ticket["status"] | "all"; label: string }[] = [
   { value: "all", label: "Todas" },
@@ -24,10 +25,15 @@ const filterItems: { value: Ticket["status"] | "all"; label: string }[] = [
 
 const AllTicketsHomeScreen: React.FC = () => {
   const [view, setView] = React.useState<Ticket["status"] | "all">("all");
+  const { filters } = useFilters();
   const { tickets, loadTickets, loading } = useTickets(
-    view === "all" ? undefined : view
+    (ticket) =>
+      filters.departments.includes(ticket.username) &&
+      filters.teams.includes(ticket.team) &&
+      filters.maintenanceTypes.includes(ticket.maintenanceType) &&
+      filters.causes.includes(ticket.cause) &&
+      (view === "all" || ticket.status === view)
   );
-
   const nav = useNavigation();
 
   const onRefresh = () => {
@@ -79,7 +85,17 @@ const AllTicketsHomeScreen: React.FC = () => {
 
       {tickets.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>Nenhuma OS para mostrar</Text>
+          <Subheading style={styles.emptyText}>
+            Nenhuma OS para mostrar
+          </Subheading>
+          <Button
+            mode="text"
+            style={styles.emptyBtn}
+            color={systemColor("primary")}
+            onPress={() => nav.navigate("filterTickets")}
+          >
+            Filtros, talvez?
+          </Button>
         </View>
       ) : (
         <FlatList
@@ -113,6 +129,9 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontStyle: "italic",
+  },
+  emptyBtn: {
+    marginTop: 30,
   },
   listSeparator: {
     height: 15,

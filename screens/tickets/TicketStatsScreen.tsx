@@ -1,8 +1,12 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as React from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { Divider } from "react-native-paper";
-import { ScreenContainer, TicketStatsItem } from "../../components";
+import {
+  HeaderButton,
+  ScreenContainer,
+  TicketStatsItem,
+} from "../../components";
 import Fb from "../../firebase";
 import { useGlobalLoading } from "../../hooks";
 import { TicketDependantRoute, TicketStats } from "../../types";
@@ -11,15 +15,33 @@ const TicketStatsScreen: React.FC = () => {
   const {
     params: { ticket },
   } = useRoute<TicketDependantRoute>();
-  const { execGlobalLoading } = useGlobalLoading();
+  const nav = useNavigation();
+  const { isGlobalLoading, execGlobalLoading } = useGlobalLoading();
   const [ticketStats, setTicketStats] = React.useState<TicketStats>();
 
-  React.useEffect(() => {
+  const loadStats = () => {
     execGlobalLoading(async () => {
       const stats = await Fb.Fs.getTicketStats(ticket);
       setTicketStats(stats);
     });
+  };
+
+  React.useEffect(() => {
+    loadStats();
   }, []);
+
+  React.useLayoutEffect(() => {
+    nav.setOptions({
+      headerRight: () => (
+        <HeaderButton
+          title="Atualizar"
+          icon="refresh-outline"
+          onPress={loadStats}
+          disabled={isGlobalLoading}
+        />
+      ),
+    });
+  });
 
   return (
     <ScreenContainer style={{ marginTop: 10 }}>
@@ -74,7 +96,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginVertical: 30,
-    backgroundColor: "#333",
+    backgroundColor: "#222",
   },
 });
 

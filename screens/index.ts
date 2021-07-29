@@ -1,5 +1,6 @@
 export { default as AccountHomeScreen } from "./account/AccountHomeScreen";
-export { default as FiltersScreen } from "./FiltersScreen";
+export { default as FiltersHomeScreen } from "./filters/FiltersHomeScreen";
+export { default as FiltersSelectScreen } from "./filters/FiltersSelectScreen";
 export { default as LoadingScreen } from "./LoadingScreen";
 export { default as NewTicketFormScreen } from "./new-ticket/NewTicketFormScreen";
 export { default as NewTicketHomeScreen } from "./new-ticket/NewTicketHomeScreen";

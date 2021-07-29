@@ -3,7 +3,8 @@ import * as React from "react";
 import { useDepartment } from "../../hooks";
 import {
   AllTicketsHomeScreen,
-  FiltersScreen,
+  FiltersHomeScreen,
+  FiltersSelectScreen,
   ReportsScreen,
   TicketDetailsScreen,
   TicketEditScreen,
@@ -29,7 +30,14 @@ const AllTicketsStack: React.FC = () => {
 
       <Stack.Screen
         name="filterTickets"
-        component={FiltersScreen}
+        component={FiltersHomeScreen}
+        options={{
+          headerTitle: "Filtrar OS",
+        }}
+      />
+      <Stack.Screen
+        name="filterSelect"
+        component={FiltersSelectScreen}
         options={{
           headerTitle: "Filtrar OS",
         }}
