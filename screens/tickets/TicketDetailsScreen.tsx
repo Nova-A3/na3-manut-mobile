@@ -128,28 +128,38 @@ const TicketDetailsScreen: React.FC = () => {
     });
   };
 
-  const onAcceptTicketSolution = async () => {
+  const onAcceptTicketSolution = () => {
     setShowFormModal(false);
 
-    await execGlobalLoading(async () => {
-      const { error } = await Firebase.Firestore.acceptTicketSolution(ticket);
+    Alert.alert("Encerrar OS?", "Esta ação não pode ser desfeita.", [
+      {
+        style: "default",
+        text: "Encerrar OS",
+        onPress: () =>
+          execGlobalLoading(async () => {
+            const { error } = await Firebase.Firestore.acceptTicketSolution(
+              ticket
+            );
 
-      if (error) {
-        msg.show({
-          type: "warning",
-          title: error.title,
-          text: error.description,
-        });
-      } else {
-        msg.show({
-          type: "success",
-          title: "OS encerrada",
-          text: `OS nº ${ticket.id} encerrada com sucesso!`,
-        });
+            if (error) {
+              msg.show({
+                type: "warning",
+                title: error.title,
+                text: error.description,
+              });
+            } else {
+              msg.show({
+                type: "success",
+                title: "OS encerrada",
+                text: `OS nº ${ticket.id} encerrada com sucesso!`,
+              });
 
-        nav.goBack();
-      }
-    });
+              nav.goBack();
+            }
+          }),
+      },
+      { style: "cancel", text: "Cancelar" },
+    ]);
   };
 
   const onRefuseTicketSolution = async (
