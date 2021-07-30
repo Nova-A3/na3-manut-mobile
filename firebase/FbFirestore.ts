@@ -385,7 +385,7 @@ class FbFirestore {
       sendNotification({
         to: await this.getPushTokens("manutencao"),
         title: `OS #${ticketData.id}`,
-        body: `ATENÇÃO: OS editada pelo solicitante (${ticketData.dpt})}`,
+        body: `ATENÇÃO: OS editada pelo solicitante (${ticketData.dpt})`,
       });
       sendNotification({
         to: await this.getPushTokens(
