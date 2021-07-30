@@ -54,11 +54,11 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             {data.events.find((e) => e.type === "solutionRefused") &&
-              ["pending", "solving", "solved"].includes(data.status) && (
+              ["pending", "solving"].includes(data.status) && (
                 <View style={{ marginRight: 6 }}>
                   <Ionicons
                     name="alert-circle"
-                    size={18}
+                    size={24}
                     color={systemColor("danger")}
                   />
                 </View>
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   badge: {
-    alignSelf: "flex-start",
+    alignSelf: "center",
     paddingHorizontal: 10,
     marginLeft: 12,
   },
