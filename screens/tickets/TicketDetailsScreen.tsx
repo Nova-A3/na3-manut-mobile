@@ -301,7 +301,14 @@ const TicketDetailsScreen: React.FC = () => {
           >
             {statusStyles.text}
           </Badge>
-          <Headline style={styles.title}>{ticket.description}</Headline>
+          <Headline
+            style={[
+              styles.title,
+              ticket.username === "off-set" ? { color: "#333" } : undefined,
+            ]}
+          >
+            {ticket.description}
+          </Headline>
         </View>
 
         <ScrollView style={styles.content}>

@@ -26,11 +26,13 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
   const getBadge = (): {
     text: string;
     color: string;
+    textColor: string;
   } => {
     if (Firebase.Firestore.checkTicketUrgency(data, department)) {
       return {
         text: department.isViewOnly() ? data.dpt : "AÇÃO NECESSÁRIA",
         color: COLORS.SYSTEM.RED,
+        textColor: "white",
       };
     } else {
       return {
@@ -39,6 +41,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
           department.isMaintenance() || department.isViewOnly()
             ? Database.getDepartment(data.username)!.color
             : department.color,
+        textColor: data.username === "off-set" ? "#333" : "white",
       };
     }
   };
@@ -55,6 +58,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
               style={{
                 ...styles.badge,
                 backgroundColor: badge.color,
+                color: badge.textColor,
               }}
             >
               {badge.text}
@@ -125,7 +129,6 @@ const styles = StyleSheet.create({
   badge: {
     alignSelf: "flex-start",
     paddingHorizontal: 10,
-    color: "white",
     marginLeft: 12,
   },
   descriptionText: {
