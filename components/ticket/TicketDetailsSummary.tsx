@@ -33,6 +33,7 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     team,
     maintenanceType,
     cause,
+    additionalInfo,
     interruptions,
     priority,
     refusalReason,
@@ -73,13 +74,15 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     });
   };
 
+  console.log(additionalInfo);
+
   return (
     <>
       <View style={styles.card}>
         {newPriority && (
           <>
             <View style={styles.summaryItem}>
-              <Caption style={styles.itemKey}>Prioridade: </Caption>
+              <Caption style={styles.itemKey}>Prioridade:</Caption>
               <View style={styles.priorityContainer}>
                 <View style={styles.priority}>
                   <View style={styles.priorityIcon}>
@@ -120,46 +123,60 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
         )}
 
         <View style={[styles.summaryItem, styles.bottomMargined]}>
-          <Caption style={styles.itemKey}>Setor: </Caption>
-          <Text>{dpt}</Text>
+          <Caption style={styles.itemKey}>Setor:</Caption>
+          <Text style={styles.itemValue}>{dpt}</Text>
         </View>
         <View style={styles.summaryItem}>
-          <Caption style={styles.itemKey}>Máquina: </Caption>
-          <Text>{machine}</Text>
+          <Caption style={styles.itemKey}>Máquina:</Caption>
+          <Text style={styles.itemValue}>{machine}</Text>
         </View>
 
         <Divider style={styles.divider} />
 
         <View style={styles.summaryItem}>
-          <Caption style={styles.itemKey}>Equipe responsável: </Caption>
-          <Text>{idToName(team)}</Text>
+          <Caption style={styles.itemKey}>Equipe responsável:</Caption>
+          <Text style={styles.itemValue}>{idToName(team)}</Text>
         </View>
         <View style={[styles.summaryItem, styles.middleItem]}>
-          <Caption style={styles.itemKey}>Tipo de manutenção: </Caption>
-          <Text>{idToName(maintenanceType)}</Text>
+          <Caption style={styles.itemKey}>Tipo de manutenção:</Caption>
+          <Text style={styles.itemValue}>{idToName(maintenanceType)}</Text>
         </View>
         <View style={styles.summaryItem}>
-          <Caption style={styles.itemKey}>Tipo de causa: </Caption>
-          <Text>{idToName(cause)}</Text>
+          <Caption style={styles.itemKey}>Tipo de causa:</Caption>
+          <Text style={styles.itemValue}>{idToName(cause)}</Text>
         </View>
 
         <Divider style={styles.divider} />
 
         <View style={[styles.summaryItem, styles.bottomMargined]}>
-          <Caption style={styles.itemKey}>Parou linha: </Caption>
-          <Text>{interruptions.line ? "SIM" : "NÃO"}</Text>
+          <Caption style={styles.itemKey}>Parou linha:</Caption>
+          <Text style={styles.itemValue}>
+            {interruptions.line ? "SIM" : "NÃO"}
+          </Text>
         </View>
         <View style={styles.summaryItem}>
-          <Caption style={styles.itemKey}>Parou máquina: </Caption>
-          <Text>{interruptions.equipment ? "SIM" : "NÃO"}</Text>
+          <Caption style={styles.itemKey}>Parou máquina:</Caption>
+          <Text style={styles.itemValue}>
+            {interruptions.equipment ? "SIM" : "NÃO"}
+          </Text>
         </View>
+
+        {additionalInfo ? (
+          <>
+            <Divider style={styles.divider} />
+            <View style={styles.summaryItem}>
+              <Caption style={styles.itemKey}>Mais informações:</Caption>
+              <Text style={styles.itemValue}>{additionalInfo}</Text>
+            </View>
+          </>
+        ) : undefined}
 
         {refusalReason && ["pending", "solving"].includes(status) && (
           <>
             <Divider style={styles.divider} />
             <View style={styles.summaryItem}>
-              <Caption style={styles.itemKey}>Motivo da reabertura: </Caption>
-              <Text>{refusalReason}</Text>
+              <Caption style={styles.itemKey}>Motivo da reabertura:</Caption>
+              <Text style={styles.itemValue}>{refusalReason}</Text>
             </View>
           </>
         )}
@@ -213,6 +230,9 @@ const styles = StyleSheet.create({
   itemKey: {
     width: "45%",
     fontWeight: "bold",
+  },
+  itemValue: {
+    width: "48%",
   },
   middleItem: {
     marginVertical: 4,
