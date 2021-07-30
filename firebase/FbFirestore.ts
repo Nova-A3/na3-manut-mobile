@@ -82,6 +82,7 @@ class FbFirestore {
       | "team"
       | "maintenanceType"
       | "cause"
+      | "additionalInfo"
     >
   ) {
     const event = this.buildTicketEvent("ticketCreated");

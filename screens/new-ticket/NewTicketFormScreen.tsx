@@ -25,6 +25,7 @@ const NewTicketFormScreen: React.FC = () => {
   const [team, setTeam] = React.useState("mecanica");
   const [maintenanceType, setMaintenanceType] = React.useState("preventiva");
   const [cause, setCause] = React.useState("mecanica");
+  const [additionalInfo, setAdditionalInfo] = React.useState("");
 
   const nav = useNavigation();
   const { execGlobalLoading } = useGlobalLoading();
@@ -57,7 +58,7 @@ const NewTicketFormScreen: React.FC = () => {
                 username: department!.username,
                 dpt,
                 machine,
-                description,
+                description: description.trim(),
                 interruptions: {
                   line: stoppedLine,
                   equipment: stoppedEquipment,
@@ -65,6 +66,7 @@ const NewTicketFormScreen: React.FC = () => {
                 team,
                 maintenanceType,
                 cause,
+                additionalInfo: additionalInfo.trim(),
               });
 
               nav.goBack();
@@ -177,6 +179,19 @@ const NewTicketFormScreen: React.FC = () => {
                 { value: "machineAdjustment", label: "Ajuste de máquina" },
               ]}
               onValueChange={(val) => setCause(val)}
+              style={styles.formField}
+            />
+          </View>
+
+          <View style={styles.formSection}>
+            <Header title="Informações adicionais" />
+            <TextInput
+              mode="outlined"
+              multiline
+              numberOfLines={3}
+              label="Informações adicionais"
+              value={additionalInfo}
+              onChangeText={(val) => setAdditionalInfo(val)}
               style={styles.formField}
             />
           </View>

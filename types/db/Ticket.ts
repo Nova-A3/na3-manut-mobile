@@ -24,6 +24,7 @@ export type Ticket = {
   team: string;
   maintenanceType: string;
   cause: string;
+  additionalInfo?: string;
 
   status: "pending" | "solving" | "solved" | "closed" | "refused";
   priority?: "low" | "medium" | "high" | null;
