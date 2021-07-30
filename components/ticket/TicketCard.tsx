@@ -8,7 +8,7 @@ import Database from "../../db";
 import Firebase from "../../firebase";
 import { useDepartment } from "../../hooks";
 import { Ticket } from "../../types";
-import { formatTimestamp } from "../../utils";
+import { formatTimestamp, systemColor } from "../../utils";
 import TicketCardStatus from "./TicketCardStatus";
 
 type TicketCardProps = {
@@ -53,7 +53,19 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
       <>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
+            {data.events.find((e) => e.type === "solutionRefused") &&
+              ["pending", "solving", "solved"].includes(data.status) && (
+                <View style={{ marginRight: 6 }}>
+                  <Ionicons
+                    name="alert-circle"
+                    size={18}
+                    color={systemColor("danger")}
+                  />
+                </View>
+              )}
+
             <Text style={styles.idText}>#{data.id}</Text>
+
             <Badge
               style={{
                 ...styles.badge,
@@ -67,6 +79,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
 
           <TicketCardStatus status={data.status} />
         </View>
+
         <Title style={styles.descriptionText}>{data.description}</Title>
 
         <View style={styles.infoContainer}>
