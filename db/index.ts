@@ -81,7 +81,7 @@ export class Db {
       type: "operator",
       username: "corte-solda-luva",
       displayName: "CORTE & SOLDA (LUVA)",
-      color: "#51E898",
+      color: "#F58F29",
       machines: 4,
     }),
     new Department({
