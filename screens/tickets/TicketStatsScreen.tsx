@@ -40,8 +40,8 @@ const TicketStatsScreen: React.FC = () => {
   });
 
   return (
-    <View>
-      <ScrollView style={{ paddingTop: 20 }}>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ paddingTop: 20, flexGrow: 1 }}>
         <TicketStatsItem
           label="TAC"
           labelDefinition="Tempo até 1ª Confirmação"
