@@ -74,8 +74,6 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     });
   };
 
-  console.log(additionalInfo);
-
   return (
     <>
       <View style={styles.card}>
