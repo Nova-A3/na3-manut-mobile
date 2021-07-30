@@ -91,8 +91,12 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
                 name="circle"
                 size={22}
                 color={
-                  type === "ticketClosed"
+                  type === "ticketCreated"
+                    ? COLORS.SYSTEM.BLUE
+                    : type === "ticketClosed"
                     ? COLORS.SYSTEM.GREEN
+                    : type === "solutionRefused"
+                    ? COLORS.SYSTEM.RED
                     : COLORS.SYSTEM.GRAY
                 }
               />
