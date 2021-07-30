@@ -489,7 +489,7 @@ class FbFirestore {
             "seconds"
           )
         )
-        .sort((a, b) => a - b);
+        .sort((a, b) => b - a);
 
       return {
         pos: ticket.events.find((e) => events.includes(e.type))
