@@ -1,4 +1,4 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import * as React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { Divider, Subheading, Switch } from "react-native-paper";
@@ -10,7 +10,33 @@ const FiltersSelectScreen: React.FC = () => {
   const {
     params: { key, items },
   } = useRoute<RouteProp<AllTicketsStackParamList, "filterSelect">>();
+  const nav = useNavigation();
   const { filters, toggleFilter } = useFilters();
+
+  React.useLayoutEffect(() => {
+    let headerTitle: string;
+    switch (key) {
+      case "departments":
+        headerTitle = "Setores";
+        break;
+      case "problems":
+        headerTitle = "Tipos de problema";
+        break;
+      case "teams":
+        headerTitle = "Equipes responsáveis";
+        break;
+      case "maintenanceTypes":
+        headerTitle = "Tipos de manutenção";
+        break;
+      case "causes":
+        headerTitle = "Tipos de causa";
+        break;
+    }
+
+    nav.setOptions({
+      headerTitle,
+    });
+  });
 
   return (
     <ScreenContainer>
