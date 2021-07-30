@@ -85,6 +85,15 @@ const AccountHomeScreen: React.FC = () => {
 
   React.useLayoutEffect(() => {
     nav.setOptions({
+      headerLeft: () => (
+        <HeaderButton
+          left
+          title="Ajuda"
+          icon="help-circle-outline"
+          onPress={() => {}}
+          disabled
+        />
+      ),
       headerRight: () => (
         <HeaderButton
           title="Sair"
