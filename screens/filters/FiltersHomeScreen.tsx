@@ -13,10 +13,12 @@ const FiltersHomeScreen: React.FC = () => {
         <FilterItem
           filterKey="departments"
           label="Setores"
-          items={Db.getDepartments().map((d) => ({
-            label: d.displayName,
-            value: d.username,
-          }))}
+          items={Db.getDepartments()
+            .filter((d) => d.isOperator())
+            .map((d) => ({
+              label: d.displayName,
+              value: d.username,
+            }))}
           selectedCount={filters.departments.length}
         />
       )}
