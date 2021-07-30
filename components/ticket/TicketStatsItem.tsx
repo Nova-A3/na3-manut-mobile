@@ -37,41 +37,44 @@ const TicketStatsItem: React.FC<TicketStatsItemProps> = ({
       </View>
 
       {!inline && (
-        <View style={styles.dataContainer}>
-          <Subheading style={styles.data}>
-            {stats ? stats.data : "–––"}
-          </Subheading>
-          <Subheading
-            style={[
-              { width: "21%" },
-              stats?.pos === 1 && {
-                color: COLORS.SYSTEM.GREEN,
-                fontWeight: "bold",
-              },
-            ]}
-          >
-            <Ionicons
-              name={stats?.pos === 1 ? "analytics" : "analytics-outline"}
-              size={16}
-            />{" "}
-            {stats ? stats.pos : "–––"}
-          </Subheading>
-          <Subheading
-            style={[
-              { width: "39%" },
-              stats?.pos === 1 && {
-                color: COLORS.SYSTEM.GREEN,
-                fontWeight: "bold",
-              },
-            ]}
-          >
-            <Ionicons
-              name={stats?.pos === 1 ? "trophy" : "trophy-outline"}
-              size={16}
-            />{" "}
-            {stats ? stats.best : "–––"}
-          </Subheading>
-        </View>
+        <>
+          {/* ALL TIME */}
+          <View style={styles.dataContainer}>
+            <Subheading style={styles.data}>
+              {stats ? stats.data : "–––"}
+            </Subheading>
+            <Subheading
+              style={[
+                { width: "21%" },
+                stats?.pos === 1 && {
+                  color: COLORS.SYSTEM.GREEN,
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              <Ionicons
+                name={stats?.pos === 1 ? "analytics" : "analytics-outline"}
+                size={16}
+              />{" "}
+              {stats ? stats.pos : "–––"}
+            </Subheading>
+            <Subheading
+              style={[
+                { width: "39%" },
+                stats?.pos === 1 && {
+                  color: COLORS.SYSTEM.GREEN,
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              <Ionicons
+                name={stats?.pos === 1 ? "trophy" : "trophy-outline"}
+                size={16}
+              />{" "}
+              {stats ? stats.best : "–––"}
+            </Subheading>
+          </View>
+        </>
       )}
     </View>
   );
