@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#ddd",
-    borderRadius: 10,
   },
   emptyText: {
     fontStyle: "italic",
