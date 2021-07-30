@@ -1,6 +1,7 @@
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
+import { systemColor } from "../../utils";
 
 type DataLoadingProps = {
   show: boolean;
@@ -11,7 +12,7 @@ const DataLoading: React.FC<DataLoadingProps> = ({ show }) => {
     return (
       <View style={styles.loadingContainer}>
         <View style={styles.loading}>
-          <ActivityIndicator />
+          <ActivityIndicator color={systemColor("primary")} />
           <Text style={styles.loadingText}>Carregando...</Text>
         </View>
       </View>

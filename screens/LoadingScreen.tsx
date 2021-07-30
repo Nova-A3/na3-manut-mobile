@@ -1,11 +1,12 @@
 import * as React from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
+import { systemColor } from "../utils";
 
 const LoadingScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <ActivityIndicator />
+      <ActivityIndicator color={systemColor("primary")} />
       <View style={styles.textContainer}>
         <Text>Carregando</Text>
       </View>
