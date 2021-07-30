@@ -10,12 +10,12 @@ const TicketTimelineScreen: React.FC = () => {
   } = useRoute<TicketDependantRoute>();
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={ticket.events}
         renderItem={({ item }) => <TicketTimelineItem data={item} />}
         ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
-        style={{ paddingHorizontal: 20 }}
+        style={{ paddingHorizontal: 20, flexGrow: 1 }}
         ListHeaderComponent={<View style={{ height: 30 }} />}
         ListFooterComponent={<View style={{ height: 20 }} />}
       />
