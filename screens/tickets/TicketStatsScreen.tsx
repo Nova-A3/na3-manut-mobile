@@ -1,12 +1,8 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as React from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Divider } from "react-native-paper";
-import {
-  HeaderButton,
-  ScreenContainer,
-  TicketStatsItem,
-} from "../../components";
+import { HeaderButton, TicketStatsItem } from "../../components";
 import Fb from "../../firebase";
 import { useGlobalLoading } from "../../hooks";
 import { TicketDependantRoute, TicketStats } from "../../types";
@@ -44,8 +40,8 @@ const TicketStatsScreen: React.FC = () => {
   });
 
   return (
-    <ScreenContainer style={{ marginTop: 10 }}>
-      <ScrollView>
+    <View>
+      <ScrollView style={{ paddingTop: 20 }}>
         <TicketStatsItem
           label="TAC"
           labelDefinition="Tempo até 1ª Confirmação"
@@ -68,6 +64,7 @@ const TicketStatsScreen: React.FC = () => {
           label="TAE"
           labelDefinition="Tempo até Encerramento"
           stats={ticketStats?.timeToClosure}
+          style={styles.statsItem}
         />
 
         <Divider style={styles.divider} />
@@ -84,18 +81,22 @@ const TicketStatsScreen: React.FC = () => {
           label="QCT"
           labelDefinition="Qtd. Cutucadas"
           stats={ticketStats?.pokes}
+          style={styles.statsItem}
         />
       </ScrollView>
-    </ScreenContainer>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   statsItem: {
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   divider: {
-    marginVertical: 30,
+    marginTop: 10,
+    marginBottom: 30,
+    marginHorizontal: 20,
     backgroundColor: "#222",
   },
 });
