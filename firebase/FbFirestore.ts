@@ -45,8 +45,20 @@ class FbFirestore {
       }
     });
 
-    urgentTickets.sort((a, b) => +b.id - +a.id);
-    nonUrgentTickets.sort((a, b) => +b.id - +a.id);
+    const ticketStatuses: Record<Ticket["status"], number> = {
+      pending: 1,
+      solving: 2,
+      solved: 3,
+      closed: 4,
+      refused: 5,
+    };
+
+    urgentTickets
+      .sort((a, b) => +b.id - +a.id)
+      .sort((a, b) => ticketStatuses[a.status] - ticketStatuses[b.status]);
+    nonUrgentTickets
+      .sort((a, b) => +b.id - +a.id)
+      .sort((a, b) => ticketStatuses[a.status] - ticketStatuses[b.status]);
 
     Notifications.setBadgeCountAsync(urgentTickets.length);
 
