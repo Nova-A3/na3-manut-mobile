@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
 import { Badge, Text, Title } from "react-native-paper";
 import { COLORS } from "../../constants";
 import Database from "../../db";
@@ -13,9 +13,10 @@ import TicketCardStatus from "./TicketCardStatus";
 
 type TicketCardProps = {
   data: Ticket;
+  style?: ViewStyle;
 };
 
-const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
+const TicketCard: React.FC<TicketCardProps> = ({ data, style }) => {
   const department = useDepartment()!;
   const nav = useNavigation();
 
@@ -49,7 +50,11 @@ const TicketCard: React.FC<TicketCardProps> = ({ data }) => {
   const badge = getBadge();
 
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.4} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.card, style]}
+      activeOpacity={0.4}
+      onPress={onPress}
+    >
       <>
         <View style={styles.header}>
           <View style={styles.headerLeft}>

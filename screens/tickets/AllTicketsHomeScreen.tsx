@@ -7,7 +7,6 @@ import {
   Dropdown,
   HeaderButton,
   MultipleHeaderButtons,
-  ScreenContainer,
   TicketCard,
 } from "../../components";
 import { useFilters, useTickets } from "../../hooks";
@@ -77,12 +76,15 @@ const AllTicketsHomeScreen: React.FC = () => {
   }, []);
 
   return (
-    <ScreenContainer>
-      <Dropdown
-        label="Mostrar"
-        items={filterItems}
-        onValueChange={(val) => setView(val as Ticket["status"] | "all")}
-      />
+    <View style={styles.container}>
+      <View style={styles.dropdownContainer}>
+        <Dropdown
+          label="Mostrar"
+          items={filterItems}
+          onValueChange={(val) => setView(val as Ticket["status"] | "all")}
+        />
+      </View>
+
       <Divider style={styles.divider} />
 
       {tickets.length === 0 ? (
@@ -102,25 +104,38 @@ const AllTicketsHomeScreen: React.FC = () => {
       ) : (
         <FlatList
           data={tickets}
-          renderItem={({ item }) => <TicketCard data={item} />}
+          renderItem={({ item }) => (
+            <TicketCard data={item} style={styles.ticketCard} />
+          )}
           ItemSeparatorComponent={() => (
             <View style={styles.listSeparator}></View>
           )}
+          ListHeaderComponent={() => <View style={styles.listHeaderFooter} />}
+          ListFooterComponent={() => <View style={styles.listHeaderFooter} />}
           refreshing={loading}
           onRefresh={onRefresh}
         />
       )}
 
       <DataLoading show={loading} />
-    </ScreenContainer>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginTop: 20,
+    flex: 1,
+  },
+  dropdownContainer: {
+    marginHorizontal: 20,
+  },
   divider: {
     marginTop: 20,
-    marginBottom: 20,
-    backgroundColor: "#333",
+    backgroundColor: "#ccc",
+  },
+  ticketCard: {
+    marginHorizontal: 20,
   },
   empty: {
     flexGrow: 1,
@@ -137,6 +152,9 @@ const styles = StyleSheet.create({
   },
   listSeparator: {
     height: 15,
+  },
+  listHeaderFooter: {
+    height: 20,
   },
 });
 
