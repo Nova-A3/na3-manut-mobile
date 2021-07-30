@@ -2,7 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as MailComposer from "expo-mail-composer";
 import * as Notifications from "expo-notifications";
 import * as React from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Switch, Text, TextInput } from "react-native-paper";
 import {
   Button,
@@ -122,7 +122,7 @@ const AccountHomeScreen: React.FC = () => {
   return (
     <ScreenContainer>
       <View style={styles.container}>
-        <View>
+        <ScrollView>
           <TextInput
             mode="outlined"
             label="Logado como"
@@ -150,7 +150,7 @@ const AccountHomeScreen: React.FC = () => {
               </View>
             </View>
           )}
-        </View>
+        </ScrollView>
 
         <View>
           <Button
