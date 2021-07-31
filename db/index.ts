@@ -140,6 +140,25 @@ export class Db {
       displayName: "GLADSTONE J DOS SANTOS JR",
       color: "#333",
     }),
+    new Department({
+      type: "viewOnly",
+      username: "mvieira",
+      displayName: "MARCUS M VIEIRA",
+      color: "#333",
+    }),
+    new Department({
+      type: "viewOnly",
+      username: "agomes",
+      displayName: "ARTHUR GOMES",
+      color: "#333",
+    }),
+
+    new Department({
+      type: "viewOnly",
+      username: "visitante",
+      displayName: "VISITANTE",
+      color: "#333",
+    }),
   ];
 
   static getDepartments() {
