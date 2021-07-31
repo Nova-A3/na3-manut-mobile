@@ -26,7 +26,11 @@ import {
   useTickets,
 } from "../../hooks";
 import { AllTicketsStackParamList, Ticket } from "../../types";
-import { getTicketStatusStyles, translatePriority } from "../../utils";
+import {
+  ColorType,
+  getTicketStatusStyles,
+  translatePriority,
+} from "../../utils";
 
 type TicketDetailsScreenRouteProp = RouteProp<
   AllTicketsStackParamList,
@@ -47,9 +51,13 @@ const TicketDetailsScreen: React.FC = () => {
   const { execGlobalLoading } = useGlobalLoading();
   const msg = useFlashMessage();
 
-  const [showFormModal, setShowFormModal] = React.useState(false);
+  const [formModalId, setFormModalId] = React.useState<Exclude<
+    Parameters<React.ComponentProps<typeof TicketDetailsButton>["onPress"]>[0],
+    "accept_solution"
+  > | null>(null);
   const [ticketPriority, setTicketPriority] =
     React.useState<Exclude<Ticket["priority"], undefined | null>>("low");
+  const [ticketSolutionStatus, setTicketSolutionStatus] = React.useState("");
   const [ticketSolution, setTicketSolution] = React.useState("");
   const [refusalReason, setRefusalReason] = React.useState("");
 
@@ -64,7 +72,8 @@ const TicketDetailsScreen: React.FC = () => {
       case "confirm_ticket":
       case "send_solution":
       case "decline_solution":
-        setShowFormModal(true);
+      case "share_status":
+        setFormModalId(btnId);
         break;
       case "accept_solution":
         onAcceptTicketSolution();
@@ -74,7 +83,7 @@ const TicketDetailsScreen: React.FC = () => {
   const onConfirmTicket = async (
     priority: Exclude<Ticket["priority"], undefined | null>
   ) => {
-    setShowFormModal(false);
+    setFormModalId(null);
 
     await execGlobalLoading(async () => {
       const { error } = await Firebase.Firestore.confirmTicket(ticket, {
@@ -87,6 +96,7 @@ const TicketDetailsScreen: React.FC = () => {
           title: error.title,
           text: error.description,
         });
+        setFormModalId("confirm_ticket");
       } else {
         msg.show({
           type: "success",
@@ -99,8 +109,36 @@ const TicketDetailsScreen: React.FC = () => {
     });
   };
 
+  const onShareTicketSolutionStatus = async (solutionStatus: string) => {
+    setFormModalId(null);
+
+    await execGlobalLoading(async () => {
+      const { error } = await Firebase.Firestore.shareTicketSolutionStatus(
+        ticket,
+        { solutionStatus }
+      );
+
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
+        setFormModalId("share_status");
+      } else {
+        msg.show({
+          type: "success",
+          title: "Status compartilhado",
+          text: `OS nº ${ticket.id} – Status da solução compartilhado com sucesso!`,
+        });
+
+        nav.goBack();
+      }
+    });
+  };
+
   const onTransmitTicketSolution = async (solution: string) => {
-    setShowFormModal(false);
+    setFormModalId(null);
 
     await execGlobalLoading(async () => {
       const { error } = await Firebase.Firestore.transmitTicketSolution(
@@ -114,8 +152,7 @@ const TicketDetailsScreen: React.FC = () => {
           title: error.title,
           text: error.description,
         });
-
-        setShowFormModal(true);
+        setFormModalId("send_solution");
       } else {
         msg.show({
           type: "success",
@@ -129,7 +166,7 @@ const TicketDetailsScreen: React.FC = () => {
   };
 
   const onAcceptTicketSolution = () => {
-    setShowFormModal(false);
+    setFormModalId(null);
 
     Alert.alert("Encerrar OS?", "Esta ação não pode ser desfeita.", [
       {
@@ -165,7 +202,7 @@ const TicketDetailsScreen: React.FC = () => {
   const onRefuseTicketSolution = async (
     reason: Exclude<Ticket["refusalReason"], undefined | null>
   ) => {
-    setShowFormModal(false);
+    setFormModalId(null);
 
     await execGlobalLoading(async () => {
       const { error } = await Firebase.Firestore.refuseTicketSolution(ticket, {
@@ -178,8 +215,7 @@ const TicketDetailsScreen: React.FC = () => {
           title: error.title,
           text: error.description,
         });
-
-        setShowFormModal(true);
+        setFormModalId("decline_solution");
       } else {
         msg.show({
           type: "success",
@@ -288,6 +324,96 @@ const TicketDetailsScreen: React.FC = () => {
     });
   });
 
+  let formModal: {
+    title: string;
+    children: React.ReactNode;
+    footerBtn: { label: string; onPress: () => void; color?: ColorType };
+  } | null = null;
+  switch (formModalId) {
+    case "confirm_ticket":
+      formModal = {
+        title: "Definir prioridade",
+        children: (
+          <Dropdown
+            label="Definir prioridade"
+            items={[
+              { value: "low", label: translatePriority("low") },
+              { value: "medium", label: translatePriority("medium") },
+              { value: "high", label: translatePriority("high") },
+            ]}
+            onValueChange={(val) =>
+              setTicketPriority(
+                val as Exclude<Ticket["priority"], undefined | null>
+              )
+            }
+          />
+        ),
+        footerBtn: {
+          label: "Confirmar OS",
+          onPress: () => onConfirmTicket(ticketPriority),
+        },
+      };
+      break;
+    case "share_status":
+      formModal = {
+        title: "Informar status",
+        children: (
+          <TextInput
+            mode="outlined"
+            multiline
+            numberOfLines={3}
+            label="Status da solução"
+            value={ticketSolutionStatus}
+            onChangeText={(val) => setTicketSolutionStatus(val)}
+          />
+        ),
+        footerBtn: {
+          label: "Enviar status",
+          onPress: () => onShareTicketSolutionStatus(ticketSolutionStatus),
+        },
+      };
+      break;
+    case "send_solution":
+      formModal = {
+        title: "Descrição da solução",
+        children: (
+          <TextInput
+            mode="outlined"
+            multiline
+            numberOfLines={3}
+            label="Descrição da solução"
+            value={ticketSolution}
+            onChangeText={(val) => setTicketSolution(val)}
+          />
+        ),
+        footerBtn: {
+          label: "Transmitir Solução",
+          onPress: () => onTransmitTicketSolution(ticketSolution),
+        },
+      };
+      break;
+    case "decline_solution":
+      formModal = {
+        title: "Motivo da recusa",
+        children: (
+          <TextInput
+            mode="outlined"
+            multiline
+            numberOfLines={3}
+            label="Motivo"
+            value={refusalReason}
+            onChangeText={(val) => setRefusalReason(val)}
+          />
+        ),
+        footerBtn: {
+          label: "Recusar Solução",
+          onPress: () => onRefuseTicketSolution(refusalReason),
+          color: "danger",
+        },
+      };
+      break;
+  }
+
   return (
     <>
       <View>
@@ -383,84 +509,18 @@ const TicketDetailsScreen: React.FC = () => {
         </View>
       </View>
 
-      {Firebase.Firestore.checkTicketUrgency(ticket, department) ? (
-        ticket.status === "pending" ? (
-          <FormModal
-            title="Definir prioridade"
-            show={showFormModal}
-            onDismiss={() => setShowFormModal(false)}
-            footer={
-              <Button
-                label="Confirmar OS"
-                onPress={() => onConfirmTicket(ticketPriority)}
-                icon="arrow-right"
-                iconRight
-              />
-            }
-          >
-            <Dropdown
-              label="Definir prioridade"
-              items={[
-                { value: "low", label: translatePriority("low") },
-                { value: "medium", label: translatePriority("medium") },
-                { value: "high", label: translatePriority("high") },
-              ]}
-              onValueChange={(val) =>
-                setTicketPriority(
-                  val as Exclude<Ticket["priority"], undefined | null>
-                )
-              }
-            />
-          </FormModal>
-        ) : ticket.status === "solving" ? (
-          <FormModal
-            title="Descrição da solução"
-            show={showFormModal}
-            onDismiss={() => setShowFormModal(false)}
-            footer={
-              <Button
-                label="Transmitir Solução"
-                onPress={() => onTransmitTicketSolution(ticketSolution)}
-                icon="arrow-right"
-                iconRight
-              />
-            }
-          >
-            <TextInput
-              mode="outlined"
-              multiline
-              numberOfLines={3}
-              label="Descrição da solução"
-              value={ticketSolution}
-              onChangeText={(val) => setTicketSolution(val)}
-            />
-          </FormModal>
-        ) : ticket.status === "solved" ? (
-          <FormModal
-            title="Motivo da recusa"
-            show={showFormModal}
-            onDismiss={() => setShowFormModal(false)}
-            footer={
-              <Button
-                label="Recusar Solução"
-                onPress={() => onRefuseTicketSolution(refusalReason)}
-                icon="arrow-right"
-                color="danger"
-                iconRight
-              />
-            }
-          >
-            <TextInput
-              mode="outlined"
-              multiline
-              numberOfLines={3}
-              label="Motivo"
-              value={refusalReason}
-              onChangeText={(val) => setRefusalReason(val)}
-            />
-          </FormModal>
-        ) : null
-      ) : null}
+      {formModal && (
+        <FormModal
+          title={formModal.title}
+          show={!!formModalId}
+          onDismiss={() => setFormModalId(null)}
+          footer={
+            <Button {...formModal.footerBtn} icon="arrow-right" iconRight />
+          }
+        >
+          {formModal.children}
+        </FormModal>
+      )}
     </>
   );
 };

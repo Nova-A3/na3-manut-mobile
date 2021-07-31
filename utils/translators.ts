@@ -21,6 +21,8 @@ export const translateEventType = (
       return "OS CRIADA";
     case "ticketConfirmed":
       return "OS CONFIRMADA";
+    case "solutionStepAdded":
+      return "PROGRESSO";
     case "solutionTransmitted":
       return "SOLUÇÃO TRANSMITIDA";
     case "solutionAccepted":

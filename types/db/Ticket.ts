@@ -30,6 +30,7 @@ export type Ticket = {
   priority?: "low" | "medium" | "high" | null;
 
   solution?: string | null;
+  solutionSteps?: string[];
   refusalReason?: string | null;
 
   createdAt: string;
@@ -43,6 +44,7 @@ export type Ticket = {
     type:
       | "ticketCreated"
       | "ticketConfirmed"
+      | "solutionStepAdded"
       | "solutionTransmitted"
       | "solutionAccepted"
       | "ticketClosed"
@@ -64,6 +66,14 @@ export type Ticket = {
       refusalReason?: Ticket["refusalReason"];
       changes?: TicketEditedEventChanges;
       poke?: { from: string; to: string };
+      solutionStep?: {
+        type:
+          | "step"
+          | "solutionTransmitted"
+          | "solutionAccepted"
+          | "solutionRefused";
+        content?: string;
+      };
     } | null;
   }[];
 };

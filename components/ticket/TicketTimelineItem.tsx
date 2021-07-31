@@ -34,6 +34,11 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
                 : "Nova prioridade",
             message: translatePriority(payload.priority),
           };
+        case "solutionStep":
+          return {
+            title: "Progresso da solução",
+            message: payload.solutionStep?.content,
+          };
         case "solution":
           return {
             title: "Solução transmitida",

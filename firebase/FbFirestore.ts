@@ -91,6 +91,7 @@ class FbFirestore {
       id,
       createdAt: event.timestamp,
       status: "pending",
+      solutionSteps: [],
       events: [event],
     };
 
@@ -159,6 +160,64 @@ class FbFirestore {
     }
   }
 
+  async shareTicketSolutionStatus(
+    ticket: Ticket,
+    data: { solutionStatus: string }
+  ): Promise<{ error: { title: string; description: string } | null }> {
+    if (!data.solutionStatus.trim()) {
+      return {
+        error: {
+          title: "Campo requerido",
+          description: 'O campo "Status da solução" é obrigatório.',
+        },
+      };
+    }
+
+    try {
+      await firebase
+        .firestore()
+        .collection("tickets")
+        .doc(ticket.id)
+        .update({
+          solutionSteps: firebase.firestore.FieldValue.arrayUnion(
+            data.solutionStatus
+          ),
+        });
+
+      await this.pushTicketEvents(ticket.id, {
+        type: "solutionStepAdded",
+        payload: {
+          solutionStep: { type: "step", content: data.solutionStatus },
+        },
+      });
+
+      sendNotification({
+        to: await this.getPushTokens(ticket.username),
+        title: `OS #${ticket.id}`,
+        body: `Novo progresso na solução da OS: "${data.solutionStatus}"`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticket.id} (${ticket.dpt})`,
+        body: `Novo progresso na solução da OS: "${data.solutionStatus}"`,
+      });
+
+      return { error: null };
+    } catch (e) {
+      return {
+        error: {
+          title: "Erro ao compartilhar status",
+          description:
+            "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+        },
+      };
+    }
+  }
+
   async transmitTicketSolution(
     ticket: Ticket,
     data: { solution: Exclude<Ticket["solution"], undefined | null> }
@@ -172,17 +231,27 @@ class FbFirestore {
       };
     }
 
+    data.solution = data.solution.trim();
+
     try {
       await firebase.firestore().collection("tickets").doc(ticket.id).update({
         solvedAt: timestamp(),
         status: "solved",
-        solution: data.solution,
+        solution: data.solution.trim(),
       });
 
-      await this.pushTicketEvents(ticket.id, {
-        type: "solutionTransmitted",
-        payload: { solution: data.solution },
-      });
+      await this.pushTicketEvents(ticket.id, [
+        { type: "solutionTransmitted", payload: { solution: data.solution } },
+        {
+          type: "solutionStepAdded",
+          payload: {
+            solutionStep: {
+              type: "solutionTransmitted",
+              content: data.solution,
+            },
+          },
+        },
+      ]);
 
       sendNotification({
         to: await this.getPushTokens(ticket.username),
@@ -223,6 +292,10 @@ class FbFirestore {
       await this.pushTicketEvents(ticket.id, [
         { type: "solutionAccepted" },
         { type: "ticketClosed" },
+        {
+          type: "solutionStepAdded",
+          payload: { solutionStep: { type: "solutionAccepted" } },
+        },
       ]);
 
       sendNotification({
@@ -254,8 +327,19 @@ class FbFirestore {
 
   async refuseTicketSolution(
     ticket: Ticket,
-    data: { refusalReason: Exclude<Ticket["refusalReason"], undefined | null> }
+    data: { refusalReason: string }
   ): Promise<{ error: { title: string; description: string } | null }> {
+    if (!data.refusalReason.trim()) {
+      return {
+        error: {
+          title: "Campo requerido",
+          description: 'O campo "Motivo da recusa" é obrigatório.',
+        },
+      };
+    }
+
+    data.refusalReason = data.refusalReason.trim();
+
     try {
       await firebase.firestore().collection("tickets").doc(ticket.id).update({
         status: "pending",
@@ -273,6 +357,10 @@ class FbFirestore {
           payload: { refusalReason: data.refusalReason },
         },
         { type: "ticketReopened" },
+        {
+          type: "solutionStepAdded",
+          payload: { solutionStep: { type: "solutionRefused" } },
+        },
       ]);
 
       sendNotification({

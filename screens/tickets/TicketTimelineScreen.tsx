@@ -12,7 +12,11 @@ const TicketTimelineScreen: React.FC = () => {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={ticket.events}
+        data={ticket.events.filter(
+          (e) =>
+            e.type !== "solutionStepAdded" ||
+            e.payload?.solutionStep?.type === "step"
+        )}
         renderItem={({ item }) => <TicketTimelineItem data={item} />}
         ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
         style={{ paddingHorizontal: 20, flexGrow: 1 }}

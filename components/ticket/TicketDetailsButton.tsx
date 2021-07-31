@@ -12,6 +12,7 @@ type TicketDetailsButtonProps = {
       | "send_solution"
       | "accept_solution"
       | "decline_solution"
+      | "share_status"
   ) => void;
 };
 
@@ -34,7 +35,13 @@ const TicketDetailsButton: React.FC<TicketDetailsButtonProps> = ({
       ];
     } else if (ticketStatus === "solving") {
       buttons = [
-        { id: "send_solution", label: "Transmitir Solução", icon: "check" },
+        {
+          id: "share_status",
+          label: "Informar Status",
+          icon: "check",
+          color: "primary",
+        },
+        { id: "send_solution", label: "Transmitir Solução", icon: "check-all" },
       ];
     }
   } else if (ticketStatus === "solved") {
@@ -58,7 +65,7 @@ const TicketDetailsButton: React.FC<TicketDetailsButtonProps> = ({
           icon={btn.icon}
           color={btn.color ? btn.color : "success"}
           onPress={() => onPress(btn.id)}
-          style={styles.button}
+          style={{ ...styles.button, marginTop: idx > 0 ? 12 : 20 }}
         />
       ))}
     </>
