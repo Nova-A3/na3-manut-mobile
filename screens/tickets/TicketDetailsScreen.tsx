@@ -282,14 +282,18 @@ const TicketDetailsScreen: React.FC = () => {
     nav.setOptions({
       headerRight: () => (
         <HeaderOverflowMenu
-          buttons={[
-            {
-              title: "Cutucar",
-              iconName: "alert-circle-outline",
-              onPress: onPoke,
-              disabled: !checkPokeAvailability(),
-            },
-          ]}
+          buttons={
+            ticket.status === "closed"
+              ? undefined
+              : [
+                  {
+                    title: "Cutucar",
+                    iconName: "alert-circle-outline",
+                    onPress: onPoke,
+                    disabled: !checkPokeAvailability(),
+                  },
+                ]
+          }
           items={[
             {
               title: "Histórico",
