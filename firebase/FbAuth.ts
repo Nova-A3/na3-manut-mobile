@@ -4,6 +4,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import { Alert, Platform } from "react-native";
 import Database from "../db";
+import { fsCollectionId } from "../utils";
 
 type AuthCredentials = { username: string; password: string };
 
@@ -101,7 +102,7 @@ class FbAuth {
 
       const docsWithToken = await firebase
         .firestore()
-        .collection("push-tokens")
+        .collection(fsCollectionId("push-tokens"))
         .where("tokens", "array-contains", token)
         .get();
 
@@ -115,7 +116,7 @@ class FbAuth {
 
       const doc = await firebase
         .firestore()
-        .collection("push-tokens")
+        .collection(fsCollectionId("push-tokens"))
         .doc(username)
         .get();
 

@@ -9,6 +9,7 @@ import store from "../store";
 import { setDataLoading, setTickets } from "../store/actions";
 import { Department, Ticket, TicketStats, TicketStatsItem } from "../types";
 import {
+  fsCollectionId,
   getTicketChanges,
   sendNotification,
   timestamp,
@@ -16,7 +17,7 @@ import {
 } from "../utils";
 class FbFirestore {
   collection(collectionId: "tickets" | "push-tokens") {
-    return firebase.firestore().collection(collectionId);
+    return firebase.firestore().collection(fsCollectionId(collectionId));
   }
 
   async getTicketById(ticketId: Ticket["id"]): Promise<Ticket> {
@@ -25,7 +26,7 @@ class FbFirestore {
   }
 
   async getTickets(department: Department): Promise<Ticket[]> {
-    const collection = firebase.firestore().collection("tickets");
+    const collection = this.collection("tickets");
 
     const query =
       department.isMaintenance() || department.isViewOnly()
@@ -66,7 +67,7 @@ class FbFirestore {
   }
 
   async getNextTicketId() {
-    const query = await firebase.firestore().collection("tickets").get();
+    const query = await this.collection("tickets").get();
     return (query.size + 1).toString().padStart(4, "0");
   }
 
@@ -95,7 +96,7 @@ class FbFirestore {
       events: [event],
     };
 
-    await firebase.firestore().collection("tickets").doc(id).set(ticket);
+    await this.collection("tickets").doc(id).set(ticket);
 
     sendNotification({
       to: await this.getPushTokens("manutencao"),
@@ -118,7 +119,7 @@ class FbFirestore {
     data: { priority: Exclude<Ticket["priority"], undefined> }
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      await firebase.firestore().collection("tickets").doc(ticket.id).update({
+      await this.collection("tickets").doc(ticket.id).update({
         acceptedAt: timestamp(),
         status: "solving",
         priority: data.priority,
@@ -174,9 +175,7 @@ class FbFirestore {
     }
 
     try {
-      await firebase
-        .firestore()
-        .collection("tickets")
+      await this.collection("tickets")
         .doc(ticket.id)
         .update({
           solutionSteps: firebase.firestore.FieldValue.arrayUnion(
@@ -234,7 +233,7 @@ class FbFirestore {
     data.solution = data.solution.trim();
 
     try {
-      await firebase.firestore().collection("tickets").doc(ticket.id).update({
+      await this.collection("tickets").doc(ticket.id).update({
         solvedAt: timestamp(),
         status: "solved",
         solution: data.solution.trim(),
@@ -284,7 +283,7 @@ class FbFirestore {
     ticket: Ticket
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      await firebase.firestore().collection("tickets").doc(ticket.id).update({
+      await this.collection("tickets").doc(ticket.id).update({
         closedAt: timestamp(),
         status: "closed",
       });
@@ -341,7 +340,7 @@ class FbFirestore {
     data.refusalReason = data.refusalReason.trim();
 
     try {
-      await firebase.firestore().collection("tickets").doc(ticket.id).update({
+      await this.collection("tickets").doc(ticket.id).update({
         status: "pending",
         refusalReason: data.refusalReason,
         acceptedAt: null,
@@ -395,11 +394,7 @@ class FbFirestore {
     data: { priority: Exclude<Ticket["priority"], undefined | null> }
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      const ticket = await firebase
-        .firestore()
-        .collection("tickets")
-        .doc(ticketId)
-        .get();
+      const ticket = await this.collection("tickets").doc(ticketId).get();
 
       await ticket.ref.update({ priority: data.priority });
 
@@ -454,9 +449,7 @@ class FbFirestore {
     >
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      const ticketDoc = await firebase
-        .firestore()
-        .collection("tickets")
+      const ticketDoc = await this.collection("tickets")
         .doc(editedTicket.id)
         .get();
       const ticketData = ticketDoc.data() as Ticket;
@@ -740,9 +733,7 @@ class FbFirestore {
     }
 
     const docs = await Promise.all(
-      usernames.map((uname) =>
-        firebase.firestore().collection("push-tokens").doc(uname).get()
-      )
+      usernames.map((uname) => this.collection("push-tokens").doc(uname).get())
     );
 
     let pushTokens: string[] = [];
@@ -756,7 +747,7 @@ class FbFirestore {
   }
 
   registerRefreshTicketsListener(department: Department) {
-    const collection = firebase.firestore().collection("tickets");
+    const collection = this.collection("tickets");
 
     const query = department.isMaintenance()
       ? collection
