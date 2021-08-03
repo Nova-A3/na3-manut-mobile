@@ -15,7 +15,7 @@ import useStateSlice from "./useStateSlice";
 const useTickets = (
   filterStatus?: Ticket["status"] | ((ticket: Ticket) => boolean)
 ) => {
-  const { tickets, dptIssues, loading, didFirstLoad } = useStateSlice("data");
+  const { tickets, loading, didFirstLoad } = useStateSlice("data");
   const department = useDepartment()!;
   const dispatch = useDispatch();
   const msg = useFlashMessage();

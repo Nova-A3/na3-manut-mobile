@@ -28,7 +28,7 @@ export default {
       icon: "./assets/app-icon.png",
       package: "com.novaa3.manut",
       googleServicesFile: "./google-services.json",
-      versionCode: 6,
+      versionCode: 7,
     },
     web: {
       favicon: "./assets/favicon.png",
