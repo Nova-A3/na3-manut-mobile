@@ -1,5 +1,6 @@
 import {
   DataActionRegisterFirstLoad,
+  DataActionSetDptIssues,
   DataActionSetLoading,
   DataActionSetTickets,
   DataActionToggleFilter,
@@ -12,6 +13,15 @@ export const setTickets = (
   return {
     type: "SET_TICKETS",
     payload: { tickets },
+  };
+};
+
+export const setDptIssues = (
+  issues: DataActionSetDptIssues["payload"]["issues"]
+): DataActionSetDptIssues => {
+  return {
+    type: "SET_DPT_ISSUES",
+    payload: { issues },
   };
 };
 

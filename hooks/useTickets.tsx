@@ -4,6 +4,7 @@ import Firebase from "../firebase";
 import {
   registerDataFirstLoad,
   setDataLoading,
+  setDptIssues,
   setTickets,
 } from "../store/actions";
 import { Ticket } from "../types";
@@ -14,7 +15,7 @@ import useStateSlice from "./useStateSlice";
 const useTickets = (
   filterStatus?: Ticket["status"] | ((ticket: Ticket) => boolean)
 ) => {
-  const { tickets, loading, didFirstLoad } = useStateSlice("data");
+  const { tickets, dptIssues, loading, didFirstLoad } = useStateSlice("data");
   const department = useDepartment()!;
   const dispatch = useDispatch();
   const msg = useFlashMessage();
@@ -34,6 +35,11 @@ const useTickets = (
     }
 
     if (!didFirstLoad) {
+      const dptDoc = await Firebase.Firestore.collection("departments")
+        .doc(department.username)
+        .get();
+      const dptIssues = dptDoc.data()?.manutIssues || [];
+      dispatch(setDptIssues(dptIssues));
       dispatch(registerDataFirstLoad());
     }
     dispatch(setDataLoading(false));

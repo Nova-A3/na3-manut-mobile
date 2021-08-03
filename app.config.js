@@ -35,7 +35,7 @@ export default {
     },
 
     extra: {
-      environment: "development",
+      environment: "production",
     },
   },
 };

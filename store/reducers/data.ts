@@ -3,6 +3,7 @@ import { DataAction, DataState } from "../../types";
 
 const initialState: DataState = {
   tickets: [],
+  dptIssues: [],
   loading: false,
   didFirstLoad: false,
   filters: {
@@ -22,6 +23,11 @@ const dataReducer = (state = initialState, action: DataAction) => {
       return {
         ...state,
         tickets: action.payload.tickets ? action.payload.tickets : [],
+      };
+    case "SET_DPT_ISSUES":
+      return {
+        ...state,
+        dptIssues: action.payload.issues ? action.payload.issues : [],
       };
     case "SET_DATA_LOADING":
       return {

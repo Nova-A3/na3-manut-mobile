@@ -16,17 +16,23 @@ import {
   translatePriority,
 } from "../utils";
 class FbFirestore {
-  collection(collectionId: "tickets" | "push-tokens") {
+  collection(collectionId: "tickets" | "push-tokens" | "departments") {
     return firebase.firestore().collection(fsCollectionId(collectionId));
   }
 
   async getTicketById(ticketId: Ticket["id"]): Promise<Ticket> {
-    const doc = await this.collection("tickets").doc(ticketId).get();
+    const doc = await firebase
+      .firestore()
+      .collection(fsCollectionId("tickets"))
+      .doc(ticketId)
+      .get();
     return doc.data() as Ticket;
   }
 
   async getTickets(department: Department): Promise<Ticket[]> {
-    const collection = this.collection("tickets");
+    const collection = firebase
+      .firestore()
+      .collection(fsCollectionId("tickets"));
 
     const query =
       department.isMaintenance() || department.isViewOnly()
@@ -66,10 +72,13 @@ class FbFirestore {
     return [...urgentTickets, ...nonUrgentTickets];
   }
 
-  async getNextTicketId() {
-    const query = await this.collection("tickets").get();
+  getNextTicketId = async () => {
+    const query = await firebase
+      .firestore()
+      .collection(fsCollectionId("tickets"))
+      .get();
     return (query.size + 1).toString().padStart(4, "0");
-  }
+  };
 
   async postTicket(
     id: Ticket["id"],
@@ -96,7 +105,11 @@ class FbFirestore {
       events: [event],
     };
 
-    await this.collection("tickets").doc(id).set(ticket);
+    await firebase
+      .firestore()
+      .collection(fsCollectionId("tickets"))
+      .doc(id)
+      .set(ticket);
 
     sendNotification({
       to: await this.getPushTokens("manutencao"),
@@ -119,11 +132,15 @@ class FbFirestore {
     data: { priority: Exclude<Ticket["priority"], undefined> }
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      await this.collection("tickets").doc(ticket.id).update({
-        acceptedAt: timestamp(),
-        status: "solving",
-        priority: data.priority,
-      });
+      await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
+        .doc(ticket.id)
+        .update({
+          acceptedAt: timestamp(),
+          status: "solving",
+          priority: data.priority,
+        });
 
       await this.pushTicketEvents(ticket.id, {
         type: "ticketConfirmed",
@@ -175,7 +192,9 @@ class FbFirestore {
     }
 
     try {
-      await this.collection("tickets")
+      await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
         .doc(ticket.id)
         .update({
           solutionSteps: firebase.firestore.FieldValue.arrayUnion(
@@ -233,11 +252,15 @@ class FbFirestore {
     data.solution = data.solution.trim();
 
     try {
-      await this.collection("tickets").doc(ticket.id).update({
-        solvedAt: timestamp(),
-        status: "solved",
-        solution: data.solution.trim(),
-      });
+      await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
+        .doc(ticket.id)
+        .update({
+          solvedAt: timestamp(),
+          status: "solved",
+          solution: data.solution.trim(),
+        });
 
       await this.pushTicketEvents(ticket.id, [
         { type: "solutionTransmitted", payload: { solution: data.solution } },
@@ -283,10 +306,14 @@ class FbFirestore {
     ticket: Ticket
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      await this.collection("tickets").doc(ticket.id).update({
-        closedAt: timestamp(),
-        status: "closed",
-      });
+      await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
+        .doc(ticket.id)
+        .update({
+          closedAt: timestamp(),
+          status: "closed",
+        });
 
       await this.pushTicketEvents(ticket.id, [
         { type: "solutionAccepted" },
@@ -340,15 +367,19 @@ class FbFirestore {
     data.refusalReason = data.refusalReason.trim();
 
     try {
-      await this.collection("tickets").doc(ticket.id).update({
-        status: "pending",
-        refusalReason: data.refusalReason,
-        acceptedAt: null,
-        solvedAt: null,
-        reopenedAt: timestamp(),
-        priority: null,
-        solution: null,
-      });
+      await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
+        .doc(ticket.id)
+        .update({
+          status: "pending",
+          refusalReason: data.refusalReason,
+          acceptedAt: null,
+          solvedAt: null,
+          reopenedAt: timestamp(),
+          priority: null,
+          solution: null,
+        });
 
       await this.pushTicketEvents(ticket.id, [
         {
@@ -394,7 +425,11 @@ class FbFirestore {
     data: { priority: Exclude<Ticket["priority"], undefined | null> }
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      const ticket = await this.collection("tickets").doc(ticketId).get();
+      const ticket = await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
+        .doc(ticketId)
+        .get();
 
       await ticket.ref.update({ priority: data.priority });
 
@@ -449,7 +484,9 @@ class FbFirestore {
     >
   ): Promise<{ error: { title: string; description: string } | null }> {
     try {
-      const ticketDoc = await this.collection("tickets")
+      const ticketDoc = await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
         .doc(editedTicket.id)
         .get();
       const ticketData = ticketDoc.data() as Ticket;
@@ -562,7 +599,9 @@ class FbFirestore {
         events = [events];
       }
 
-      const sortedTimeDiffs = (await this.collection("tickets").get()).docs
+      const sortedTimeDiffs = (
+        await firebase.firestore().collection(fsCollectionId("tickets")).get()
+      ).docs
         .map((d) => d.data().events as Ticket["events"])
         .filter((e) => e.find((ee) => events.includes(ee.type)))
         .map((e) =>
@@ -690,10 +729,16 @@ class FbFirestore {
       this.buildTicketEvent(e.type, e.payload)
     );
     const registeredEvents = (
-      await this.collection("tickets").doc(ticketId).get()
+      await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
+        .doc(ticketId)
+        .get()
     ).data()!.events as Ticket["events"] | undefined | null;
 
-    await this.collection("tickets")
+    await firebase
+      .firestore()
+      .collection(fsCollectionId("tickets"))
       .doc(ticketId)
       .update({
         events: registeredEvents
@@ -733,7 +778,13 @@ class FbFirestore {
     }
 
     const docs = await Promise.all(
-      usernames.map((uname) => this.collection("push-tokens").doc(uname).get())
+      usernames.map((uname) =>
+        firebase
+          .firestore()
+          .collection(fsCollectionId("tickets"))
+          .doc(uname)
+          .get()
+      )
     );
 
     let pushTokens: string[] = [];
@@ -747,7 +798,9 @@ class FbFirestore {
   }
 
   registerRefreshTicketsListener(department: Department) {
-    const collection = this.collection("tickets");
+    const collection = firebase
+      .firestore()
+      .collection(fsCollectionId("tickets"));
 
     const query = department.isMaintenance()
       ? collection

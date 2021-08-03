@@ -13,9 +13,11 @@ import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
 import Firebase from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
+import useStateSlice from "../../hooks/useStateSlice";
 
 const NewTicketFormScreen: React.FC = () => {
   const department = useDepartment()!;
+  const { dptIssues } = useStateSlice("data");
 
   const [dpt, setDpt] = React.useState(department!.displayName);
   const [machine, setMachine] = React.useState("1");
@@ -32,7 +34,7 @@ const NewTicketFormScreen: React.FC = () => {
   const msg = useFlashMessage();
 
   const onSubmit = async () => {
-    if (description.trim().length === 0) {
+    if (description === "[placeholder]" || description.trim().length === 0) {
       msg.show({
         type: "warning",
         title: "Campo requerido",
@@ -123,29 +125,46 @@ const NewTicketFormScreen: React.FC = () => {
 
           <View style={styles.formSection}>
             <Header title="Descrição do problema" />
-            <TextInput
-              mode="outlined"
-              multiline
-              numberOfLines={3}
-              label="Descrição do problema"
-              value={description}
-              onChangeText={(val) => setDescription(val)}
+            <Dropdown
+              label="Problema"
+              items={[
+                { label: "Escolher...", value: "[placeholder]" },
+                ...[...dptIssues].sort().map((issue) => ({
+                  label: issue.toUpperCase(),
+                  value: issue,
+                })),
+                { label: "Outro...", value: "" },
+              ]}
+              onValueChange={(val) => setDescription(val)}
               style={styles.formField}
             />
+            {(!description || !dptIssues.includes(description)) &&
+              description !== "[placeholder]" && (
+                <TextInput
+                  mode="outlined"
+                  multiline
+                  numberOfLines={3}
+                  label="Descrição do problema"
+                  value={description}
+                  onChangeText={(val) => setDescription(val)}
+                  style={styles.formField}
+                />
+              )}
           </View>
 
           <View style={styles.formSection}>
             <Header title="Interrupções" />
             <View style={{ ...styles.formField, ...styles.switchField }}>
-              <Text>Parou linha?</Text>
-              <Switch value={stoppedLine} onValueChange={setStoppedLine} />
-            </View>
-            <View style={{ ...styles.formField, ...styles.switchField }}>
               <Text>Parou máquina?</Text>
               <Switch
-                value={stoppedEquipment}
+                value={stoppedLine ? true : stoppedEquipment}
                 onValueChange={setStoppedEquipment}
+                disabled={stoppedLine}
               />
+            </View>
+            <View style={{ ...styles.formField, ...styles.switchField }}>
+              <Text>Parou linha?</Text>
+              <Switch value={stoppedLine} onValueChange={setStoppedLine} />
             </View>
           </View>
 
