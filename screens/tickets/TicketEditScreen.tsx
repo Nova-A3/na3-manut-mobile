@@ -13,10 +13,13 @@ import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
 import Fb from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
+import useStateSlice from "../../hooks/useStateSlice";
 import { TicketDependantRoute } from "../../types";
 
 const TicketEditScreen: React.FC = () => {
   const department = useDepartment()!;
+  const { dptIssues } = useStateSlice("data");
+
   const { execGlobalLoading } = useGlobalLoading();
   const {
     params: { ticket },
@@ -72,7 +75,7 @@ const TicketEditScreen: React.FC = () => {
                 description,
                 interruptions: {
                   line: stoppedLine,
-                  equipment: stoppedEquipment,
+                  equipment: stoppedLine || stoppedEquipment,
                 },
                 team,
                 maintenanceType,
@@ -137,29 +140,46 @@ const TicketEditScreen: React.FC = () => {
 
           <View style={styles.formSection}>
             <Header title="Descrição do problema" />
-            <TextInput
-              mode="outlined"
-              multiline
-              numberOfLines={3}
-              label="Descrição do problema"
+            <Dropdown
+              label="Problema"
+              items={[
+                ...[...dptIssues].sort().map((issue) => ({
+                  label: issue.toUpperCase(),
+                  value: issue,
+                })),
+                { label: "Outro...", value: "" },
+              ]}
               value={description}
-              onChangeText={(val) => setDescription(val)}
+              onValueChange={(val) => setDescription(val)}
               style={styles.formField}
             />
+            {(!description || !dptIssues.includes(description)) &&
+              description !== "[placeholder]" && (
+                <TextInput
+                  mode="outlined"
+                  multiline
+                  numberOfLines={3}
+                  label="Descrição do problema"
+                  value={description}
+                  onChangeText={(val) => setDescription(val)}
+                  style={styles.formField}
+                />
+              )}
           </View>
 
           <View style={styles.formSection}>
             <Header title="Interrupções" />
             <View style={{ ...styles.formField, ...styles.switchField }}>
-              <Text>Parou linha?</Text>
-              <Switch value={stoppedLine} onValueChange={setStoppedLine} />
-            </View>
-            <View style={{ ...styles.formField, ...styles.switchField }}>
               <Text>Parou máquina?</Text>
               <Switch
-                value={stoppedEquipment}
+                value={stoppedLine ? true : stoppedEquipment}
                 onValueChange={setStoppedEquipment}
+                disabled={stoppedLine}
               />
+            </View>
+            <View style={{ ...styles.formField, ...styles.switchField }}>
+              <Text>Parou linha?</Text>
+              <Switch value={stoppedLine} onValueChange={setStoppedLine} />
             </View>
           </View>
 
