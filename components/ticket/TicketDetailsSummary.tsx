@@ -146,16 +146,16 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
 
         <Divider style={styles.divider} />
 
-        <View style={[styles.summaryItem, styles.bottomMargined]}>
-          <Caption style={styles.itemKey}>Parou linha:</Caption>
-          <Text style={styles.itemValue}>
-            {interruptions.line ? "SIM" : "NÃO"}
-          </Text>
-        </View>
         <View style={styles.summaryItem}>
           <Caption style={styles.itemKey}>Parou máquina:</Caption>
           <Text style={styles.itemValue}>
             {interruptions.equipment ? "SIM" : "NÃO"}
+          </Text>
+        </View>
+        <View style={[styles.summaryItem, styles.bottomMargined]}>
+          <Caption style={styles.itemKey}>Parou linha:</Caption>
+          <Text style={styles.itemValue}>
+            {interruptions.line ? "SIM" : "NÃO"}
           </Text>
         </View>
 
