@@ -21,7 +21,7 @@ const NewTicketFormScreen: React.FC = () => {
 
   const [dpt, setDpt] = React.useState(department!.displayName);
   const [machine, setMachine] = React.useState("1");
-  const [description, setDescription] = React.useState("");
+  const [description, setDescription] = React.useState("[placeholder]");
   const [stoppedLine, setStoppedLine] = React.useState(false);
   const [stoppedEquipment, setStoppedEquipment] = React.useState(false);
   const [team, setTeam] = React.useState("mecanica");
@@ -63,7 +63,7 @@ const NewTicketFormScreen: React.FC = () => {
                 description: description.trim(),
                 interruptions: {
                   line: stoppedLine,
-                  equipment: stoppedEquipment,
+                  equipment: stoppedLine || stoppedEquipment,
                 },
                 team,
                 maintenanceType,
