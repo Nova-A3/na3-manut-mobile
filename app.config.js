@@ -28,14 +28,14 @@ export default {
       icon: "./assets/app-icon.png",
       package: "com.novaa3.manut",
       googleServicesFile: "./google-services.json",
-      versionCode: 7,
+      versionCode: 8, // Subir para 9
     },
     web: {
       favicon: "./assets/favicon.png",
     },
 
     extra: {
-      environment: "production",
+      environment: "production", // or "production"
     },
   },
 };
