@@ -4,7 +4,7 @@ export default {
     description:
       "App para criação, gerenciamento e acompanhamento de OS (Ordens de Serviço) pelo setor de Manutenção da matriz Nova A3–Areal.",
     slug: "na3-manut",
-    version: "1.0.0",
+    version: "2.0.3",
     orientation: "portrait",
     icon: "./assets/app-icon.png",
     splash: {
@@ -28,12 +28,11 @@ export default {
       icon: "./assets/app-icon.png",
       package: "com.novaa3.manut",
       googleServicesFile: "./google-services.json",
-      versionCode: 8, // Subir para 9
+      versionCode: 9, // Subir para 10
     },
     web: {
       favicon: "./assets/favicon.png",
     },
-
     extra: {
       environment: "production", // or "production"
     },
