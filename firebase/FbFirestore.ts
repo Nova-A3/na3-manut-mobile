@@ -781,7 +781,7 @@ class FbFirestore {
       usernames.map((uname) =>
         firebase
           .firestore()
-          .collection(fsCollectionId("tickets"))
+          .collection(fsCollectionId("push-tokens"))
           .doc(uname)
           .get()
       )
