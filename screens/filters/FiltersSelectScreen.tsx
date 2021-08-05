@@ -41,11 +41,13 @@ const FiltersSelectScreen: React.FC = () => {
   return (
     <ScreenContainer>
       <FlatList
-        data={items.map((i) => ({ ...i, key: i.value }))}
+        data={items
+          .map((i) => ({ ...i, key: i.value }))
+          .sort((a, b) => a.label.localeCompare(b.label))}
         renderItem={({ item }) => (
           <>
             <View style={styles.itemContainer}>
-              <Subheading>{item.label}</Subheading>
+              <Subheading>{item.label.toUpperCase()}</Subheading>
               <Switch
                 value={filters[key].includes(item.value)}
                 onValueChange={() => toggleFilter(key, item.value)}
