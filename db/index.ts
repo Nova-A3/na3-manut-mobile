@@ -126,6 +126,13 @@ export class Db {
       color: "#F5B700",
       machines: 2,
     }),
+    new Department({
+      type: "operator",
+      username: "kit-manual",
+      displayName: "KIT MANUAL",
+      color: "#333333",
+      machines: 2,
+    }),
 
     new Department({
       type: "maintenance",
