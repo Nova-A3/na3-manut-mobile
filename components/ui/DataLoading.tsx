@@ -25,7 +25,6 @@ const DataLoading: React.FC<DataLoadingProps> = ({ show }) => {
 const styles = StyleSheet.create({
   loadingContainer: {
     position: "absolute",
-    left: 20,
     bottom: 30,
     alignItems: "center",
     justifyContent: "center",
