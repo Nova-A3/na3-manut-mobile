@@ -35,7 +35,7 @@ const AccountHomeScreen: React.FC = () => {
         text: "Sim, sair",
         onPress: async () => {
           await execGlobalLoading(async () => {
-            await Firebase.Auth.signOut();
+            await Firebase.Auth.signOut(user!);
           });
 
           msg.show({

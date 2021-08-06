@@ -4,6 +4,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import { Alert, Platform } from "react-native";
 import Database from "../db";
+import { Department } from "../types";
 import { fsCollectionId } from "../utils";
 
 type AuthCredentials = { username: string; password: string };
@@ -65,7 +66,25 @@ class FbAuth {
     }
   }
 
-  async signOut(): Promise<void> {
+  async signOut(department: Department): Promise<void> {
+    const userPushTokens = (
+      await firebase
+        .firestore()
+        .collection("push-tokens")
+        .doc(department.username)
+        .get()
+    ).data()?.tokens as string[] | null;
+    if (userPushTokens) {
+      const currPushToken = (await Notifications.getExpoPushTokenAsync()).data;
+      await firebase
+        .firestore()
+        .collection("push-tokens")
+        .doc(department.username)
+        .update({
+          tokens: userPushTokens.filter((pT) => pT !== currPushToken),
+        });
+    }
+
     await firebase.auth().signOut();
   }
 
