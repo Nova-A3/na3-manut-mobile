@@ -34,9 +34,12 @@ export const setDataLoading = (
   };
 };
 
-export const registerDataFirstLoad = (): DataActionRegisterFirstLoad => {
+export const registerDataFirstLoad = (
+  value = true
+): DataActionRegisterFirstLoad => {
   return {
     type: "REGISTER_DATA_FIRST_LOAD",
+    payload: { value },
   };
 };
 

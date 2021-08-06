@@ -37,7 +37,7 @@ const dataReducer = (state = initialState, action: DataAction) => {
     case "REGISTER_DATA_FIRST_LOAD":
       return {
         ...state,
-        didFirstLoad: true,
+        didFirstLoad: action.payload.value,
       };
     case "TOGGLE_FILTER":
       return {

@@ -4,6 +4,7 @@ import * as Notifications from "expo-notifications";
 import * as React from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Switch, Text, TextInput } from "react-native-paper";
+import { useDispatch } from "react-redux";
 import {
   Button,
   Header,
@@ -12,6 +13,7 @@ import {
 } from "../../components";
 import Firebase, { Fb } from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
+import { registerDataFirstLoad } from "../../store/actions";
 
 const AccountHomeScreen: React.FC = () => {
   const user = useDepartment();
@@ -20,6 +22,7 @@ const AccountHomeScreen: React.FC = () => {
   const msg = useFlashMessage();
   const [notificationsStatus, setNotificationsStatus] =
     React.useState<boolean>();
+  const dispatch = useDispatch();
 
   const onContact = () => {
     MailComposer.composeAsync({
@@ -37,6 +40,8 @@ const AccountHomeScreen: React.FC = () => {
           await execGlobalLoading(async () => {
             await Firebase.Auth.signOut(user!);
           });
+
+          dispatch(registerDataFirstLoad(false));
 
           msg.show({
             type: "warning",

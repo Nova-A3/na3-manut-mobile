@@ -31,6 +31,7 @@ export type DataActionSetLoading = {
 
 export type DataActionRegisterFirstLoad = {
   type: "REGISTER_DATA_FIRST_LOAD";
+  payload: { value: boolean };
 };
 
 export type DataActionToggleFilter = {
