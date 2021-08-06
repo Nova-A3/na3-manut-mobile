@@ -26,9 +26,18 @@ export default {
         backgroundColor: "#EEEEEE",
       },
       icon: "./assets/app-icon.png",
+      splash: {
+        resizeMode: "native",
+        mdpi: "./assets/splash-android.png",
+        hdpi: "./assets/splash-android@1.5x.png",
+        xhdpi: "./assets/splash-android@2x.png",
+        xxhdpi: "./assets/splash-android@3x.png",
+        xxxhdpi: "./assets/splash-android@4x.png",
+        backgroundColor: "#ffffff",
+      },
       package: "com.novaa3.manut",
       googleServicesFile: "./google-services.json",
-      versionCode: 10, // Subir para 11
+      versionCode: 11, // Subir para 12
     },
     web: {
       favicon: "./assets/favicon.png",
