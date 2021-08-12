@@ -44,7 +44,7 @@ export default {
       favicon: "./assets/favicon.png",
     },
     extra: {
-      environment: "development", // "development/production"
+      environment: "production", // "development/production"
     },
   },
 };

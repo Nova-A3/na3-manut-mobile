@@ -7,11 +7,17 @@ import moment from "moment";
 import "moment/locale/pt-br";
 import * as React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Badge, Subheading, Text, Title } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Badge,
+  Subheading,
+  Text,
+  Title,
+} from "react-native-paper";
 import { COLORS } from "../../constants";
 import { useFlashMessage } from "../../hooks";
 import { Department, DeviceTutorial, TutorialView } from "../../types";
-import { translateAccountType } from "../../utils";
+import { systemColor, translateAccountType } from "../../utils";
 
 type TutorialCardProps = {
   tutorial: DeviceTutorial;
@@ -98,6 +104,9 @@ const TutorialCard: React.FC<TutorialCardProps> = ({ tutorial, user }) => {
       activeOpacity={0.4}
       onPress={handlePress}
     >
+      <View style={styles.imgLoading}>
+        <ActivityIndicator color={systemColor("primary")} />
+      </View>
       <Image style={styles.thumbnail} source={{ uri: tutorial.thumbnail }} />
 
       <View style={styles.infoContainer}>
@@ -144,6 +153,15 @@ const styles = StyleSheet.create({
     width: 85,
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
+  },
+  imgLoading: {
+    position: "absolute",
+    height: 85,
+    width: 85,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    backgroundColor: "#eee",
+    justifyContent: "center",
   },
   infoContainer: {
     flexGrow: 1,
