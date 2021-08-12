@@ -1,4 +1,6 @@
 import * as Notifications from "expo-notifications";
+import * as Random from "expo-random";
+import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import FlashMessage from "react-native-flash-message";
@@ -35,6 +37,14 @@ const UI: React.FC = () => {
 const App: React.FC = () => {
   const department = useDepartment();
 
+  const generateDeviceId = async () => {
+    if (await SecureStore.getItemAsync("device_id")) {
+      return;
+    }
+    const generatedDeviceId = Random.getRandomBytes(16).join("");
+    SecureStore.setItemAsync("device_id", generatedDeviceId);
+  };
+
   let Content: React.FC;
 
   if (department === undefined) {
@@ -48,6 +58,10 @@ const App: React.FC = () => {
   } else {
     Content = () => <MainNav />;
   }
+
+  React.useEffect(() => {
+    generateDeviceId();
+  }, []);
 
   return <Content />;
 };

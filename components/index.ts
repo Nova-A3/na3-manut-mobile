@@ -8,6 +8,7 @@ export { default as TicketDetailsButton } from "./ticket/TicketDetailsButton";
 export { default as TicketDetailsSummary } from "./ticket/TicketDetailsSummary";
 export { default as TicketStatsItem } from "./ticket/TicketStatsItem";
 export { default as TicketTimelineItem } from "./ticket/TicketTimelineItem";
+export { default as TutorialCard } from "./tutorials/TutorialCard";
 export { default as Button } from "./ui/Button";
 export { default as DataLoading } from "./ui/DataLoading";
 export { default as Dropdown } from "./ui/Dropdown";

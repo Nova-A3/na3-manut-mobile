@@ -14,6 +14,7 @@ import {
 import Firebase, { Fb } from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
 import { registerDataFirstLoad } from "../../store/actions";
+import { translateAccountType } from "../../utils";
 
 const AccountHomeScreen: React.FC = () => {
   const user = useDepartment();
@@ -77,17 +78,6 @@ const AccountHomeScreen: React.FC = () => {
     }
   };
 
-  const displayAccountType = () => {
-    switch (user!.type) {
-      case "operator":
-        return "OPERADOR";
-      case "maintenance":
-        return "MANUTENÇÃO";
-      case "viewOnly":
-        return "VISUALIZADOR";
-    }
-  };
-
   React.useLayoutEffect(() => {
     nav.setOptions({
       headerLeft: () => (
@@ -95,8 +85,7 @@ const AccountHomeScreen: React.FC = () => {
           left
           title="Ajuda"
           icon="help-circle-outline"
-          onPress={() => {}}
-          disabled
+          onPress={() => nav.navigate("accountHelp")}
         />
       ),
       headerRight: () => (
@@ -138,7 +127,7 @@ const AccountHomeScreen: React.FC = () => {
           <TextInput
             mode="outlined"
             label="Tipo de conta"
-            value={displayAccountType()}
+            value={translateAccountType(user!.type).toUpperCase()}
             disabled
           />
 

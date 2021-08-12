@@ -5,6 +5,7 @@ const useFlashMessage = () => {
     type: "success" | "warning" | "danger";
     title: string;
     text: string;
+    duration?: number;
   }) => {
     showMessage({
       type: data.type,
@@ -12,6 +13,7 @@ const useFlashMessage = () => {
       description: data.text,
       autoHide: true,
       hideStatusBar: true,
+      duration: data.duration,
     });
   };
 

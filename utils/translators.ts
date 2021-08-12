@@ -62,3 +62,16 @@ export const translateTicketKey = (key: string) => {
       return key;
   }
 };
+
+export const translateAccountType = (
+  accType: "operator" | "maintenance" | "viewOnly"
+) => {
+  switch (accType) {
+    case "operator":
+      return "Operador";
+    case "maintenance":
+      return "Manutenção";
+    case "viewOnly":
+      return "Visualizador";
+  }
+};

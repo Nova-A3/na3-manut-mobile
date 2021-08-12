@@ -1,5 +1,6 @@
 export * from "./db/Department";
 export * from "./db/Ticket";
+export * from "./db/Tutorial";
 export * from "./nav";
 export * from "./state/Auth";
 export * from "./state/Data";

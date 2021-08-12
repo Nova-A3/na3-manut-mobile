@@ -3,6 +3,7 @@ import { Ticket } from "./db/Ticket";
 import { DataState } from "./state/Data";
 
 export type AccountStackParamList = {
+  accountHelp: undefined;
   accountHome: undefined;
 };
 

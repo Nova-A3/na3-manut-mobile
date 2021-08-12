@@ -1,3 +1,4 @@
+export { default as AccountHelpScreen } from "./account/AccountHelpScreen";
 export { default as AccountHomeScreen } from "./account/AccountHomeScreen";
 export { default as FiltersHomeScreen } from "./filters/FiltersHomeScreen";
 export { default as FiltersSelectScreen } from "./filters/FiltersSelectScreen";
