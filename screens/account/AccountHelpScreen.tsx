@@ -47,32 +47,32 @@ const AccountHelpScreen: React.FC = () => {
   return (
     <ScreenContainer style={styles.screen}>
       <View style={styles.container}>
-        <View>
-          <Header title="Tutoriais para você" noMarginBottom />
-          <FlatList
-            data={allTutorials?.filter((t) => t.targets.includes(dpt.type))}
-            renderItem={({ item }) => (
-              <TutorialCard tutorial={item} user={dpt} key={item.id} />
-            )}
-            ListEmptyComponent={
-              <View style={styles.empty}>
-                <Subheading style={styles.emptyText}>
-                  Nenhum tutorial disponível
-                </Subheading>
-              </View>
-            }
-            ItemSeparatorComponent={() => (
-              <View style={styles.listSeparator}></View>
-            )}
-            ListHeaderComponent={() => <View style={styles.listHeaderFooter} />}
-            ListFooterComponent={() => <View style={styles.listHeaderFooter} />}
-          />
+        <Header title="Tutoriais para você" noMarginBottom />
+        <FlatList
+          data={allTutorials?.filter((t) => t.targets.includes(dpt.type))}
+          renderItem={({ item }) => (
+            <TutorialCard tutorial={item} user={dpt} key={item.id} />
+          )}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Subheading style={styles.emptyText}>
+                Nenhum tutorial disponível
+              </Subheading>
+            </View>
+          }
+          ItemSeparatorComponent={() => (
+            <View style={styles.listSeparator}></View>
+          )}
+          ListHeaderComponent={() => <View style={styles.listHeaderFooter} />}
+          ListFooterComponent={() => <View style={styles.listHeaderFooter} />}
+        />
 
-          <Header
-            title="Outros tutoriais"
-            style={{ marginTop: 17 }}
-            noMarginBottom
-          />
+        <Header
+          title="Outros tutoriais"
+          style={{ marginTop: 17 }}
+          noMarginBottom
+        />
+        <View style={styles.otherTutorials}>
           <FlatList
             data={allTutorials?.filter((t) => !t.targets.includes(dpt.type))}
             ListEmptyComponent={
@@ -116,6 +116,9 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontStyle: "italic",
+  },
+  otherTutorials: {
+    flexGrow: 4,
   },
   btn: {
     margin: 20,
