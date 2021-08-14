@@ -79,6 +79,11 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
               Db.getDepartment(payload.poke!.to)!.displayName
             }`,
           };
+        case "assignedMaintainer":
+          return {
+            title: "Novo responsável",
+            message: payload.assignedMaintainer,
+          };
         default:
           return;
       }

@@ -39,6 +39,8 @@ export const translateEventType = (
       return "OS EDITADA";
     case "poke":
       return "SETOR CUTUCADO";
+    case "maintainerChanged":
+      return "RESPONSÁVEL REDEFINIDO";
   }
 };
 
