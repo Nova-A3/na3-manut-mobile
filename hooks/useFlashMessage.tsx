@@ -13,7 +13,7 @@ const useFlashMessage = () => {
       description: data.text,
       autoHide: true,
       hideStatusBar: true,
-      duration: data.duration,
+      duration: data.duration ? data.duration : 1850,
     });
   };
 
