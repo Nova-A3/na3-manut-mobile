@@ -12,7 +12,7 @@ const AccountStack: React.FC = () => {
         name="accountHelp"
         component={AccountHelpScreen}
         options={{
-          headerTitle: "Ajuda",
+          headerTitle: "Tutoriais",
         }}
       />
 
