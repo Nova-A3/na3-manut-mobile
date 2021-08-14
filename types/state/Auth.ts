@@ -2,6 +2,7 @@ import { Department } from "../db/Department";
 
 export type AuthState = {
   department: Department | null | undefined;
+  isSwapping: boolean;
 };
 
 export type AuthActionSetDepartment = {
@@ -9,4 +10,9 @@ export type AuthActionSetDepartment = {
   payload: { department: Department | null };
 };
 
-export type AuthAction = AuthActionSetDepartment;
+export type AuthActionSetSwapping = {
+  type: "SET_SWAPPING";
+  payload: { swapping: boolean };
+};
+
+export type AuthAction = AuthActionSetDepartment | AuthActionSetSwapping;
