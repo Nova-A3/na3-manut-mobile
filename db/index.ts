@@ -6,6 +6,7 @@ class Department implements IDepartment {
   displayName: IDepartment["displayName"];
   color: IDepartment["color"];
   machines: IDepartment["machines"];
+  swappableWith?: IDepartment["swappableWith"];
 
   constructor({
     type,
@@ -13,15 +14,17 @@ class Department implements IDepartment {
     displayName,
     color,
     machines,
+    swappableWith,
   }: Pick<
     IDepartment,
-    "type" | "username" | "displayName" | "color" | "machines"
+    "type" | "username" | "displayName" | "color" | "machines" | "swappableWith"
   >) {
     this.type = type;
     this.username = username.trim().toLowerCase();
     this.displayName = displayName.trim().toUpperCase();
     this.color = color;
     this.machines = machines;
+    this.swappableWith = swappableWith;
   }
 
   get email(): IDepartment["email"] {
@@ -76,6 +79,7 @@ export class Db {
       displayName: "EXTRUSÃO",
       color: "#08C2E0",
       machines: 4,
+      swappableWith: "reciclagem",
     }),
     new Department({
       type: "operator",
@@ -83,6 +87,7 @@ export class Db {
       displayName: "CORTE & SOLDA (LUVA)",
       color: "#F58F29",
       machines: 4,
+      swappableWith: "corte-solda-saco",
     }),
     new Department({
       type: "operator",
@@ -90,6 +95,7 @@ export class Db {
       displayName: "CORTE & SOLDA (SACO)",
       color: "#FF78CB",
       machines: 4,
+      swappableWith: "corte-solda-luva",
     }),
     new Department({
       type: "operator",
@@ -97,6 +103,7 @@ export class Db {
       displayName: "RECICLAGEM",
       color: "#D5573B",
       machines: 1,
+      swappableWith: "extrusao",
     }),
     new Department({
       type: "operator",
@@ -104,6 +111,7 @@ export class Db {
       displayName: "DOBRA",
       color: "#885053",
       machines: 7,
+      swappableWith: "corte",
     }),
     new Department({
       type: "operator",
@@ -118,6 +126,7 @@ export class Db {
       displayName: "CORTE",
       color: "#04E762",
       machines: 1,
+      swappableWith: "dobra",
     }),
     new Department({
       type: "operator",

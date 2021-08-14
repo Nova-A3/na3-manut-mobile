@@ -6,6 +6,8 @@ export type Department = {
   color: string;
   machines?: number;
 
+  swappableWith?: string;
+
   isOperator: () => boolean;
   isMaintenance: () => boolean;
   isViewOnly: () => boolean;
