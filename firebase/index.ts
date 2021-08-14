@@ -25,6 +25,10 @@ export class Fb {
       firebase.initializeApp(FIREBASE_CONFIG);
 
       firebase.auth().onAuthStateChanged((fbUser) => {
+        if (store.getState().auth.isSwapping) {
+          return;
+        }
+
         if (fbUser) {
           const department = Database.getDepartment(fbUser.email!)!;
           Fb.Firestore.registerRefreshTicketsListener(department);
