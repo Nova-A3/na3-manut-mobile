@@ -123,7 +123,7 @@ const AccountHomeScreen: React.FC = () => {
         <HeaderButton
           left
           title="Ajuda"
-          icon="help-circle-outline"
+          icon="school-outline"
           onPress={() => nav.navigate("accountHelp")}
         />
       ),
