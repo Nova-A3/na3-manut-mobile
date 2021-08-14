@@ -1,7 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import * as React from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
-import { Caption, Divider } from "react-native-paper";
+import { Caption, Divider, TextInput } from "react-native-paper";
 import { COLORS } from "../../constants";
 import Fb from "../../firebase";
 import {
@@ -37,6 +37,7 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     interruptions,
     priority,
     refusalReason,
+    assignedMaintainer,
   } = tickets[0]!;
   const department = useDepartment();
   const { execGlobalLoading } = useGlobalLoading();
@@ -45,6 +46,11 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
   const [newPriority, setNewPriority] =
     React.useState<Ticket["priority"]>(priority);
   const [showEditPriority, setShowEditPriority] = React.useState(false);
+
+  const [newAssignedMaintainer, setNewAssignedMaintainer] =
+    React.useState<Ticket["assignedMaintainer"]>(assignedMaintainer);
+  const [showEditAssignedMaintainer, setShowEditAssignedMaintainer] =
+    React.useState(false);
 
   const onEditPriority = async (editedPriority: Ticket["priority"]) => {
     setNewPriority(priority);
@@ -74,12 +80,54 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     });
   };
 
+  const onEditAssignedMaintainer = async (editedAssignedMaintainer: string) => {
+    setNewAssignedMaintainer(assignedMaintainer);
+    setShowEditAssignedMaintainer(false);
+
+    if (editedAssignedMaintainer.trim().length === 0) {
+      msg.show({
+        type: "warning",
+        title: "Campo requerido",
+        text: 'O campo "Manutentor(es)" é obrigatório.',
+      });
+      setNewAssignedMaintainer(editedAssignedMaintainer);
+      setShowEditAssignedMaintainer(true);
+      return;
+    }
+
+    await execGlobalLoading(async () => {
+      const { error } = await Fb.Fs.editTicketAssignedMaintainer(id, {
+        assignedMaintainer: editedAssignedMaintainer!,
+      });
+
+      if (error) {
+        msg.show({
+          type: "warning",
+          title: error.title,
+          text: error.description,
+        });
+      } else {
+        msg.show({
+          type: "success",
+          title: "Manutentor(es) redefinido(s)",
+          text: `Manutentor(es) da OS nº ${id} redefinido(s) para "${editedAssignedMaintainer}"`,
+        });
+        setNewAssignedMaintainer(editedAssignedMaintainer);
+      }
+    });
+  };
+
   return (
     <>
       <View style={styles.card}>
         {newPriority && (
           <>
-            <View style={styles.summaryItem}>
+            <View
+              style={[
+                styles.summaryItem,
+                assignedMaintainer ? styles.bottomMargined : null,
+              ]}
+            >
               <Caption style={styles.itemKey}>Prioridade:</Caption>
               <View style={styles.priorityContainer}>
                 <View style={styles.priority}>
@@ -115,6 +163,13 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
                 )}
               </View>
             </View>
+
+            {assignedMaintainer && (
+              <View style={styles.summaryItem}>
+                <Caption style={styles.itemKey}>Responsável:</Caption>
+                <Text style={styles.itemValue}>{assignedMaintainer}</Text>
+              </View>
+            )}
 
             <Divider style={styles.divider} />
           </>
@@ -181,34 +236,62 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
       </View>
 
       {department?.isMaintenance() && status === "solving" && (
-        <FormModal
-          show={showEditPriority}
-          onDismiss={() => setShowEditPriority(false)}
-          title="Editar prioridade"
-          footer={
-            <Button
-              label="Redefinir prioridade"
-              onPress={() => onEditPriority(newPriority)}
-              icon="arrow-right"
-              iconRight
-            />
-          }
-        >
-          <Dropdown
-            label="Nova prioridade"
-            items={[
-              { value: "low", label: translatePriority("low") },
-              { value: "medium", label: translatePriority("medium") },
-              { value: "high", label: translatePriority("high") },
-            ]}
-            value={newPriority!}
-            onValueChange={(val) =>
-              setNewPriority(
-                val as Exclude<Ticket["priority"], undefined | null>
-              )
+        <>
+          <FormModal
+            show={showEditPriority}
+            onDismiss={() => setShowEditPriority(false)}
+            title="Editar prioridade"
+            footer={
+              <Button
+                label="Redefinir prioridade"
+                onPress={() => onEditPriority(newPriority)}
+                icon="arrow-right"
+                iconRight
+              />
             }
-          />
-        </FormModal>
+          >
+            <Dropdown
+              label="Nova prioridade"
+              items={[
+                { value: "low", label: translatePriority("low") },
+                { value: "medium", label: translatePriority("medium") },
+                { value: "high", label: translatePriority("high") },
+              ]}
+              value={newPriority!}
+              onValueChange={(val) =>
+                setNewPriority(
+                  val as Exclude<Ticket["priority"], undefined | null>
+                )
+              }
+            />
+          </FormModal>
+
+          <FormModal
+            show={showEditAssignedMaintainer}
+            onDismiss={() => {
+              setNewAssignedMaintainer(assignedMaintainer);
+              setShowEditAssignedMaintainer(false);
+            }}
+            title="Redefinir responsável/eis"
+            footer={
+              <Button
+                label="Redefinir"
+                onPress={() => onEditAssignedMaintainer(newAssignedMaintainer!)}
+                icon="arrow-right"
+                iconRight
+              />
+            }
+          >
+            <TextInput
+              mode="outlined"
+              multiline
+              numberOfLines={2}
+              label="Manutentor(es)"
+              value={newAssignedMaintainer!}
+              onChangeText={(val) => setNewAssignedMaintainer(val)}
+            />
+          </FormModal>
+        </>
       )}
     </>
   );

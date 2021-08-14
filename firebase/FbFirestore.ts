@@ -129,8 +129,20 @@ class FbFirestore {
 
   async confirmTicket(
     ticket: Ticket,
-    data: { priority: Exclude<Ticket["priority"], undefined> }
+    data: {
+      priority: Exclude<Ticket["priority"], undefined>;
+      assignedMaintainer: string;
+    }
   ): Promise<{ error: { title: string; description: string } | null }> {
+    if (!data.assignedMaintainer.trim()) {
+      return {
+        error: {
+          title: "Campo requerido",
+          description: 'O campo "Manutentor(es)" é obrigatório.',
+        },
+      };
+    }
+
     try {
       await firebase
         .firestore()
@@ -140,11 +152,17 @@ class FbFirestore {
           acceptedAt: timestamp(),
           status: "solving",
           priority: data.priority,
+          assignedMaintainer: data.assignedMaintainer
+            ? data.assignedMaintainer
+            : null,
         });
 
       await this.pushTicketEvents(ticket.id, {
         type: "ticketConfirmed",
-        payload: { priority: data.priority },
+        payload: {
+          priority: data.priority,
+          assignedMaintainer: data.assignedMaintainer,
+        },
       });
 
       sendNotification({
@@ -452,7 +470,7 @@ class FbFirestore {
             .map((d) => d.username)
         ),
         title: `OS #${ticketId} (${ticket.data()!.dpt})`,
-        body: `Prioridade redefinida pela Manutenção:  ${translatePriority(
+        body: `Prioridade redefinida pela Manutenção: ${translatePriority(
           ticket.data()!.priority
         )} -> ${translatePriority(data.priority)}`,
       });
@@ -462,6 +480,56 @@ class FbFirestore {
       return {
         error: {
           title: "Erro ao redefinir prioridade",
+          description:
+            "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+        },
+      };
+    }
+  }
+
+  async editTicketAssignedMaintainer(
+    ticketId: Ticket["id"],
+    data: {
+      assignedMaintainer: Exclude<
+        Ticket["assignedMaintainer"],
+        undefined | null
+      >;
+    }
+  ): Promise<{ error: { title: string; description: string } | null }> {
+    try {
+      const ticket = await firebase
+        .firestore()
+        .collection(fsCollectionId("tickets"))
+        .doc(ticketId)
+        .get();
+
+      await ticket.ref.update({ assignedMaintainer: data.assignedMaintainer });
+
+      await this.pushTicketEvents(ticketId, {
+        type: "maintainerChanged",
+        payload: { assignedMaintainer: data.assignedMaintainer },
+      });
+
+      sendNotification({
+        to: await this.getPushTokens(ticket.data()!.username),
+        title: `OS #${ticketId}`,
+        body: `Manutentor responsável redefinido: "${data.assignedMaintainer}"`,
+      });
+      sendNotification({
+        to: await this.getPushTokens(
+          Db.getDepartments()
+            .filter((d) => d.isViewOnly())
+            .map((d) => d.username)
+        ),
+        title: `OS #${ticketId} (${ticket.data()!.dpt})`,
+        body: `Manutentor responsável redefinido: "${data.assignedMaintainer}"`,
+      });
+
+      return { error: null };
+    } catch (e) {
+      return {
+        error: {
+          title: "Erro ao redefinir manutentor(es)",
           description:
             "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
         },

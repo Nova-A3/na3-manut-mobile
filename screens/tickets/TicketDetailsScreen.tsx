@@ -57,6 +57,7 @@ const TicketDetailsScreen: React.FC = () => {
   > | null>(null);
   const [ticketPriority, setTicketPriority] =
     React.useState<Exclude<Ticket["priority"], undefined | null>>("low");
+  const [assignedMaintainer, setAssignedMaintainer] = React.useState("");
   const [ticketSolutionStatus, setTicketSolutionStatus] = React.useState("");
   const [ticketSolution, setTicketSolution] = React.useState("");
   const [refusalReason, setRefusalReason] = React.useState("");
@@ -81,13 +82,15 @@ const TicketDetailsScreen: React.FC = () => {
   };
 
   const onConfirmTicket = async (
-    priority: Exclude<Ticket["priority"], undefined | null>
+    priority: Exclude<Ticket["priority"], undefined | null>,
+    assignedMaintainer: string
   ) => {
     setFormModalId(null);
 
     await execGlobalLoading(async () => {
       const { error } = await Firebase.Firestore.confirmTicket(ticket, {
         priority,
+        assignedMaintainer,
       });
 
       if (error) {
@@ -336,25 +339,37 @@ const TicketDetailsScreen: React.FC = () => {
   switch (formModalId) {
     case "confirm_ticket":
       formModal = {
-        title: "Definir prioridade",
+        title: "Confirmar OS",
         children: (
-          <Dropdown
-            label="Definir prioridade"
-            items={[
-              { value: "low", label: translatePriority("low") },
-              { value: "medium", label: translatePriority("medium") },
-              { value: "high", label: translatePriority("high") },
-            ]}
-            onValueChange={(val) =>
-              setTicketPriority(
-                val as Exclude<Ticket["priority"], undefined | null>
-              )
-            }
-          />
+          <>
+            <View style={{ marginBottom: 7 }}>
+              <Dropdown
+                label="Prioridade"
+                items={[
+                  { value: "low", label: translatePriority("low") },
+                  { value: "medium", label: translatePriority("medium") },
+                  { value: "high", label: translatePriority("high") },
+                ]}
+                onValueChange={(val) =>
+                  setTicketPriority(
+                    val as Exclude<Ticket["priority"], undefined | null>
+                  )
+                }
+              />
+            </View>
+            <TextInput
+              mode="outlined"
+              multiline
+              numberOfLines={2}
+              label="Manutentor(es)"
+              value={assignedMaintainer}
+              onChangeText={(val) => setAssignedMaintainer(val)}
+            />
+          </>
         ),
         footerBtn: {
           label: "Confirmar OS",
-          onPress: () => onConfirmTicket(ticketPriority),
+          onPress: () => onConfirmTicket(ticketPriority, assignedMaintainer),
         },
       };
       break;

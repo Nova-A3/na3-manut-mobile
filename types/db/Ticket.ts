@@ -29,6 +29,8 @@ export type Ticket = {
   status: "pending" | "solving" | "solved" | "closed" | "refused";
   priority?: "low" | "medium" | "high" | null;
 
+  assignedMaintainer?: string;
+
   solution?: string | null;
   solutionSteps?: string[];
   refusalReason?: string | null;
@@ -52,7 +54,8 @@ export type Ticket = {
       | "ticketReopened"
       | "priorityChanged"
       | "ticketEdited"
-      | "poke";
+      | "poke"
+      | "maintainerChanged";
     timestamp: string;
     device: {
       name: string | null;
@@ -62,6 +65,7 @@ export type Ticket = {
 
     payload: {
       priority?: Ticket["priority"];
+      assignedMaintainer?: Ticket["assignedMaintainer"];
       solution?: Ticket["solution"];
       refusalReason?: Ticket["refusalReason"];
       changes?: TicketEditedEventChanges;
