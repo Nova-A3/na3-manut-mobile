@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import * as MailComposer from "expo-mail-composer";
 import * as Notifications from "expo-notifications";
+import firebase from "firebase";
 import * as React from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Switch, Text, TextInput } from "react-native-paper";
@@ -9,11 +10,14 @@ import {
   Button,
   Header,
   HeaderButton,
+  MultipleHeaderButtons,
   ScreenContainer,
 } from "../../components";
+import { COLORS } from "../../constants";
+import Db from "../../db";
 import Firebase, { Fb } from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
-import { registerDataFirstLoad } from "../../store/actions";
+import { registerDataFirstLoad, setSwapping } from "../../store/actions";
 import { translateAccountType } from "../../utils";
 
 const AccountHomeScreen: React.FC = () => {
@@ -78,6 +82,41 @@ const AccountHomeScreen: React.FC = () => {
     }
   };
 
+  const onSwapAccounts = (swapUsername: string) => {
+    const swapAcc = Db.getDepartment(swapUsername)!;
+
+    Alert.alert(
+      "Alternar contas?",
+      `Tem certeza que deseja trocar de conta para "${swapAcc.displayName}"?`,
+      [
+        {
+          style: "destructive",
+          text: "Sim, trocar",
+          onPress: () =>
+            execGlobalLoading(async () => {
+              dispatch(setSwapping(true));
+              await firebase.auth().signOut();
+              dispatch(registerDataFirstLoad(false));
+              dispatch(setSwapping(false));
+              await firebase
+                .auth()
+                .signInWithEmailAndPassword(
+                  swapAcc.email,
+                  `manut-${swapAcc.username}`
+                );
+
+              msg.show({
+                type: "success",
+                title: "Conta alternada",
+                text: `Você mudou para: ${swapAcc.displayName}`,
+              });
+            }),
+        },
+        { style: "default", text: "Não, ficar" },
+      ]
+    );
+  };
+
   React.useLayoutEffect(() => {
     nav.setOptions({
       headerLeft: () => (
@@ -89,11 +128,23 @@ const AccountHomeScreen: React.FC = () => {
         />
       ),
       headerRight: () => (
-        <HeaderButton
-          title="Sair"
-          icon="log-out-outline"
-          onPress={onSignOut}
-          color="danger"
+        <MultipleHeaderButtons
+          items={[
+            user!.swappableWith
+              ? {
+                  title: "Alternar contas",
+                  iconName: "swap-horizontal-outline",
+                  onPress: () => onSwapAccounts(user!.swappableWith!),
+                  color: COLORS.SYSTEM.BLUE,
+                }
+              : undefined,
+            {
+              title: "Sair",
+              iconName: "log-out-outline",
+              onPress: onSignOut,
+              color: COLORS.SYSTEM.RED,
+            },
+          ]}
         />
       ),
     });
