@@ -17,13 +17,37 @@ const FormModal: React.FC<FormModalProps> = ({
   footer,
   children,
 }) => {
+  const [modalBottomMargin, setModalBottomMargin] = React.useState(0);
+
+  React.useEffect(() => {
+    const willShowListener = Keyboard.addListener("keyboardWillShow", (ev) => {
+      if (ev.isEventFromThisApp) {
+        setModalBottomMargin(ev.endCoordinates.height);
+      }
+    });
+
+    const willHideListener = Keyboard.addListener("keyboardWillHide", (ev) => {
+      if (ev.isEventFromThisApp) {
+        setModalBottomMargin(0);
+      }
+    });
+
+    return () => {
+      willShowListener.remove();
+      willHideListener.remove();
+    };
+  }, []);
+
   return (
     <Portal>
       <Modal
         dismissable
         visible={show}
         onDismiss={onDismiss}
-        contentContainerStyle={styles.modal}
+        contentContainerStyle={[
+          styles.modal,
+          { marginBottom: modalBottomMargin },
+        ]}
       >
         <Pressable onPress={Keyboard.dismiss}>
           <View style={styles.body}>
