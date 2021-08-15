@@ -906,8 +906,6 @@ class FbFirestore {
       }
     });
 
-    console.log(pushTokens);
-
     return pushTokens;
   }
 
