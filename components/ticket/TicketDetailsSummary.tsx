@@ -167,7 +167,32 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
             {assignedMaintainer && (
               <View style={styles.summaryItem}>
                 <Caption style={styles.itemKey}>Responsável:</Caption>
-                <Text style={styles.itemValue}>{assignedMaintainer}</Text>
+                <View
+                  style={{
+                    width: "55%",
+                    display: "flex",
+                    flexDirection: "row",
+                    flexGrow: 1,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <View style={{ width: "87.2728%" }}>
+                    <Text>{assignedMaintainer}</Text>
+                  </View>
+
+                  {department?.isMaintenance() && status === "solving" && (
+                    <IoniconsIconButton
+                      icon="pencil"
+                      onPress={() => {
+                        setShowEditAssignedMaintainer(true);
+                      }}
+                      color={systemColor("primary")}
+                      size={14}
+                      style={{ margin: 0, padding: 0 }}
+                    />
+                  )}
+                </View>
               </View>
             )}
 
