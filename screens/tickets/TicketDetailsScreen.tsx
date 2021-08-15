@@ -85,7 +85,9 @@ const TicketDetailsScreen: React.FC = () => {
     priority: Exclude<Ticket["priority"], undefined | null>,
     assignedMaintainer: string
   ) => {
-    setFormModalId(null);
+    if (assignedMaintainer.trim().length !== 0) {
+      setFormModalId(null);
+    }
 
     await execGlobalLoading(async () => {
       const { error } = await Firebase.Firestore.confirmTicket(ticket, {
