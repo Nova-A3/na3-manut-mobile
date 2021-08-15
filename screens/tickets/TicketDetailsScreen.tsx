@@ -481,7 +481,7 @@ const TicketDetailsScreen: React.FC = () => {
 
   return (
     <>
-      <View>
+      <View style={{ height: "100%" }}>
         <View
           style={{
             ...styles.header,
@@ -512,7 +512,12 @@ const TicketDetailsScreen: React.FC = () => {
           </Headline>
         </View>
 
-        <ScrollView style={styles.content}>
+        <View
+          style={{
+            flexGrow: 1,
+            justifyContent: "space-between",
+          }}
+        >
           {!department.isViewOnly() && (
             <TicketDetailsButton
               departmentType={department.type}
@@ -520,57 +525,56 @@ const TicketDetailsScreen: React.FC = () => {
               onPress={onDetailsBtnPress}
             />
           )}
-
-          <View style={styles.body}>
+          <ScrollView style={styles.content}>
             <TicketDetailsSummary data={ticket} />
-          </View>
-        </ScrollView>
-      </View>
+          </ScrollView>
 
-      <View style={styles.statusContainer}>
-        <View style={styles.currStage}>
-          <Text>Estágio atual:</Text>
-          <Subheading style={styles.currStageText}>
-            {currStage(ticket.status)}
-          </Subheading>
-        </View>
-        <View style={styles.stepsContainer}>
-          <View
-            style={[styles.step, styles.stepRightRounded, styles.stepDone]}
-          />
-          <View
-            style={[
-              styles.step,
-              styles.stepLeftRounded,
-              styles.stepRightRounded,
-              ticket.status === "pending"
-                ? styles.stepCurrent
-                : styles.stepDone,
-            ]}
-          />
-          <View
-            style={[
-              styles.step,
-              styles.stepLeftRounded,
-              styles.stepRightRounded,
-              ticket.status === "solving"
-                ? styles.stepCurrent
-                : ["solved", "closed"].includes(ticket.status)
-                ? styles.stepDone
-                : null,
-            ]}
-          />
-          <View
-            style={[
-              styles.step,
-              styles.stepLeftRounded,
-              ticket.status === "solved"
-                ? styles.stepCurrent
-                : ticket.status === "closed"
-                ? styles.stepDone
-                : null,
-            ]}
-          />
+          <View style={styles.statusContainer}>
+            <View style={styles.currStage}>
+              <Text>Estágio atual:</Text>
+              <Subheading style={styles.currStageText}>
+                {currStage(ticket.status)}
+              </Subheading>
+            </View>
+            <View style={styles.stepsContainer}>
+              <View
+                style={[styles.step, styles.stepRightRounded, styles.stepDone]}
+              />
+              <View
+                style={[
+                  styles.step,
+                  styles.stepLeftRounded,
+                  styles.stepRightRounded,
+                  ticket.status === "pending"
+                    ? styles.stepCurrent
+                    : styles.stepDone,
+                ]}
+              />
+              <View
+                style={[
+                  styles.step,
+                  styles.stepLeftRounded,
+                  styles.stepRightRounded,
+                  ticket.status === "solving"
+                    ? styles.stepCurrent
+                    : ["solved", "closed"].includes(ticket.status)
+                    ? styles.stepDone
+                    : null,
+                ]}
+              />
+              <View
+                style={[
+                  styles.step,
+                  styles.stepLeftRounded,
+                  ticket.status === "solved"
+                    ? styles.stepCurrent
+                    : ticket.status === "closed"
+                    ? styles.stepDone
+                    : null,
+                ]}
+              />
+            </View>
+          </View>
         </View>
       </View>
 
@@ -605,17 +609,12 @@ const styles = StyleSheet.create({
     color: "white",
     lineHeight: 26,
   },
-  body: {
+  content: {
+    flexGrow: 1,
     padding: 20,
   },
-  content: {
-    height: "100%",
-  },
   statusContainer: {
-    position: "absolute",
-    bottom: 0,
     backgroundColor: "white",
-    width: "100%",
   },
   currStage: {
     padding: 20,
