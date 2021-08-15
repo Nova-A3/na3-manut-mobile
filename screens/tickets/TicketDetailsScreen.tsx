@@ -308,7 +308,7 @@ const TicketDetailsScreen: React.FC = () => {
               : [
                   {
                     title: "Cutucar",
-                    iconName: "alert-circle-outline",
+                    iconName: "notifications-outline",
                     onPress: onPoke,
                     disabled: !checkPokeAvailability(),
                   },
@@ -403,6 +403,7 @@ const TicketDetailsScreen: React.FC = () => {
                 label="Status da solução"
                 value={ticketSolutionStatus}
                 onChangeText={(val) => setTicketSolutionStatus(val)}
+                autoFocus
               />
             </View>
             <TextInput
@@ -416,7 +417,7 @@ const TicketDetailsScreen: React.FC = () => {
           </>
         ),
         footerBtn: {
-          label: "Enviar status",
+          label: "Informar status",
           onPress: () =>
             onShareTicketSolutionStatus(
               ticketSolutionStatus,
@@ -438,6 +439,7 @@ const TicketDetailsScreen: React.FC = () => {
                 label="Descrição da solução"
                 value={ticketSolution}
                 onChangeText={(val) => setTicketSolution(val)}
+                autoFocus
               />
             </View>
             <TextInput
@@ -454,6 +456,7 @@ const TicketDetailsScreen: React.FC = () => {
           label: "Transmitir Solução",
           onPress: () =>
             onTransmitTicketSolution(ticketSolution, assignedMaintainer),
+          color: "success",
         },
       };
       break;
@@ -468,6 +471,7 @@ const TicketDetailsScreen: React.FC = () => {
             label="Motivo"
             value={refusalReason}
             onChangeText={(val) => setRefusalReason(val)}
+            autoFocus
           />
         ),
         footerBtn: {

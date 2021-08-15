@@ -1,4 +1,5 @@
 import { RouteProp } from "@react-navigation/native";
+import { FsInternalProject } from "./db/InternalProject";
 import { Ticket } from "./db/Ticket";
 import { DataState } from "./state/Data";
 
@@ -45,4 +46,11 @@ export type TicketDependantRoute = RouteProp<
 
 export type StatsStackParamList = {
   statsHome: undefined;
+};
+
+export type InternalProjectsStackParamList = {
+  internalProjectsHome: undefined;
+  internalProjectsNewForm: undefined;
+  internalProjectDetails: { project: FsInternalProject };
+  internalProjectTimeline: { project: FsInternalProject };
 };

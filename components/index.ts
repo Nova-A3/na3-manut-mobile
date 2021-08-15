@@ -1,4 +1,6 @@
 export { default as FilterItem } from "./filters/FilterItem";
+export { default as ProjectCard } from "./internal-project/ProjectCard";
+export { default as ProjectDetailsTimeRemaining } from "./internal-project/ProjectDetailsTimeRemaining";
 export { default as HeaderButton } from "./nav/HeaderButton";
 export { default as HeaderOverflowMenu } from "./nav/HeaderOverflowMenu";
 export { default as MultipleHeaderButtons } from "./nav/MultipleHeaderButtons";

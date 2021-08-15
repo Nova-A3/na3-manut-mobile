@@ -15,6 +15,7 @@ const initialState: DataState = {
     maintenanceTypes: ["preventiva", "corretiva", "preditiva"],
     causes: ["mecanica", "eletrica", "machineAdjustment"],
   },
+  projects: [],
 };
 
 const dataReducer = (state = initialState, action: DataAction) => {
@@ -55,6 +56,11 @@ const dataReducer = (state = initialState, action: DataAction) => {
                 action.payload.filterValue,
               ],
         },
+      };
+    case "SET_PROJECTS":
+      return {
+        ...state,
+        projects: action.payload.projects ? action.payload.projects : [],
       };
     default:
       return state;

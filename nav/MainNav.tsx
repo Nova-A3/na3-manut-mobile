@@ -24,9 +24,9 @@ const Nav: React.FC = () => {
             tabBarLabel: "Minhas OS",
             tabBarIcon: ({ focused, color, size }) => {
               return focused ? (
-                <Ionicons name="list-circle" size={size} color={color} />
-              ) : (
                 <Ionicons name="list" size={size} color={color} />
+              ) : (
+                <Ionicons name="list-outline" size={size} color={color} />
               );
             },
             tabBarBadge: tickets.length > 0 ? tickets.length : undefined,

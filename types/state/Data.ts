@@ -1,3 +1,4 @@
+import { FsInternalProject } from "../db/InternalProject";
 import { Ticket } from "../db/Ticket";
 
 export type DataState = {
@@ -12,6 +13,8 @@ export type DataState = {
     maintenanceTypes: string[];
     causes: string[];
   };
+
+  projects: FsInternalProject[];
 };
 
 export type DataActionSetTickets = {
@@ -39,9 +42,15 @@ export type DataActionToggleFilter = {
   payload: { filterKey: keyof DataState["filters"]; filterValue: string };
 };
 
+export type DataActionSetProjects = {
+  type: "SET_PROJECTS";
+  payload: { projects?: FsInternalProject[] };
+};
+
 export type DataAction =
   | DataActionSetTickets
   | DataActionSetDptIssues
   | DataActionSetLoading
   | DataActionRegisterFirstLoad
-  | DataActionToggleFilter;
+  | DataActionToggleFilter
+  | DataActionSetProjects;

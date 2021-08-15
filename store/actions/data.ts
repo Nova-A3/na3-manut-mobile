@@ -2,6 +2,7 @@ import {
   DataActionRegisterFirstLoad,
   DataActionSetDptIssues,
   DataActionSetLoading,
+  DataActionSetProjects,
   DataActionSetTickets,
   DataActionToggleFilter,
   DataState,
@@ -50,5 +51,14 @@ export const toggleFilter = (
   return {
     type: "TOGGLE_FILTER",
     payload: { filterKey, filterValue },
+  };
+};
+
+export const setProjects = (
+  projects: DataActionSetProjects["payload"]["projects"]
+): DataActionSetProjects => {
+  return {
+    type: "SET_PROJECTS",
+    payload: { projects },
   };
 };

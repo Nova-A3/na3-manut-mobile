@@ -4,28 +4,28 @@ import { TextInput } from "react-native-paper";
 import MdDropdown from "react-native-paper-dropdown";
 import { COLORS } from "../../constants";
 
-type DropdownProps = {
+type DropdownProps<T extends string> = {
   label: string;
   items: {
     label: string;
-    value: string;
+    value: T;
   }[];
   value?: string;
-  onValueChange: (newVal: string) => void;
+  onValueChange: (newVal: DropdownProps<T>["items"][number]["value"]) => void;
   style?: ViewStyle;
 };
 
-const Dropdown: React.FC<DropdownProps> = ({
+const Dropdown = <T extends string>({
   label,
   items,
   value,
   onValueChange,
   style,
-}) => {
+}: DropdownProps<T>) => {
   const [val, setVal] = React.useState(items[0]!.value);
   const [show, setShow] = React.useState(false);
 
-  const handleValueChange = (newVal: string) => {
+  const handleValueChange = (newVal: T) => {
     setVal(newVal);
     onValueChange(newVal);
   };
@@ -36,7 +36,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         label={label}
         mode="outlined"
         value={value ? value : val}
-        setValue={(newVal) => handleValueChange(newVal as string)}
+        setValue={(newVal) => handleValueChange(newVal as T)}
         list={items}
         visible={show}
         showDropDown={() => setShow(true)}

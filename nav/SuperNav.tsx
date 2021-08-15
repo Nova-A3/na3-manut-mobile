@@ -4,7 +4,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import * as React from "react";
 import Firebase from "../firebase";
 import { useDepartment, useTickets } from "../hooks";
-import { AccountStack, AllTicketsStack, UrgentTicketsStack } from "./stacks";
+import {
+  AccountStack,
+  AllTicketsStack,
+  InternalProjectsStack,
+  UrgentTicketsStack,
+} from "./stacks";
 
 const Tabs = createBottomTabNavigator();
 
@@ -37,12 +42,27 @@ const SuperNav: React.FC = () => {
           name="allTicketsTab"
           component={AllTicketsStack}
           options={{
-            tabBarLabel: "Todas",
+            tabBarLabel: "Todas as OS",
             tabBarIcon: ({ focused, color, size }) => {
               return focused ? (
-                <Ionicons name="list-circle" size={size} color={color} />
-              ) : (
                 <Ionicons name="list" size={size} color={color} />
+              ) : (
+                <Ionicons name="list-outline" size={size} color={color} />
+              );
+            },
+          }}
+        />
+
+        <Tabs.Screen
+          name="internalProjectsTab"
+          component={InternalProjectsStack}
+          options={{
+            tabBarLabel: "Projetos",
+            tabBarIcon: ({ focused, color, size }) => {
+              return focused ? (
+                <Ionicons name="build" size={size} color={color} />
+              ) : (
+                <Ionicons name="build-outline" size={size} color={color} />
               );
             },
           }}
