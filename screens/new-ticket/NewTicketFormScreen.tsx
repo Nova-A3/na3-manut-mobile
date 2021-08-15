@@ -24,6 +24,7 @@ const NewTicketFormScreen: React.FC = () => {
   const [description, setDescription] = React.useState("[placeholder]");
   const [stoppedLine, setStoppedLine] = React.useState(false);
   const [stoppedEquipment, setStoppedEquipment] = React.useState(false);
+  const [stoppedProduction, setStoppedProduction] = React.useState(false);
   const [team, setTeam] = React.useState("mecanica");
   const [maintenanceType, setMaintenanceType] = React.useState("preventiva");
   const [cause, setCause] = React.useState("mecanica");
@@ -64,6 +65,7 @@ const NewTicketFormScreen: React.FC = () => {
                 interruptions: {
                   line: stoppedLine,
                   equipment: stoppedLine || stoppedEquipment,
+                  production: stoppedProduction,
                 },
                 team,
                 maintenanceType,
@@ -165,6 +167,13 @@ const NewTicketFormScreen: React.FC = () => {
             <View style={{ ...styles.formField, ...styles.switchField }}>
               <Text>Parou linha?</Text>
               <Switch value={stoppedLine} onValueChange={setStoppedLine} />
+            </View>
+            <View style={{ ...styles.formField, ...styles.switchField }}>
+              <Text>Parou produção?</Text>
+              <Switch
+                value={stoppedProduction}
+                onValueChange={setStoppedProduction}
+              />
             </View>
           </View>
 

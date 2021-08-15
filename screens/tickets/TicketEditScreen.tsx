@@ -7,7 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
@@ -32,6 +32,7 @@ const TicketEditScreen: React.FC = () => {
   const [description, setDescription] = React.useState("");
   const [stoppedLine, setStoppedLine] = React.useState(false);
   const [stoppedEquipment, setStoppedEquipment] = React.useState(false);
+  const [stoppedProduction, setStoppedProduction] = React.useState(false);
   const [team, setTeam] = React.useState("mecanica");
   const [maintenanceType, setMaintenanceType] = React.useState("preventiva");
   const [cause, setCause] = React.useState("mecanica");
@@ -42,6 +43,7 @@ const TicketEditScreen: React.FC = () => {
       setDescription(ticket.description);
       setStoppedLine(ticket.interruptions.line);
       setStoppedEquipment(ticket.interruptions.equipment);
+      setStoppedProduction(ticket.interruptions.production || false);
       setTeam(ticket.team);
       setMaintenanceType(ticket.maintenanceType);
       setCause(ticket.cause);
@@ -76,6 +78,7 @@ const TicketEditScreen: React.FC = () => {
                 interruptions: {
                   line: stoppedLine,
                   equipment: stoppedLine || stoppedEquipment,
+                  production: stoppedProduction,
                 },
                 team,
                 maintenanceType,
@@ -180,6 +183,13 @@ const TicketEditScreen: React.FC = () => {
             <View style={{ ...styles.formField, ...styles.switchField }}>
               <Text>Parou linha?</Text>
               <Switch value={stoppedLine} onValueChange={setStoppedLine} />
+            </View>
+            <View style={{ ...styles.formField, ...styles.switchField }}>
+              <Text>Parou produção?</Text>
+              <Switch
+                value={stoppedProduction}
+                onValueChange={setStoppedProduction}
+              />
             </View>
           </View>
 

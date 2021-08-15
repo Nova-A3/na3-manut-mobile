@@ -236,12 +236,27 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
             {interruptions.equipment ? "SIM" : "NÃO"}
           </Text>
         </View>
-        <View style={styles.summaryItem}>
+        <View
+          style={[
+            styles.summaryItem,
+            interruptions.production !== undefined
+              ? styles.bottomMargined
+              : undefined,
+          ]}
+        >
           <Caption style={styles.itemKey}>Parou linha:</Caption>
           <Text style={styles.itemValue}>
             {interruptions.line ? "SIM" : "NÃO"}
           </Text>
         </View>
+        {interruptions.production !== undefined && (
+          <View style={styles.summaryItem}>
+            <Caption style={styles.itemKey}>Parou produção:</Caption>
+            <Text style={styles.itemValue}>
+              {interruptions.production ? "SIM" : "NÃO"}
+            </Text>
+          </View>
+        )}
 
         {additionalInfo ? (
           <>

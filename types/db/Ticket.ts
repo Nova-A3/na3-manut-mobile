@@ -20,6 +20,7 @@ export type Ticket = {
   interruptions: {
     line: boolean;
     equipment: boolean;
+    production?: boolean;
   };
   team: string;
   maintenanceType: string;
