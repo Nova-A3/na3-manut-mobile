@@ -7,7 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
