@@ -168,9 +168,9 @@ class FbFirestore {
       sendNotification({
         to: await this.getPushTokens(ticket.username),
         title: `OS #${ticket.id}`,
-        body: `A OS está sendo resolvida: prioridade ${translatePriority(
+        body: `A OS está sendo resolvida\nPrioridade: ${translatePriority(
           data.priority
-        )}`,
+        )}; Responsável: ${data.assignedMaintainer}`,
       });
       sendNotification({
         to: await this.getPushTokens(
@@ -179,9 +179,9 @@ class FbFirestore {
             .map((d) => d.username)
         ),
         title: `OS #${ticket.id} (${ticket.dpt})`,
-        body: `Confirmada pela Manutenção: prioridade ${translatePriority(
+        body: `Confirmada pela Manutenção\nPrioridade: ${translatePriority(
           data.priority
-        )}`,
+        )}; Responsável: ${data.assignedMaintainer}`,
       });
 
       return { error: null };
@@ -198,7 +198,7 @@ class FbFirestore {
 
   async shareTicketSolutionStatus(
     ticket: Ticket,
-    data: { solutionStatus: string }
+    data: { solutionStatus: string; assignedMaintainer: string }
   ): Promise<{ error: { title: string; description: string } | null }> {
     if (!data.solutionStatus.trim()) {
       return {
@@ -207,7 +207,17 @@ class FbFirestore {
           description: 'O campo "Status da solução" é obrigatório.',
         },
       };
+    } else if (!data.assignedMaintainer.trim()) {
+      return {
+        error: {
+          title: "Campo requerido",
+          description: 'O campo "Responsável" é obrigatório.',
+        },
+      };
     }
+
+    data.solutionStatus = data.solutionStatus.trim();
+    data.assignedMaintainer = data.assignedMaintainer.trim();
 
     try {
       await firebase
@@ -223,14 +233,18 @@ class FbFirestore {
       await this.pushTicketEvents(ticket.id, {
         type: "solutionStepAdded",
         payload: {
-          solutionStep: { type: "step", content: data.solutionStatus },
+          solutionStep: {
+            type: "step",
+            content: data.solutionStatus,
+            who: data.assignedMaintainer,
+          },
         },
       });
 
       sendNotification({
         to: await this.getPushTokens(ticket.username),
         title: `OS #${ticket.id}`,
-        body: `Novo progresso na solução da OS: "${data.solutionStatus}"`,
+        body: `Novo progresso na solução da OS: "${data.solutionStatus}" (${data.assignedMaintainer})`,
       });
       sendNotification({
         to: await this.getPushTokens(
@@ -239,7 +253,7 @@ class FbFirestore {
             .map((d) => d.username)
         ),
         title: `OS #${ticket.id} (${ticket.dpt})`,
-        body: `Novo progresso na solução da OS: "${data.solutionStatus}"`,
+        body: `Novo progresso na solução da OS: "${data.solutionStatus}" (${data.assignedMaintainer})`,
       });
 
       return { error: null };
@@ -256,7 +270,10 @@ class FbFirestore {
 
   async transmitTicketSolution(
     ticket: Ticket,
-    data: { solution: Exclude<Ticket["solution"], undefined | null> }
+    data: {
+      solution: Exclude<Ticket["solution"], undefined | null>;
+      assignedMaintainer: string;
+    }
   ): Promise<{ error: { title: string; description: string } | null }> {
     if (!data.solution.trim()) {
       return {
@@ -265,9 +282,17 @@ class FbFirestore {
           description: 'O campo "Descrição da solução" é obrigatório.',
         },
       };
+    } else if (!data.assignedMaintainer.trim()) {
+      return {
+        error: {
+          title: "Campo requerido",
+          description: 'O campo "Responsável" é obrigatório.',
+        },
+      };
     }
 
     data.solution = data.solution.trim();
+    data.assignedMaintainer = data.assignedMaintainer.trim();
 
     try {
       await firebase
@@ -281,13 +306,21 @@ class FbFirestore {
         });
 
       await this.pushTicketEvents(ticket.id, [
-        { type: "solutionTransmitted", payload: { solution: data.solution } },
+        {
+          type: "solutionTransmitted",
+          payload: {
+            solution: data.assignedMaintainer
+              ? { content: data.solution, who: data.assignedMaintainer }
+              : data.solution,
+          },
+        },
         {
           type: "solutionStepAdded",
           payload: {
             solutionStep: {
               type: "solutionTransmitted",
               content: data.solution,
+              who: data.assignedMaintainer,
             },
           },
         },
@@ -305,7 +338,7 @@ class FbFirestore {
             .map((d) => d.username)
         ),
         title: `OS #${ticket.id} (${ticket.dpt})`,
-        body: `Nova solução disponível: "${data.solution}"`,
+        body: `Nova solução disponível: "${data.solution}" (${data.assignedMaintainer})`,
       });
 
       return { error: null };
@@ -861,6 +894,8 @@ class FbFirestore {
         pushTokens = [...pushTokens, ...doc.data()!.tokens];
       }
     });
+
+    console.log(pushTokens);
 
     return pushTokens;
   }

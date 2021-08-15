@@ -57,7 +57,9 @@ const TicketDetailsScreen: React.FC = () => {
   > | null>(null);
   const [ticketPriority, setTicketPriority] =
     React.useState<Exclude<Ticket["priority"], undefined | null>>("low");
-  const [assignedMaintainer, setAssignedMaintainer] = React.useState("");
+  const [assignedMaintainer, setAssignedMaintainer] = React.useState(
+    ticket.assignedMaintainer || ""
+  );
   const [ticketSolutionStatus, setTicketSolutionStatus] = React.useState("");
   const [ticketSolution, setTicketSolution] = React.useState("");
   const [refusalReason, setRefusalReason] = React.useState("");
@@ -114,13 +116,21 @@ const TicketDetailsScreen: React.FC = () => {
     });
   };
 
-  const onShareTicketSolutionStatus = async (solutionStatus: string) => {
-    setFormModalId(null);
+  const onShareTicketSolutionStatus = async (
+    solutionStatus: string,
+    assignedMaintainer: string
+  ) => {
+    if (
+      assignedMaintainer.trim().length !== 0 &&
+      solutionStatus.trim().length
+    ) {
+      setFormModalId(null);
+    }
 
     await execGlobalLoading(async () => {
       const { error } = await Firebase.Firestore.shareTicketSolutionStatus(
         ticket,
-        { solutionStatus }
+        { solutionStatus, assignedMaintainer }
       );
 
       if (error) {
@@ -142,13 +152,18 @@ const TicketDetailsScreen: React.FC = () => {
     });
   };
 
-  const onTransmitTicketSolution = async (solution: string) => {
-    setFormModalId(null);
+  const onTransmitTicketSolution = async (
+    solution: string,
+    assignedMaintainer: string
+  ) => {
+    if (assignedMaintainer.trim().length !== 0 && solution.trim().length) {
+      setFormModalId(null);
+    }
 
     await execGlobalLoading(async () => {
       const { error } = await Firebase.Firestore.transmitTicketSolution(
         ticket,
-        { solution }
+        { solution, assignedMaintainer }
       );
 
       if (error) {
@@ -379,18 +394,34 @@ const TicketDetailsScreen: React.FC = () => {
       formModal = {
         title: "Informar status",
         children: (
-          <TextInput
-            mode="outlined"
-            multiline
-            numberOfLines={3}
-            label="Status da solução"
-            value={ticketSolutionStatus}
-            onChangeText={(val) => setTicketSolutionStatus(val)}
-          />
+          <>
+            <View style={{ marginBottom: 7 }}>
+              <TextInput
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                label="Status da solução"
+                value={ticketSolutionStatus}
+                onChangeText={(val) => setTicketSolutionStatus(val)}
+              />
+            </View>
+            <TextInput
+              mode="outlined"
+              multiline
+              numberOfLines={2}
+              label="Responsável"
+              value={assignedMaintainer}
+              onChangeText={(val) => setAssignedMaintainer(val)}
+            />
+          </>
         ),
         footerBtn: {
           label: "Enviar status",
-          onPress: () => onShareTicketSolutionStatus(ticketSolutionStatus),
+          onPress: () =>
+            onShareTicketSolutionStatus(
+              ticketSolutionStatus,
+              assignedMaintainer
+            ),
         },
       };
       break;
@@ -398,18 +429,31 @@ const TicketDetailsScreen: React.FC = () => {
       formModal = {
         title: "Descrição da solução",
         children: (
-          <TextInput
-            mode="outlined"
-            multiline
-            numberOfLines={3}
-            label="Descrição da solução"
-            value={ticketSolution}
-            onChangeText={(val) => setTicketSolution(val)}
-          />
+          <>
+            <View style={{ marginBottom: 7 }}>
+              <TextInput
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                label="Descrição da solução"
+                value={ticketSolution}
+                onChangeText={(val) => setTicketSolution(val)}
+              />
+            </View>
+            <TextInput
+              mode="outlined"
+              multiline
+              numberOfLines={2}
+              label="Responsável"
+              value={assignedMaintainer}
+              onChangeText={(val) => setAssignedMaintainer(val)}
+            />
+          </>
         ),
         footerBtn: {
           label: "Transmitir Solução",
-          onPress: () => onTransmitTicketSolution(ticketSolution),
+          onPress: () =>
+            onTransmitTicketSolution(ticketSolution, assignedMaintainer),
         },
       };
       break;

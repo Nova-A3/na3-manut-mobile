@@ -66,7 +66,7 @@ export type Ticket = {
     payload: {
       priority?: Ticket["priority"];
       assignedMaintainer?: Ticket["assignedMaintainer"];
-      solution?: Ticket["solution"];
+      solution?: Ticket["solution"] | { content?: string; who?: string };
       refusalReason?: Ticket["refusalReason"];
       changes?: TicketEditedEventChanges;
       poke?: { from: string; to: string };
@@ -77,6 +77,7 @@ export type Ticket = {
           | "solutionAccepted"
           | "solutionRefused";
         content?: string;
+        who?: string;
       };
     } | null;
   }[];

@@ -25,24 +25,39 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
 }) => {
   const payloadAlert = () => {
     if (payload) {
+      if (type === "ticketConfirmed") {
+        return {
+          title: "OS confirmada",
+          message: `Prioridade: ${translatePriority(payload.priority)}${
+            payload.assignedMaintainer
+              ? `\nManutentor: ${payload.assignedMaintainer}`
+              : ""
+          }`,
+        };
+      }
+
       switch (Object.keys(payload)[0]) {
         case "priority":
           return {
-            title:
-              type === "ticketConfirmed"
-                ? "Prioridade definida"
-                : "Nova prioridade",
+            title: "Nova prioridade",
             message: translatePriority(payload.priority),
           };
         case "solutionStep":
           return {
             title: "Progresso da solução",
-            message: payload.solutionStep?.content,
+            message: `${payload.solutionStep?.content}${
+              payload.solutionStep?.who ? ` (${payload.solutionStep.who})` : ""
+            }`,
           };
         case "solution":
           return {
             title: "Solução transmitida",
-            message: payload.solution,
+            message:
+              typeof payload.solution === "string"
+                ? payload.solution
+                : `${payload.solution?.content}${
+                    payload.solution?.who ? ` (${payload.solution.who})` : ""
+                  }`,
           };
         case "refusalReason":
           return {
