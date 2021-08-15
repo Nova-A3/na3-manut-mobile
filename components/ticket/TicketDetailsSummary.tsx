@@ -95,6 +95,10 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
       return;
     }
 
+    if (editedAssignedMaintainer === assignedMaintainer) {
+      return;
+    }
+
     await execGlobalLoading(async () => {
       const { error } = await Fb.Fs.editTicketAssignedMaintainer(id, {
         assignedMaintainer: editedAssignedMaintainer!,
