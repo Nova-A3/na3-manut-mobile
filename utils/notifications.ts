@@ -2,10 +2,13 @@ export const sendNotification = async ({
   to,
   title,
   body,
+  data,
 }: {
   to: string | string[];
   title: string;
   body: string;
+  data?: { [key: string]: string };
+  badge?: number;
 }) => {
   await fetch("https://exp.host/--/api/v2/push/send", {
     method: "POST",

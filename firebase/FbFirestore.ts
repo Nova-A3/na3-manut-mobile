@@ -111,10 +111,14 @@ class FbFirestore {
       .doc(id)
       .set(ticket);
 
+    const badgeCount = (await this.getTickets(Db.getDepartment("manutencao")!))
+      .length;
+
     sendNotification({
       to: await this.getPushTokens("manutencao"),
       title: `[AÇÃO NECESSÁRIA] Nova OS – nº ${ticket.id}`,
       body: `Acesse o app para aceitar: "${ticket.description}"`,
+      badge: badgeCount,
     });
     sendNotification({
       to: await this.getPushTokens(
@@ -124,6 +128,7 @@ class FbFirestore {
       ),
       title: `Nova OS – nº ${ticket.id} (${ticket.dpt})`,
       body: ticket.description,
+      badge: badgeCount,
     });
   }
 
@@ -375,10 +380,15 @@ class FbFirestore {
         },
       ]);
 
+      const badgeCount = (
+        await this.getTickets(Db.getDepartment("manutencao")!)
+      ).length;
+
       sendNotification({
         to: await this.getPushTokens("manutencao"),
         title: `OS #${ticket.id}`,
         body: `OS encerrada pelo solicitante (${ticket.dpt})`,
+        badge: badgeCount,
       });
       sendNotification({
         to: await this.getPushTokens(
@@ -388,6 +398,7 @@ class FbFirestore {
         ),
         title: `OS #${ticket.id} (${ticket.dpt})`,
         body: `Encerrada pelo solicitante`,
+        badge: badgeCount,
       });
 
       return { error: null };
