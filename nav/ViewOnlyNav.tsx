@@ -16,7 +16,22 @@ const ViewOnlyNav: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <Tabs.Navigator>
+      <Tabs.Navigator initialRouteName="allTicketsTab">
+        <Tabs.Screen
+          name="internalProjectsTab"
+          component={InternalProjectsStack}
+          options={{
+            tabBarLabel: "Projetos",
+            tabBarIcon: ({ focused, color, size }) => {
+              return focused ? (
+                <Ionicons name="build" size={size} color={color} />
+              ) : (
+                <Ionicons name="build-outline" size={size} color={color} />
+              );
+            },
+          }}
+        />
+
         <Tabs.Screen
           name="allTicketsTab"
           component={AllTicketsStack}
@@ -30,21 +45,6 @@ const ViewOnlyNav: React.FC = () => {
               );
             },
             tabBarBadge: tickets.length > 0 ? tickets.length : undefined,
-          }}
-        />
-
-        <Tabs.Screen
-          name="internalProjectsTab"
-          component={InternalProjectsStack}
-          options={{
-            tabBarLabel: "Projetos",
-            tabBarIcon: ({ focused, color, size }) => {
-              return focused ? (
-                <Ionicons name="build" size={size} color={color} />
-              ) : (
-                <Ionicons name="build-outline" size={size} color={color} />
-              );
-            },
           }}
         />
 
