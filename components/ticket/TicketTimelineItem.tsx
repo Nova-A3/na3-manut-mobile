@@ -12,7 +12,7 @@ import {
   idToName,
   translateEventType,
   translatePriority,
-  translateTicketKey,
+  translateTicketKey
 } from "../../utils";
 import IoniconsIconButton from "../ui/IoniconsIconButton";
 
@@ -122,6 +122,8 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
                     ? COLORS.SYSTEM.GREEN
                     : type === "solutionRefused"
                     ? COLORS.SYSTEM.RED
+                    : type === "solutionStepAdded"
+                    ? COLORS.SYSTEM.CYAN
                     : COLORS.SYSTEM.GRAY
                 }
               />
