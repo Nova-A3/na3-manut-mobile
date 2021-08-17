@@ -509,7 +509,9 @@ const TicketDetailsScreen: React.FC = () => {
           <Headline
             style={[
               styles.title,
-              ticket.username === "off-set" ? { color: "#333" } : undefined,
+              ["off-set", "ekoplasto"].includes(ticket.username)
+                ? { color: "#333" }
+                : undefined,
             ]}
           >
             {ticket.description}

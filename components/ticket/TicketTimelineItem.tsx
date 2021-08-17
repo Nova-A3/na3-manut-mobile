@@ -5,6 +5,7 @@ import { Subheading, Text } from "react-native-paper";
 import { Divider } from "react-navigation-header-buttons";
 import { COLORS } from "../../constants";
 import Db from "../../db";
+import { useDepartment } from "../../hooks";
 import { Ticket } from "../../types";
 import {
   formatDeviceInfo,
@@ -12,7 +13,7 @@ import {
   idToName,
   translateEventType,
   translatePriority,
-  translateTicketKey
+  translateTicketKey,
 } from "../../utils";
 import IoniconsIconButton from "../ui/IoniconsIconButton";
 
@@ -23,6 +24,8 @@ type TicketTimelineItemProps = {
 const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
   data: { type, timestamp, device, payload },
 }) => {
+  const dpt = useDepartment()!;
+
   const payloadAlert = () => {
     if (payload) {
       if (type === "ticketConfirmed") {
@@ -78,6 +81,13 @@ const TicketTimelineItem: React.FC<TicketTimelineItemProps> = ({
                         } -> ${val.new === true ? "SIM" : "NÃO"}`
                     )
                     .join("\n");
+                }
+                if (dpt.username === "ekoplasto" && key === "machine") {
+                  return `${translateTicketKey(key)}: ${
+                    // @ts-ignore
+                    dpt.getMachineNames()[+val.old - 1]
+                    // @ts-ignore
+                  } -> ${dpt.getMachineNames()[+val.new - 1]}`;
                 }
                 return `${translateTicketKey(key)}: ${idToName(
                   // @ts-ignore

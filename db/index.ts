@@ -46,14 +46,21 @@ class Department implements IDepartment {
   getMachineNames(): string[] {
     if (!this.machines) {
       return [];
+    } else if (this.username === "ekoplasto") {
+      return [
+        "Sem-fim",
+        "Carrossel",
+        "Picotador",
+        "Aglutinador",
+        "Elétrica...",
+      ];
+    } else {
+      const machineNames: string[] = [];
+      for (let i = 0; i < this.machines; i++) {
+        machineNames.push(`Máquina ${i + 1}`);
+      }
+      return machineNames;
     }
-
-    const machineNames: string[] = [];
-    for (let i = 0; i < this.machines; i++) {
-      machineNames.push(`Máquina ${i + 1}`);
-    }
-
-    return machineNames;
   }
 }
 
@@ -84,18 +91,18 @@ export class Db {
     new Department({
       type: "operator",
       username: "corte-solda-luva",
-      displayName: "CORTE & SOLDA (LUVA)",
+      displayName: "CORTE & SOLDA – LUVA",
       color: "#F58F29",
       machines: 4,
-      swappableWith: "corte-solda-saco",
+      swappableWith: ["corte-solda-saco", "super-kit"],
     }),
     new Department({
       type: "operator",
       username: "corte-solda-saco",
-      displayName: "CORTE & SOLDA (SACO)",
+      displayName: "CORTE & SOLDA – SACO",
       color: "#FF78CB",
       machines: 4,
-      swappableWith: "corte-solda-luva",
+      swappableWith: ["corte-solda-luva", "super-kit"],
     }),
     new Department({
       type: "operator",
@@ -134,20 +141,28 @@ export class Db {
       displayName: "SUPER KIT",
       color: "#F5B700",
       machines: 2,
+      swappableWith: ["corte-solda-saco", "corte-solda-luva"],
     }),
     new Department({
       type: "operator",
       username: "kit-manual",
       displayName: "KIT MANUAL",
-      color: "#333333",
+      color: "#FF6663",
       machines: 2,
+    }),
+    new Department({
+      type: "operator",
+      username: "ekoplasto",
+      displayName: "EKOPLASTO",
+      color: "#E0FF4F",
+      machines: 4,
     }),
 
     new Department({
       type: "maintenance",
       username: "manutencao",
       displayName: "MANUTENÇÃO",
-      color: "#333",
+      color: "#191923",
     }),
 
     new Department({
@@ -166,6 +181,12 @@ export class Db {
       type: "viewOnly",
       username: "agomes",
       displayName: "ARTHUR GOMES",
+      color: "#333",
+    }),
+    new Department({
+      type: "viewOnly",
+      username: "msantos",
+      displayName: "MARCO SANTOS",
       color: "#333",
     }),
 

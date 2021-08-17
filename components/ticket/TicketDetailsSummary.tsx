@@ -3,6 +3,7 @@ import * as React from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { Caption, Divider, TextInput } from "react-native-paper";
 import { COLORS } from "../../constants";
+import Db from "../../db";
 import Fb from "../../firebase";
 import {
   useDepartment,
@@ -38,6 +39,7 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     priority,
     refusalReason,
     assignedMaintainer,
+    username,
   } = tickets[0]!;
   const department = useDepartment();
   const { execGlobalLoading } = useGlobalLoading();
@@ -210,7 +212,11 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
         </View>
         <View style={styles.summaryItem}>
           <Caption style={styles.itemKey}>Máquina:</Caption>
-          <Text style={styles.itemValue}>{machine}</Text>
+          <Text style={styles.itemValue}>
+            {username === "ekoplasto"
+              ? Db.getDepartment(username)?.getMachineNames()[+machine - 1]
+              : machine}
+          </Text>
         </View>
 
         <Divider style={styles.divider} />

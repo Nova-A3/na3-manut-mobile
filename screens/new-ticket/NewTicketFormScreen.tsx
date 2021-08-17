@@ -21,7 +21,9 @@ const NewTicketFormScreen: React.FC = () => {
 
   const [dpt, setDpt] = React.useState(department!.displayName);
   const [machine, setMachine] = React.useState("1");
-  const [description, setDescription] = React.useState("[placeholder]");
+  const [description, setDescription] = React.useState(
+    department.username === "ekoplasto" ? "" : "[placeholder]"
+  );
   const [stoppedLine, setStoppedLine] = React.useState(false);
   const [stoppedEquipment, setStoppedEquipment] = React.useState(false);
   const [stoppedProduction, setStoppedProduction] = React.useState(false);
@@ -127,31 +129,45 @@ const NewTicketFormScreen: React.FC = () => {
 
           <View style={styles.formSection}>
             <Header title="Descrição do problema" />
-            <Dropdown
-              label="Problema"
-              items={[
-                { label: "Escolher...", value: "[placeholder]" },
-                ...[...dptIssues].sort().map((issue) => ({
-                  label: issue.toUpperCase(),
-                  value: issue,
-                })),
-                { label: "Outro...", value: "" },
-              ]}
-              onValueChange={(val) => setDescription(val)}
-              style={styles.formField}
-            />
-            {(!description || !dptIssues.includes(description)) &&
-              description !== "[placeholder]" && (
-                <TextInput
-                  mode="outlined"
-                  multiline
-                  numberOfLines={3}
-                  label="Descrição do problema"
-                  value={description}
-                  onChangeText={(val) => setDescription(val)}
+            {department.username === "ekoplasto" ? (
+              <TextInput
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                label="Descrição do problema"
+                value={description}
+                onChangeText={(val) => setDescription(val)}
+                style={styles.formField}
+              />
+            ) : (
+              <>
+                <Dropdown
+                  label="Problema"
+                  items={[
+                    { label: "Escolher...", value: "[placeholder]" },
+                    ...[...dptIssues].sort().map((issue) => ({
+                      label: issue.toUpperCase(),
+                      value: issue,
+                    })),
+                    { label: "Outro...", value: "" },
+                  ]}
+                  onValueChange={(val) => setDescription(val)}
                   style={styles.formField}
                 />
-              )}
+                {(!description || !dptIssues.includes(description)) &&
+                  description !== "[placeholder]" && (
+                    <TextInput
+                      mode="outlined"
+                      multiline
+                      numberOfLines={3}
+                      label="Descrição do problema"
+                      value={description}
+                      onChangeText={(val) => setDescription(val)}
+                      style={styles.formField}
+                    />
+                  )}
+              </>
+            )}
           </View>
 
           <View style={styles.formSection}>

@@ -143,31 +143,45 @@ const TicketEditScreen: React.FC = () => {
 
           <View style={styles.formSection}>
             <Header title="Descrição do problema" />
-            <Dropdown
-              label="Problema"
-              items={[
-                ...[...dptIssues].sort().map((issue) => ({
-                  label: issue.toUpperCase(),
-                  value: issue,
-                })),
-                { label: "Outro...", value: "" },
-              ]}
-              value={description}
-              onValueChange={(val) => setDescription(val)}
-              style={styles.formField}
-            />
-            {(!description || !dptIssues.includes(description)) &&
-              description !== "[placeholder]" && (
-                <TextInput
-                  mode="outlined"
-                  multiline
-                  numberOfLines={3}
-                  label="Descrição do problema"
+            {department.username === "ekoplasto" ? (
+              <TextInput
+                mode="outlined"
+                multiline
+                numberOfLines={3}
+                label="Descrição do problema"
+                value={description}
+                onChangeText={(val) => setDescription(val)}
+                style={styles.formField}
+              />
+            ) : (
+              <>
+                <Dropdown
+                  label="Problema"
+                  items={[
+                    ...[...dptIssues].sort().map((issue) => ({
+                      label: issue.toUpperCase(),
+                      value: issue,
+                    })),
+                    { label: "Outro...", value: "" },
+                  ]}
                   value={description}
-                  onChangeText={(val) => setDescription(val)}
+                  onValueChange={(val) => setDescription(val)}
                   style={styles.formField}
                 />
-              )}
+                {(!description || !dptIssues.includes(description)) &&
+                  description !== "[placeholder]" && (
+                    <TextInput
+                      mode="outlined"
+                      multiline
+                      numberOfLines={3}
+                      label="Descrição do problema"
+                      value={description}
+                      onChangeText={(val) => setDescription(val)}
+                      style={styles.formField}
+                    />
+                  )}
+              </>
+            )}
           </View>
 
           <View style={styles.formSection}>
