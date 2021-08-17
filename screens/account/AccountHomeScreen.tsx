@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   devBtn: {
-    marginBottom: 15,
+    marginBottom: 14,
   },
   notificationsContainer: {
     marginTop: 20,
