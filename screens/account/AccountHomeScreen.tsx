@@ -93,7 +93,7 @@ const AccountHomeScreen: React.FC = () => {
         style: (swapAccs.length === 1 ? "destructive" : "default") as
           | "destructive"
           | "default",
-        text: `Trocar para "${acc.displayName}"`,
+        text: `Trocar para ${acc.displayName}`,
         onPress: () =>
           execGlobalLoading(async () => {
             dispatch(setSwapping(true));
