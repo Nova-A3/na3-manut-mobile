@@ -50,7 +50,9 @@ export type StatsStackParamList = {
 
 export type InternalProjectsStackParamList = {
   internalProjectsHome: undefined;
-  internalProjectsNewForm: undefined;
+  internalProjectsNewForm:
+    | { editing: false }
+    | { editing: true; project: FsInternalProject };
   internalProjectDetails: { project: FsInternalProject };
   internalProjectTimeline: { project: FsInternalProject };
 };

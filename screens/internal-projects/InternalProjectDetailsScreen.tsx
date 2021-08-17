@@ -8,7 +8,7 @@ import {
 import firebase from "firebase";
 import moment from "moment";
 import * as React from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import {
   Divider,
   Headline,
@@ -162,7 +162,10 @@ const InternalProjectDetailsScreen: React.FC = () => {
             {
               title: "Editar projeto",
               onPress: () => {
-                Alert.alert("Em breve");
+                nav.navigate("internalProjectsNewForm", {
+                  editing: true,
+                  project,
+                });
               },
               disabled:
                 !department.isMaintenance() ||
@@ -172,7 +175,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
         />
       ),
     });
-  }, []);
+  }, [nav, department, project]);
 
   return (
     <>
@@ -288,10 +291,15 @@ const InternalProjectDetailsScreen: React.FC = () => {
               <Subheading style={styles.infoValue}>
                 {InternalProjects.translateEvent(
                   project.events[project.events.length - 1]!
-                )}{" "}
-                <Text style={[styles.infoValue, { fontStyle: "italic" }]}>
-                  (por {project.events[project.events.length - 1]!.author})
-                </Text>
+                )}
+                {project.events[project.events.length - 1]!.type !== "edit" && (
+                  <>
+                    {" "}
+                    <Text style={[styles.infoValue, { fontStyle: "italic" }]}>
+                      (por {project.events[project.events.length - 1]!.author})
+                    </Text>
+                  </>
+                )}
               </Subheading>
             </View>
             <View style={styles.infoContainer}>

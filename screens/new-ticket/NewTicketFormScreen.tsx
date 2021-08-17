@@ -7,7 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
@@ -54,8 +54,9 @@ const NewTicketFormScreen: React.FC = () => {
       `OS #${nextTicketId}`,
       `Confirma a abertura da OS nº ${nextTicketId}: "${description}"?`,
       [
-        { style: "destructive", text: "Não, voltar" },
+        { style: "cancel", text: "Não, voltar" },
         {
+          style: "destructive",
           text: "Sim, abrir OS",
           onPress: async () => {
             await execGlobalLoading(async () => {

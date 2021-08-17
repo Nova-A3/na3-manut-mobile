@@ -65,6 +65,25 @@ export const translateTicketKey = (key: string) => {
   }
 };
 
+export const translateProjectKey = (key: string) => {
+  switch (key) {
+    case "title":
+      return "Título";
+    case "description":
+      return "Descrição";
+    case "teamManager":
+      return "Equipe – Responsável";
+    case "teamOthers":
+      return "Equipe – Manutentor(es)";
+    case "priority":
+      return "Prioridade";
+    case "eta":
+      return "Previsão de conclusão";
+    default:
+      return key;
+  }
+};
+
 export const translateAccountType = (
   accType: "operator" | "maintenance" | "viewOnly"
 ) => {

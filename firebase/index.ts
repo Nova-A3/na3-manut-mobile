@@ -32,6 +32,7 @@ export class Fb {
         if (fbUser) {
           const department = Database.getDepartment(fbUser.email!)!;
           Fb.Firestore.registerRefreshTicketsListener(department);
+          Fb.Firestore.registerRefreshProjectsListener();
           store.dispatch(setDepartment(department));
         } else {
           store.dispatch(setDepartment(null));

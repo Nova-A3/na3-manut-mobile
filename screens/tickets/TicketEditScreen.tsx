@@ -64,8 +64,9 @@ const TicketEditScreen: React.FC = () => {
       `OS #${ticket.id}`,
       `Confirma a edição da OS nº ${ticket.id}: "${description}"?`,
       [
-        { style: "destructive", text: "Não, voltar" },
+        { style: "cancel", text: "Não, voltar" },
         {
+          style: "destructive",
           text: "Sim, editar OS",
           onPress: async () => {
             await execGlobalLoading(async () => {

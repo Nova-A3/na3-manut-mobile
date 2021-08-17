@@ -1,4 +1,9 @@
-import { useNavigation } from "@react-navigation/native";
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import firebase from "firebase";
 import moment, { Moment } from "moment";
 import * as React from "react";
@@ -18,7 +23,12 @@ import { SingleChange } from "react-native-paper-dates/lib/typescript/src/Date/C
 import { InternalProjects } from "../../classes";
 import { Button, Dropdown, Header } from "../../components";
 import { useFlashMessage, useGlobalLoading } from "../../hooks";
-import { InternalProject } from "../../types";
+import {
+  InternalProject,
+  InternalProjectChanges,
+  InternalProjectEvent,
+  InternalProjectsStackParamList,
+} from "../../types";
 
 const InternalProjectsNewFormScreen: React.FC = () => {
   const [author, setAuthor] =
@@ -36,7 +46,14 @@ const InternalProjectsNewFormScreen: React.FC = () => {
 
   const [openSelectEta, setOpenSelectEta] = React.useState(false);
 
-  const nav = useNavigation();
+  const route =
+    useRoute<
+      RouteProp<InternalProjectsStackParamList, "internalProjectsNewForm">
+    >();
+  const nav =
+    useNavigation<
+      NavigationProp<InternalProjectsStackParamList, "internalProjectsNewForm">
+    >();
   const { execGlobalLoading } = useGlobalLoading();
   const msg = useFlashMessage();
 
@@ -62,6 +79,55 @@ const InternalProjectsNewFormScreen: React.FC = () => {
     return null;
   }, [author, title, description, team, eta]);
 
+  const getChanges = React.useCallback(() => {
+    if (!route.params.editing) {
+      return;
+    }
+
+    const { project: currProject } = route.params;
+    const changes: Partial<InternalProjectChanges> = {};
+
+    if (title.trim() !== currProject.title.trim()) {
+      changes.title = { old: currProject.title.trim(), new: title.trim() };
+    }
+    if (description.trim() !== currProject.description.trim()) {
+      changes.description = {
+        old: currProject.description.trim(),
+        new: description.trim(),
+      };
+    }
+    if (team.manager.trim() !== currProject.team.manager.trim()) {
+      changes.teamManager = {
+        old: currProject.team.manager,
+        new: team.manager.trim(),
+      };
+    }
+    if (team.others.trim() !== currProject.team.others.trim()) {
+      changes.teamOthers = {
+        old: currProject.team.others,
+        new: team.others.trim(),
+      };
+    }
+    if (priority !== currProject.priority) {
+      changes.priority = {
+        old: currProject.priority,
+        new: priority,
+      };
+    }
+    if (!(eta && eta.isSame(moment(currProject.eta.toDate()), "date"))) {
+      changes.eta = {
+        old: currProject.eta,
+        new: firebase.firestore.Timestamp.fromDate(eta!.toDate()),
+      };
+    }
+
+    if (Object.keys(changes).length === 0) {
+      return;
+    } else {
+      return changes;
+    }
+  }, [title, description, team, priority, eta]);
+
   const onDismissEta = React.useCallback(() => {
     setOpenSelectEta(false);
   }, []);
@@ -84,52 +150,101 @@ const InternalProjectsNewFormScreen: React.FC = () => {
     }
 
     Alert.alert(
-      `Novo projeto`,
-      `Confirma a publicação do projeto "${title}"?`,
+      route.params.editing
+        ? `Editar ${InternalProjects.formatId(route.params.project)}`
+        : "Novo projeto",
+      route.params.editing
+        ? `Confirma a edição do projeto ${InternalProjects.formatId(
+            route.params.project
+          )}?`
+        : `Confirma a publicação do projeto "${title}"?`,
       [
-        { style: "destructive", text: "Não, voltar" },
+        { style: "cancel", text: "Não, voltar" },
         {
-          text: "Sim, publicar",
+          style: "destructive",
+          text: route.params.editing ? "Sim, editar" : "Sim, publicar",
           onPress: () =>
             execGlobalLoading(async () => {
-              try {
-                const internalId = await InternalProjects.findNextId();
-                const project: InternalProject = {
-                  internalId,
-                  title: title.trim(),
-                  description: description.trim(),
-                  team: {
-                    manager: team.manager.trim(),
-                    others: team.others.trim(),
-                  },
-                  priority,
-                  eta: firebase.firestore.Timestamp.fromDate(eta!.toDate()),
-                  events: [
-                    {
-                      type: "create",
-                      timestamp: firebase.firestore.Timestamp.now(),
-                      author: author.trim(),
+              if (!route.params.editing) {
+                try {
+                  const internalId = await InternalProjects.findNextId();
+                  const project: InternalProject = {
+                    internalId,
+                    title: title.trim(),
+                    description: description.trim(),
+                    team: {
+                      manager: team.manager.trim(),
+                      others: team.others.trim(),
                     },
-                  ],
-                };
+                    priority,
+                    eta: firebase.firestore.Timestamp.fromDate(eta!.toDate()),
+                    events: [
+                      {
+                        type: "create",
+                        timestamp: firebase.firestore.Timestamp.now(),
+                        author: author.trim(),
+                      },
+                    ],
+                  };
 
-                await InternalProjects.publish(project);
+                  await InternalProjects.publish(project);
 
-                msg.show({
-                  type: "success",
-                  title: "Projeto publicado",
-                  text: `Projeto ${InternalProjects.formatId(
-                    project
-                  )} — "${title}" publicado com sucesso.`,
-                });
-              } catch (e) {
-                msg.show({
-                  type: "warning",
-                  title: "Erro ao publicar projeto",
-                  text: "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
-                });
-              } finally {
-                nav.navigate("internalProjectsHome");
+                  msg.show({
+                    type: "success",
+                    title: "Projeto publicado",
+                    text: `Projeto ${InternalProjects.formatId(
+                      project
+                    )} — "${title}" publicado com sucesso.`,
+                  });
+                } catch (e) {
+                  msg.show({
+                    type: "warning",
+                    title: "Erro ao publicar projeto",
+                    text: "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+                  });
+                } finally {
+                  nav.navigate("internalProjectsHome");
+                }
+              } else {
+                const changes = getChanges();
+                if (!changes) {
+                  return msg.show({
+                    type: "warning",
+                    title: "Erro ao editar projeto",
+                    text: "Não foram encontradas alterações na configuração do projeto.",
+                  });
+                }
+
+                try {
+                  const { project: prevProject } = route.params;
+                  const event: InternalProjectEvent = {
+                    type: "edit",
+                    timestamp: firebase.firestore.Timestamp.now(),
+                    author: author.trim(),
+                    changes,
+                  };
+
+                  await InternalProjects.edit(prevProject.id, changes);
+
+                  await InternalProjects.pushEvent(prevProject.id, event);
+
+                  msg.show({
+                    type: "success",
+                    title: "Projeto editado",
+                    text: `Projeto ${InternalProjects.formatId(
+                      prevProject
+                    )} editado com sucesso.`,
+                  });
+                } catch (e) {
+                  console.error(e);
+                  msg.show({
+                    type: "warning",
+                    title: "Erro ao editar projeto",
+                    text: "Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações.",
+                  });
+                } finally {
+                  nav.navigate("internalProjectsHome");
+                }
               }
             }),
         },
@@ -147,6 +262,19 @@ const InternalProjectsNewFormScreen: React.FC = () => {
     execGlobalLoading,
   ]);
 
+  React.useEffect(() => {
+    if (route.params.editing && route.params.project) {
+      const { project } = route.params;
+      nav.setOptions({ title: "Editar" });
+      setAuthor(project.events[0]!.author);
+      setTitle(project.title);
+      setDescription(project.description);
+      setTeam(project.team);
+      setPriority(project.priority);
+      setEta(moment(project.eta.toDate()));
+    }
+  }, [route]);
+
   return (
     <>
       <KeyboardAvoidingView
@@ -160,11 +288,12 @@ const InternalProjectsNewFormScreen: React.FC = () => {
               <Header title="Cabeçalho" />
               <TextInput
                 mode="outlined"
-                label="Seu nome"
+                label="Autor"
                 value={author}
                 onChangeText={(val) => setAuthor(val)}
                 style={styles.formField}
-                autoFocus
+                autoFocus={!route.params.editing}
+                disabled={route.params.editing}
               />
               <TextInput
                 mode="outlined"
@@ -213,6 +342,7 @@ const InternalProjectsNewFormScreen: React.FC = () => {
                   { value: "medium", label: "Média" },
                   { value: "high", label: "Alta" },
                 ]}
+                value={priority}
                 onValueChange={(val) => setPriority(val)}
                 style={styles.formField}
               />
@@ -236,7 +366,7 @@ const InternalProjectsNewFormScreen: React.FC = () => {
                 disabled
               />
               <Button
-                label="Selecionar data"
+                label={eta ? "Alterar data" : "Selecionar data"}
                 icon="calendar"
                 onPress={() => setOpenSelectEta(true)}
               />
@@ -244,14 +374,20 @@ const InternalProjectsNewFormScreen: React.FC = () => {
 
             <View>
               <Button
-                label="Enviar"
+                label={route.params.editing ? "Editar" : "Enviar"}
                 icon="check-bold"
                 onPress={onSubmit}
                 style={styles.sendBtn}
                 color="success"
               />
               <Divider />
-              <Text style={styles.footer}>Nova A3 • Manutenção</Text>
+              <Text style={styles.footer}>
+                {route.params.editing
+                  ? `Editando projeto: ${InternalProjects.formatId(
+                      route.params.project
+                    )}`
+                  : "Manutenção • Novo projeto"}
+              </Text>
             </View>
           </ScrollView>
         </TouchableWithoutFeedback>

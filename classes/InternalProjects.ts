@@ -1,7 +1,16 @@
 import firebase from "firebase";
 import moment from "moment";
-import { FsInternalProject, InternalProject } from "../types";
-import { fsCollectionId } from "../utils";
+import {
+  FsInternalProject,
+  InternalProject,
+  InternalProjectChanges,
+  InternalProjectEvent,
+} from "../types";
+import {
+  fsCollectionId,
+  translatePriority,
+  translateProjectKey,
+} from "../utils";
 
 export default class InternalProjects {
   static COLORS = {
@@ -75,6 +84,32 @@ export default class InternalProjects {
     await InternalProjects.getCollection().add(project);
   };
 
+  static edit = async (projectId: string, changes: InternalProjectChanges) => {
+    const currProject = (
+      await InternalProjects.getCollection().doc(projectId).get()
+    ).data() as InternalProject;
+
+    const edited: InternalProject = {
+      ...currProject,
+      title: changes.title ? changes.title.new : currProject.title,
+      description: changes.description
+        ? changes.description.new
+        : currProject.description,
+      priority: changes.priority ? changes.priority.new : currProject.priority,
+      eta: changes.eta ? changes.eta.new : currProject.eta,
+      team: {
+        manager: changes.teamManager
+          ? changes.teamManager.new
+          : currProject.team.manager,
+        others: changes.teamOthers
+          ? changes.teamOthers.new
+          : currProject.team.others,
+      },
+    };
+
+    await InternalProjects.getCollection().doc(projectId).update(edited);
+  };
+
   static pushEvent = async (
     projectId: string,
     event: InternalProject["events"][number]
@@ -132,7 +167,7 @@ export default class InternalProjects {
     return project.events.filter((ev) => ev.type === eventType);
   };
 
-  static translateEvent = (event: InternalProject["events"][0]) => {
+  static translateEvent = (event: InternalProjectEvent) => {
     let text: string;
     switch (event.type) {
       case "create":
@@ -144,6 +179,31 @@ export default class InternalProjects {
         break;
       case "status":
         text = event.message;
+        break;
+      case "edit":
+        const changes: InternalProjectChanges = event.changes;
+        text = `Edição:${Object.entries(changes)
+          .map(
+            ([chKey, chVal]) =>
+              `\n• ${translateProjectKey(chKey)}: ${
+                chKey === "priority"
+                  ? translatePriority(chVal.old as InternalProject["priority"])
+                  : chKey === "eta"
+                  ? moment(
+                      (chVal.old as firebase.firestore.Timestamp).toDate()
+                    ).format("DD/MM")
+                  : chVal.old
+              } -> ${
+                chKey === "priority"
+                  ? translatePriority(chVal.new as InternalProject["priority"])
+                  : chKey === "eta"
+                  ? moment(
+                      (chVal.new as firebase.firestore.Timestamp).toDate()
+                    ).format("DD/MM")
+                  : chVal.new
+              }`
+          )
+          .join("")}`;
     }
 
     return text;

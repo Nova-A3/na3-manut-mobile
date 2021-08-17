@@ -4,9 +4,10 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import moment from "moment";
 import uuid from "react-native-uuid";
+import { InternalProjects } from "../classes";
 import Db from "../db";
 import store from "../store";
-import { setDataLoading, setTickets } from "../store/actions";
+import { setDataLoading, setProjects, setTickets } from "../store/actions";
 import { Department, Ticket, TicketStats, TicketStatsItem } from "../types";
 import {
   fsCollectionId,
@@ -922,6 +923,19 @@ class FbFirestore {
       store.dispatch(setDataLoading(true));
       const tickets = await this.getTickets(department);
       store.dispatch(setTickets(tickets));
+      store.dispatch(setDataLoading(false));
+    });
+  }
+
+  registerRefreshProjectsListener() {
+    const collection = firebase
+      .firestore()
+      .collection(fsCollectionId("manut-projects"));
+
+    collection.onSnapshot(async (_) => {
+      store.dispatch(setDataLoading(true));
+      const projects = await InternalProjects.fetchAll();
+      store.dispatch(setProjects(projects));
       store.dispatch(setDataLoading(false));
     });
   }

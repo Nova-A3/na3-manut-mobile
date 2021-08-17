@@ -21,7 +21,7 @@ const InternalProjectsHomeScreen: React.FC = () => {
   };
 
   const onNavigateToNewProject = React.useCallback(() => {
-    nav.navigate("internalProjectsNewForm");
+    nav.navigate("internalProjectsNewForm", { editing: false });
   }, [nav]);
 
   const navigateToProjectDetails = React.useCallback(

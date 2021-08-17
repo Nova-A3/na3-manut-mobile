@@ -24,9 +24,9 @@ const InternalProjectsStack: React.FC = () => {
       <Stack.Screen
         name="internalProjectsNewForm"
         component={InternalProjectsNewFormScreen}
-        options={{
-          headerTitle: "Novo Projeto",
-        }}
+        options={({ route }) => ({
+          headerTitle: route.params.editing ? "Editar" : "Novo Projeto",
+        })}
       />
       <Stack.Screen
         name="internalProjectDetails"

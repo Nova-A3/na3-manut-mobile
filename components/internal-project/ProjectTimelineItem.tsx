@@ -4,6 +4,7 @@ import * as React from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { Subheading, Text } from "react-native-paper";
 import { Divider } from "react-navigation-header-buttons";
+import { InternalProjects } from "../../classes";
 import { COLORS } from "../../constants";
 import { InternalProject } from "../../types";
 import IoniconsIconButton from "../ui/IoniconsIconButton";
@@ -27,6 +28,8 @@ const ProjectTimelineItem: React.FC<ProjectTimelineItemProps> = ({
                 color={
                   projectEvent.type === "create"
                     ? COLORS.SYSTEM.BLUE
+                    : projectEvent.type === "status"
+                    ? COLORS.SYSTEM.CYAN
                     : projectEvent.type === "complete"
                     ? COLORS.SYSTEM.GREEN
                     : COLORS.SYSTEM.GRAY
@@ -38,6 +41,8 @@ const ProjectTimelineItem: React.FC<ProjectTimelineItemProps> = ({
                 ? "PROJETO CRIADO"
                 : projectEvent.type === "status"
                 ? "PROGRESSO"
+                : projectEvent.type === "edit"
+                ? "PROJETO EDITADO"
                 : "PROJETO ENTREGUE"}
             </Subheading>
           </View>
@@ -50,13 +55,27 @@ const ProjectTimelineItem: React.FC<ProjectTimelineItemProps> = ({
         </View>
 
         <View style={styles.btnRow}>
-          {projectEvent.type === "status" && (
+          {projectEvent.type === "status" ? (
             <IoniconsIconButton
               icon="document-text-outline"
               onPress={() => Alert.alert("Progresso", projectEvent.message)}
               style={{ marginRight: 0 }}
             />
-          )}
+          ) : projectEvent.type === "edit" ? (
+            <IoniconsIconButton
+              icon="document-text-outline"
+              onPress={() =>
+                Alert.alert(
+                  "Alterações",
+                  InternalProjects.translateEvent(projectEvent).replace(
+                    "Edição:\n",
+                    ""
+                  )
+                )
+              }
+              style={{ marginRight: 0 }}
+            />
+          ) : undefined}
 
           <IoniconsIconButton
             icon="person-outline"
