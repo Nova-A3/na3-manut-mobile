@@ -48,10 +48,13 @@ class Department implements IDepartment {
       return [];
     } else if (this.username === "ekoplasto") {
       return [
-        "Sem-fim",
-        "Carrossel",
-        "Picotador",
         "Aglutinador",
+        "Extrusora recicladora",
+        "Moinho a seco",
+        "Moinho da lavagem",
+        "Secadora",
+        "Tanque de lavagem",
+        "Ventoinhas/Sem-fins",
         "Elétrica...",
       ];
     } else {
