@@ -1,7 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import * as MailComposer from "expo-mail-composer";
 import * as Notifications from "expo-notifications";
-import firebase from "firebase";
 import * as React from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Switch, Text, TextInput } from "react-native-paper";
@@ -97,12 +96,13 @@ const AccountHomeScreen: React.FC = () => {
         onPress: () =>
           execGlobalLoading(async () => {
             dispatch(setSwapping(true));
-            await firebase.auth().signOut();
+            await Firebase.Auth.signOut(user!);
             dispatch(registerDataFirstLoad(false));
             dispatch(setSwapping(false));
-            await firebase
-              .auth()
-              .signInWithEmailAndPassword(acc.email, `manut-${acc.username}`);
+            await Firebase.Auth.signIn({
+              username: acc.username,
+              password: `manut-${acc.username}`,
+            });
 
             msg.show({
               type: "success",
