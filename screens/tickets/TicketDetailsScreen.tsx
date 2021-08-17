@@ -7,7 +7,7 @@ import {
   Headline,
   Subheading,
   Text,
-  TextInput,
+  TextInput
 } from "react-native-paper";
 import {
   Button,
@@ -15,7 +15,7 @@ import {
   FormModal,
   HeaderOverflowMenu,
   TicketDetailsButton,
-  TicketDetailsSummary,
+  TicketDetailsSummary
 } from "../../components";
 import Database, { Db } from "../../db";
 import { default as Firebase } from "../../firebase";
@@ -23,13 +23,13 @@ import {
   useDepartment,
   useFlashMessage,
   useGlobalLoading,
-  useTickets,
+  useTickets
 } from "../../hooks";
 import { AllTicketsStackParamList, Ticket } from "../../types";
 import {
   ColorType,
   getTicketStatusStyles,
-  translatePriority,
+  translatePriority
 } from "../../utils";
 
 type TicketDetailsScreenRouteProp = RouteProp<
@@ -328,12 +328,26 @@ const TicketDetailsScreen: React.FC = () => {
             {
               title: "Ver solução",
               onPress: () => {
-                Alert.alert(
-                  `Solução OS #${ticket.id}`,
-                  ticket.solution
-                    ? ticket.solution
-                    : "Nenhuma solução disponível"
-                );
+                let message: string;
+                if (!ticket.solution) {
+                  message = "Nenhuma solução disponível";
+                } else {
+                  const lastSolutionTransmittedEvent = ticket.events
+                    .filter((ev) => ev.type === "solutionTransmitted")
+                    .reverse()[0]!;
+                  if (
+                    typeof lastSolutionTransmittedEvent.payload!.solution ===
+                    "string"
+                  ) {
+                    message = ticket.solution;
+                  } else {
+                    message = `${ticket.solution} (${
+                      lastSolutionTransmittedEvent.payload!.solution!.who
+                    })`;
+                  }
+                }
+
+                Alert.alert(`Solução OS #${ticket.id}`, message);
               },
             },
             {
