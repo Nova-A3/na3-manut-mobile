@@ -82,39 +82,37 @@ const AccountHomeScreen: React.FC = () => {
     }
   };
 
-  const onSwapAccounts = (swapUsername: string) => {
-    const swapAcc = Db.getDepartment(swapUsername)!;
+  const onSwapAccounts = (swapUsernames: string | string[]) => {
+    if (typeof swapUsernames === "string") {
+      swapUsernames = [swapUsernames];
+    }
+    const swapAccs = swapUsernames.map((user) => Db.getDepartment(user)!);
 
-    Alert.alert(
-      "Alternar contas?",
-      `Tem certeza que deseja trocar de conta para "${swapAcc.displayName}"?`,
-      [
-        {
-          style: "destructive",
-          text: "Sim, trocar",
-          onPress: () =>
-            execGlobalLoading(async () => {
-              dispatch(setSwapping(true));
-              await firebase.auth().signOut();
-              dispatch(registerDataFirstLoad(false));
-              dispatch(setSwapping(false));
-              await firebase
-                .auth()
-                .signInWithEmailAndPassword(
-                  swapAcc.email,
-                  `manut-${swapAcc.username}`
-                );
+    Alert.alert("Alternar contas", `Tem certeza que deseja trocar de conta?`, [
+      ...swapAccs.map((acc) => ({
+        style: (swapAccs.length === 1 ? "destructive" : "default") as
+          | "destructive"
+          | "default",
+        text: `Trocar para "${acc.displayName}"`,
+        onPress: () =>
+          execGlobalLoading(async () => {
+            dispatch(setSwapping(true));
+            await firebase.auth().signOut();
+            dispatch(registerDataFirstLoad(false));
+            dispatch(setSwapping(false));
+            await firebase
+              .auth()
+              .signInWithEmailAndPassword(acc.email, `manut-${acc.username}`);
 
-              msg.show({
-                type: "success",
-                title: "Conta alternada",
-                text: `Você mudou para: ${swapAcc.displayName}`,
-              });
-            }),
-        },
-        { style: "default", text: "Não, ficar" },
-      ]
-    );
+            msg.show({
+              type: "success",
+              title: "Conta alternada",
+              text: `Você mudou para: ${acc.displayName}`,
+            });
+          }),
+      })),
+      { style: "cancel", text: "Não, ficar" },
+    ]);
   };
 
   React.useLayoutEffect(() => {

@@ -6,7 +6,7 @@ export type Department = {
   color: string;
   machines?: number;
 
-  swappableWith?: string;
+  swappableWith?: string | string[];
 
   isOperator: () => boolean;
   isMaintenance: () => boolean;
