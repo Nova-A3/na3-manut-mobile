@@ -9,7 +9,7 @@ import {
   MultipleHeaderButtons,
   TicketCard,
 } from "../../components";
-import { useFilters, useTickets } from "../../hooks";
+import { useDepartment, useFilters, useTickets } from "../../hooks";
 import { Ticket } from "../../types";
 import { systemColor } from "../../utils";
 
@@ -23,6 +23,7 @@ const filterItems: { value: Ticket["status"] | "all"; label: string }[] = [
 ];
 
 const AllTicketsHomeScreen: React.FC = () => {
+  const dpt = useDepartment()!;
   const [view, setView] = React.useState<Ticket["status"] | "all">("all");
   const { filters } = useFilters();
   const { tickets, loadTickets, loading } = useTickets(
@@ -41,16 +42,16 @@ const AllTicketsHomeScreen: React.FC = () => {
 
   React.useLayoutEffect(() => {
     nav.setOptions({
-      headerLeft: () => (
-        <HeaderButton
-          title="Relatórios"
-          icon="document-text-outline"
-          // onPress={() => nav.navigate("reportsHome")}
-          onPress={() => {}}
-          left
-          disabled
-        />
-      ),
+      headerLeft: !dpt.isOperator()
+        ? () => (
+            <HeaderButton
+              title="Relatórios"
+              icon="document-text-outline"
+              onPress={() => nav.navigate("reportsHome")}
+              left
+            />
+          )
+        : undefined,
       headerRight: () => (
         <MultipleHeaderButtons
           items={[
