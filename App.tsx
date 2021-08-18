@@ -34,13 +34,11 @@ if (isHermesEnabled || isAndroid) {
   require("@formatjs/intl-datetimeformat/polyfill");
   require("@formatjs/intl-datetimeformat/locale-data/pt.js");
 
-  require("@formatjs/intl-datetimeformat/add-golden-tz.js");
+  require("@formatjs/intl-datetimeformat/add-all-tz.js");
 
   if ("__setDefaultTimeZone" in Intl.DateTimeFormat) {
     // @ts-ignore
-    Intl.DateTimeFormat.__setDefaultTimeZone(
-      require("expo-localization").timezone
-    );
+    Intl.DateTimeFormat.__setDefaultTimeZone("America/Sao_Paulo");
   }
 }
 
