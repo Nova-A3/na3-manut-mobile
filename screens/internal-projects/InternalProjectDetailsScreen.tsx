@@ -360,6 +360,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
             label="Status do projeto"
             value={status}
             onChangeText={(val) => setStatus(val)}
+            autoCompleteType="off"
             autoFocus
           />
         </View>
@@ -370,6 +371,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
           label="Autor"
           value={author}
           onChangeText={(val) => setAuthor(val)}
+          autoCompleteType="off"
         />
       </FormModal>
 
@@ -395,6 +397,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
             label="Comentários (opcional)"
             value={deliverMessage}
             onChangeText={(val) => setDeliverMessage(val)}
+            autoCompleteType="off"
             autoFocus
           />
         </View>
@@ -405,6 +408,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
           label="Autor"
           value={author}
           onChangeText={(val) => setAuthor(val)}
+          autoCompleteType="off"
         />
       </FormModal>
     </>

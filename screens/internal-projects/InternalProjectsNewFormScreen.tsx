@@ -294,6 +294,7 @@ const InternalProjectsNewFormScreen: React.FC = () => {
                 style={styles.formField}
                 autoFocus={!route.params.editing}
                 disabled={route.params.editing}
+                autoCompleteType="off"
               />
               <TextInput
                 mode="outlined"
@@ -301,6 +302,7 @@ const InternalProjectsNewFormScreen: React.FC = () => {
                 value={title}
                 onChangeText={(val) => setTitle(val)}
                 style={styles.formField}
+                autoCompleteType="off"
               />
               <TextInput
                 mode="outlined"
@@ -308,6 +310,7 @@ const InternalProjectsNewFormScreen: React.FC = () => {
                 value={description}
                 onChangeText={(val) => setDescription(val)}
                 style={styles.formField}
+                autoCompleteType="off"
               />
             </View>
 
@@ -321,6 +324,7 @@ const InternalProjectsNewFormScreen: React.FC = () => {
                   setTeam((currTeam) => ({ ...currTeam, manager: val }))
                 }
                 style={styles.formField}
+                autoCompleteType="off"
               />
               <TextInput
                 mode="outlined"
@@ -330,6 +334,7 @@ const InternalProjectsNewFormScreen: React.FC = () => {
                   setTeam((currTeam) => ({ ...currTeam, others: val }))
                 }
                 style={styles.formField}
+                autoCompleteType="off"
               />
             </View>
 

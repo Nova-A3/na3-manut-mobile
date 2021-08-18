@@ -7,7 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
@@ -139,6 +139,7 @@ const NewTicketFormScreen: React.FC = () => {
                 value={description}
                 onChangeText={(val) => setDescription(val)}
                 style={styles.formField}
+                autoCompleteType="off"
               />
             ) : (
               <>
@@ -165,6 +166,7 @@ const NewTicketFormScreen: React.FC = () => {
                       value={description}
                       onChangeText={(val) => setDescription(val)}
                       style={styles.formField}
+                      autoCompleteType="off"
                     />
                   )}
               </>
@@ -238,6 +240,7 @@ const NewTicketFormScreen: React.FC = () => {
               value={additionalInfo}
               onChangeText={(val) => setAdditionalInfo(val)}
               style={styles.formField}
+              autoCompleteType="off"
             />
           </View>
 

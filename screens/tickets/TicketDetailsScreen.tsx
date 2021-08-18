@@ -395,6 +395,7 @@ const TicketDetailsScreen: React.FC = () => {
               label="Manutentor(es)"
               value={assignedMaintainer}
               onChangeText={(val) => setAssignedMaintainer(val)}
+              autoCompleteType="off"
             />
           </>
         ),
@@ -417,6 +418,7 @@ const TicketDetailsScreen: React.FC = () => {
                 label="Status da solução"
                 value={ticketSolutionStatus}
                 onChangeText={(val) => setTicketSolutionStatus(val)}
+                autoCompleteType="off"
                 autoFocus
               />
             </View>
@@ -427,6 +429,7 @@ const TicketDetailsScreen: React.FC = () => {
               label="Responsável"
               value={assignedMaintainer}
               onChangeText={(val) => setAssignedMaintainer(val)}
+              autoCompleteType="off"
             />
           </>
         ),
@@ -453,6 +456,7 @@ const TicketDetailsScreen: React.FC = () => {
                 label="Descrição da solução"
                 value={ticketSolution}
                 onChangeText={(val) => setTicketSolution(val)}
+                autoCompleteType="off"
                 autoFocus
               />
             </View>
@@ -463,6 +467,7 @@ const TicketDetailsScreen: React.FC = () => {
               label="Responsável"
               value={assignedMaintainer}
               onChangeText={(val) => setAssignedMaintainer(val)}
+              autoCompleteType="off"
             />
           </>
         ),
@@ -485,6 +490,7 @@ const TicketDetailsScreen: React.FC = () => {
             label="Motivo"
             value={refusalReason}
             onChangeText={(val) => setRefusalReason(val)}
+            autoCompleteType="off"
             autoFocus
           />
         ),

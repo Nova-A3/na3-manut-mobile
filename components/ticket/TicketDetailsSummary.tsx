@@ -123,6 +123,10 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
     });
   };
 
+  const onChangeNewAssignedMaintainerText = React.useCallback((val: string) => {
+    setNewAssignedMaintainer(val);
+  }, []);
+
   return (
     <>
       <View style={styles.card}>
@@ -338,7 +342,9 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
               numberOfLines={2}
               label="Manutentor(es)"
               value={newAssignedMaintainer!}
-              onChangeText={(val) => setNewAssignedMaintainer(val)}
+              onChangeText={onChangeNewAssignedMaintainerText}
+              autoCompleteType="off"
+              autoCorrect={false}
             />
           </FormModal>
         </>
