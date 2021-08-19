@@ -434,6 +434,8 @@ const styles = StyleSheet.create({
   },
   description: {
     fontStyle: "italic",
+    lineHeight: 20,
+    marginTop: 3,
   },
   body: {
     flex: 1,
@@ -447,6 +449,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginLeft: 8,
+    paddingRight: 20,
   },
   infoIcon: {
     width: 18,

@@ -134,9 +134,9 @@ const styles = StyleSheet.create({
     lineHeight: 25,
   },
   description: {
-    marginTop: -2,
     fontStyle: "italic",
     marginBottom: 8,
+    lineHeight: 18,
   },
   infoContainer: {
     flexDirection: "row",
