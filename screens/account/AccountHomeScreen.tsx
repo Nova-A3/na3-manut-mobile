@@ -1,9 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
+import Constants from "expo-constants";
 import * as MailComposer from "expo-mail-composer";
 import * as Notifications from "expo-notifications";
 import * as React from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
-import { Switch, Text, TextInput } from "react-native-paper";
+import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { useDispatch } from "react-redux";
 import {
   Button,
@@ -196,6 +197,13 @@ const AccountHomeScreen: React.FC = () => {
         </ScrollView>
 
         <View>
+          <View style={styles.version}>
+            <Text style={styles.versionText}>
+              V{Constants.manifest?.version}
+            </Text>
+            <Divider />
+          </View>
+
           <Button
             label="Falar com o Desenvolvedor"
             color="primary"
@@ -230,6 +238,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     paddingBottom: 6,
+  },
+  version: {
+    marginBottom: 14,
+  },
+  versionText: {
+    fontStyle: "italic",
+    color: COLORS.SYSTEM.GRAY,
+    textAlign: "right",
+    paddingBottom: 4,
   },
 });
 

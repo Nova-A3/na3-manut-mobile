@@ -9,7 +9,7 @@ import { OverflowMenuProvider } from "react-navigation-header-buttons";
 import { Provider } from "react-redux";
 import { GlobalLoading } from "./components";
 import Firebase from "./firebase";
-import { useDepartment } from "./hooks";
+import { useDepartment, useDevice } from "./hooks";
 import { AuthNav, MainNav, SuperNav, ViewOnlyNav } from "./nav";
 import { LoadingScreen } from "./screens";
 import store from "./store";
@@ -64,6 +64,7 @@ const UI: React.FC = () => {
 
 const App: React.FC = () => {
   const department = useDepartment();
+  const device = useDevice();
 
   const generateDeviceId = async () => {
     if (await SecureStore.getItemAsync("device_id")) {
@@ -88,8 +89,10 @@ const App: React.FC = () => {
   }
 
   React.useEffect(() => {
-    generateDeviceId();
-  }, []);
+    if (device && department) {
+      Firebase.Firestore.registerDevice(device, department);
+    }
+  }, [device, department]);
 
   return <Content />;
 };

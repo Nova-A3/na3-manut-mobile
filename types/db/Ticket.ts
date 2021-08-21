@@ -42,6 +42,8 @@ export type Ticket = {
   closedAt?: string | null;
   reopenedAt?: string;
 
+  version?: string;
+
   events: {
     id: string;
     type:

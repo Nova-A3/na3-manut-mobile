@@ -6,10 +6,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { TextInput, Title } from "react-native-paper";
+import { Text, TextInput, Title } from "react-native-paper";
 import { Button } from "../components";
 import Firebase from "../firebase";
 import { useFlashMessage, useGlobalLoading } from "../hooks";
+import Constants from "expo-constants";
+import { COLORS } from "../constants";
 
 const SignInScreen: React.FC = () => {
   const [username, setUsername] = React.useState("");
@@ -32,49 +34,55 @@ const SignInScreen: React.FC = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior="position"
-        style={styles.container}
-        keyboardVerticalOffset={-100}
-      >
-        <View style={styles.view}>
-          <View style={styles.titleContainer}>
-            <Title style={styles.title}>Manutenção</Title>
-          </View>
+    <>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior="position"
+          style={styles.container}
+          keyboardVerticalOffset={-100}
+        >
+          <View style={styles.view}>
+            <View style={styles.titleContainer}>
+              <Title style={styles.title}>Manutenção</Title>
+            </View>
 
-          <TextInput
-            mode="outlined"
-            label="Login"
-            value={username}
-            onChangeText={(val) => setUsername(val)}
-            left={<TextInput.Icon name="account" />}
-            style={styles.formField}
-            disabled={isGlobalLoading}
-          />
-          <TextInput
-            secureTextEntry
-            mode="outlined"
-            label="Senha"
-            value={password}
-            onChangeText={(val) => setPassword(val)}
-            left={<TextInput.Icon name="lock" />}
-            style={styles.formField}
-            disabled={isGlobalLoading}
-          />
-
-          <View style={styles.btnContainer}>
-            <Button
-              label={isGlobalLoading ? "Entrando..." : "Entrar"}
-              icon={isGlobalLoading ? undefined : "arrow-right"}
-              onPress={onSignIn}
-              iconRight
+            <TextInput
+              mode="outlined"
+              label="Login"
+              value={username}
+              onChangeText={(val) => setUsername(val)}
+              left={<TextInput.Icon name="account" />}
+              style={styles.formField}
               disabled={isGlobalLoading}
             />
+            <TextInput
+              secureTextEntry
+              mode="outlined"
+              label="Senha"
+              value={password}
+              onChangeText={(val) => setPassword(val)}
+              left={<TextInput.Icon name="lock" />}
+              style={styles.formField}
+              disabled={isGlobalLoading}
+            />
+
+            <View style={styles.btnContainer}>
+              <Button
+                label={isGlobalLoading ? "Entrando..." : "Entrar"}
+                icon={isGlobalLoading ? undefined : "arrow-right"}
+                onPress={onSignIn}
+                iconRight
+                disabled={isGlobalLoading}
+              />
+            </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+
+      <View style={styles.version}>
+        <Text style={styles.versionText}>V{Constants.manifest?.version}</Text>
+      </View>
+    </>
   );
 };
 
@@ -100,6 +108,15 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     marginTop: 36,
+  },
+  version: {
+    position: "absolute",
+    bottom: 40,
+    right: 30,
+  },
+  versionText: {
+    fontStyle: "italic",
+    color: COLORS.SYSTEM.GRAY,
   },
 });
 

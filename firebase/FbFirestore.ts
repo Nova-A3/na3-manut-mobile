@@ -6,6 +6,7 @@ import moment from "moment";
 import uuid from "react-native-uuid";
 import { InternalProjects } from "../classes";
 import Db from "../db";
+import { Device as DeviceType } from "../hooks";
 import store from "../store";
 import { setDataLoading, setProjects, setTickets } from "../store/actions";
 import { Department, Ticket, TicketStats, TicketStatsItem } from "../types";
@@ -908,6 +909,27 @@ class FbFirestore {
     });
 
     return pushTokens;
+  }
+
+  async registerDevice(device: DeviceType, department: Department) {
+    const departmentDoc = await this.collection("departments")
+      .doc(department.username)
+      .get();
+    if (!departmentDoc.exists) {
+      return;
+    }
+    const dptDevices = departmentDoc.data()!.devices as
+      | DeviceType[]
+      | undefined;
+    if (!dptDevices) {
+      await departmentDoc.ref.update({
+        devices: [device],
+      });
+    } else if (!dptDevices.map((d) => d.id).includes(device.id)) {
+      await departmentDoc.ref.update({
+        devices: firebase.firestore.FieldValue.arrayUnion(device),
+      });
+    }
   }
 
   registerRefreshTicketsListener(department: Department) {
