@@ -341,7 +341,7 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
               multiline
               numberOfLines={2}
               label="Manutentor(es)"
-              value={newAssignedMaintainer!}
+              defaultValue={newAssignedMaintainer!}
               onChangeText={onChangeNewAssignedMaintainerText}
               autoCompleteType="off"
               autoCorrect={false}

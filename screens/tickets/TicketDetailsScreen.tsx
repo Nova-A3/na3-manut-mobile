@@ -393,7 +393,7 @@ const TicketDetailsScreen: React.FC = () => {
               multiline
               numberOfLines={2}
               label="Manutentor(es)"
-              value={assignedMaintainer}
+              defaultValue={assignedMaintainer}
               onChangeText={(val) => setAssignedMaintainer(val)}
               autoCompleteType="off"
             />
@@ -416,7 +416,7 @@ const TicketDetailsScreen: React.FC = () => {
                 multiline
                 numberOfLines={3}
                 label="Status da solução"
-                value={ticketSolutionStatus}
+                defaultValue={ticketSolutionStatus}
                 onChangeText={(val) => setTicketSolutionStatus(val)}
                 autoCompleteType="off"
                 autoFocus
@@ -427,7 +427,7 @@ const TicketDetailsScreen: React.FC = () => {
               multiline
               numberOfLines={2}
               label="Responsável"
-              value={assignedMaintainer}
+              defaultValue={assignedMaintainer}
               onChangeText={(val) => setAssignedMaintainer(val)}
               autoCompleteType="off"
             />
@@ -454,7 +454,7 @@ const TicketDetailsScreen: React.FC = () => {
                 multiline
                 numberOfLines={3}
                 label="Descrição da solução"
-                value={ticketSolution}
+                defaultValue={ticketSolution}
                 onChangeText={(val) => setTicketSolution(val)}
                 autoCompleteType="off"
                 autoFocus
@@ -465,7 +465,7 @@ const TicketDetailsScreen: React.FC = () => {
               multiline
               numberOfLines={2}
               label="Responsável"
-              value={assignedMaintainer}
+              defaultValue={assignedMaintainer}
               onChangeText={(val) => setAssignedMaintainer(val)}
               autoCompleteType="off"
             />
@@ -488,7 +488,7 @@ const TicketDetailsScreen: React.FC = () => {
             multiline
             numberOfLines={3}
             label="Motivo"
-            value={refusalReason}
+            defaultValue={refusalReason}
             onChangeText={(val) => setRefusalReason(val)}
             autoCompleteType="off"
             autoFocus

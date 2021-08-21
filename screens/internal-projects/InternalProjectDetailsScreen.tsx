@@ -358,7 +358,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
             multiline
             numberOfLines={3}
             label="Status do projeto"
-            value={status}
+            defaultValue={status}
             onChangeText={(val) => setStatus(val)}
             autoCompleteType="off"
             autoFocus
@@ -369,7 +369,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
           multiline
           numberOfLines={2}
           label="Autor"
-          value={author}
+          defaultValue={author}
           onChangeText={(val) => setAuthor(val)}
           autoCompleteType="off"
         />
@@ -395,7 +395,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
             multiline
             numberOfLines={3}
             label="Comentários (opcional)"
-            value={deliverMessage}
+            defaultValue={deliverMessage}
             onChangeText={(val) => setDeliverMessage(val)}
             autoCompleteType="off"
             autoFocus
@@ -406,7 +406,7 @@ const InternalProjectDetailsScreen: React.FC = () => {
           multiline
           numberOfLines={2}
           label="Autor"
-          value={author}
+          defaultValue={author}
           onChangeText={(val) => setAuthor(val)}
           autoCompleteType="off"
         />
