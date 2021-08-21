@@ -42,7 +42,7 @@ export type Ticket = {
   closedAt?: string | null;
   reopenedAt?: string;
 
-  version?: string;
+  version?: string | null;
 
   events: {
     id: string;
