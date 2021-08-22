@@ -41,7 +41,7 @@ const HeaderOverflowMenu: React.FC<HeaderOverflowMenuProps> = ({
             color={systemColor("primary")}
           />
         )}
-        style={{ marginHorizontal: 10 }}
+        style={{ marginHorizontal: 11 }}
       >
         {items.map((i) => (
           <HiddenItem key={i.title} {...i} />
