@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { showMessage } from "react-native-flash-message";
 
 const useFlashMessage = () => {
@@ -11,10 +12,19 @@ const useFlashMessage = () => {
       type: data.type,
       message: data.title,
       description: data.text,
+      icon: "auto",
       autoHide: true,
       hideStatusBar: true,
-      duration: data.duration ? data.duration : 1850,
+      duration: data.duration ? data.duration : 3000,
     });
+
+    Haptics.notificationAsync(
+      data.type === "success"
+        ? Haptics.NotificationFeedbackType.Success
+        : data.type === "warning"
+        ? Haptics.NotificationFeedbackType.Warning
+        : Haptics.NotificationFeedbackType.Error
+    );
   };
 
   return { show };
