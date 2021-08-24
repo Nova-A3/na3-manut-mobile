@@ -7,7 +7,7 @@ import {
   Headline,
   Subheading,
   Text,
-  TextInput
+  TextInput,
 } from "react-native-paper";
 import {
   Button,
@@ -15,7 +15,7 @@ import {
   FormModal,
   HeaderOverflowMenu,
   TicketDetailsButton,
-  TicketDetailsSummary
+  TicketDetailsSummary,
 } from "../../components";
 import Database, { Db } from "../../db";
 import { default as Firebase } from "../../firebase";
@@ -23,13 +23,13 @@ import {
   useDepartment,
   useFlashMessage,
   useGlobalLoading,
-  useTickets
+  useTickets,
 } from "../../hooks";
 import { AllTicketsStackParamList, Ticket } from "../../types";
 import {
   ColorType,
   getTicketStatusStyles,
-  translatePriority
+  translatePriority,
 } from "../../utils";
 
 type TicketDetailsScreenRouteProp = RouteProp<
@@ -505,7 +505,7 @@ const TicketDetailsScreen: React.FC = () => {
 
   return (
     <>
-      <View style={{ height: "100%" }}>
+      <View style={{ flex: 1 }}>
         <View
           style={{
             ...styles.header,
@@ -540,7 +540,7 @@ const TicketDetailsScreen: React.FC = () => {
 
         <View
           style={{
-            flexGrow: 1,
+            flex: 1,
             justifyContent: "space-between",
           }}
         >
@@ -636,8 +636,7 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   content: {
-    flexGrow: 1,
-    padding: 20,
+    flex: 1,
   },
   statusContainer: {
     backgroundColor: "white",

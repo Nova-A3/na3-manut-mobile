@@ -19,6 +19,8 @@ import {
   translatePriority,
 } from "../utils";
 class FbFirestore {
+  private static snapshotUnsubscribeFns: (() => void)[] = [];
+
   collection(collectionId: "tickets" | "push-tokens" | "departments") {
     return firebase.firestore().collection(fsCollectionId(collectionId));
   }
@@ -939,16 +941,18 @@ class FbFirestore {
       .firestore()
       .collection(fsCollectionId("tickets"));
 
-    const query = department.isMaintenance()
+    const query = !department.isOperator()
       ? collection
       : collection.where("username", "==", department.username);
 
-    query.onSnapshot(async (_) => {
-      store.dispatch(setDataLoading(true));
-      const tickets = await this.getTickets(department);
-      store.dispatch(setTickets(tickets));
-      store.dispatch(setDataLoading(false));
-    });
+    FbFirestore.snapshotUnsubscribeFns.push(
+      query.onSnapshot(async (_) => {
+        store.dispatch(setDataLoading(true));
+        const tickets = await this.getTickets(department);
+        store.dispatch(setTickets(tickets));
+        store.dispatch(setDataLoading(false));
+      })
+    );
   }
 
   registerRefreshProjectsListener() {
@@ -956,12 +960,21 @@ class FbFirestore {
       .firestore()
       .collection(fsCollectionId("manut-projects"));
 
-    collection.onSnapshot(async (_) => {
-      store.dispatch(setDataLoading(true));
-      const projects = await InternalProjects.fetchAll();
-      store.dispatch(setProjects(projects));
-      store.dispatch(setDataLoading(false));
+    FbFirestore.snapshotUnsubscribeFns.push(
+      collection.onSnapshot(async (_) => {
+        store.dispatch(setDataLoading(true));
+        const projects = await InternalProjects.fetchAll();
+        store.dispatch(setProjects(projects));
+        store.dispatch(setDataLoading(false));
+      })
+    );
+  }
+
+  static unregisterSnapshotListeners() {
+    FbFirestore.snapshotUnsubscribeFns.forEach((unsubscribe) => {
+      unsubscribe();
     });
+    FbFirestore.snapshotUnsubscribeFns = [];
   }
 }
 

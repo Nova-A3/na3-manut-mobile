@@ -355,10 +355,12 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 12,
     backgroundColor: "white",
+    margin: 20,
   },
   summaryItem: {
     flexDirection: "row",

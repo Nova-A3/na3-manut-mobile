@@ -6,6 +6,7 @@ import { Alert, Platform } from "react-native";
 import Database from "../db";
 import { Department } from "../types";
 import { fsCollectionId } from "../utils";
+import FbFirestore from "./FbFirestore";
 
 type AuthCredentials = { username: string; password: string };
 
@@ -84,6 +85,8 @@ class FbAuth {
           tokens: userPushTokens.filter((pT) => pT !== currPushToken),
         });
     }
+
+    FbFirestore.unregisterSnapshotListeners();
 
     await firebase.auth().signOut();
   }
