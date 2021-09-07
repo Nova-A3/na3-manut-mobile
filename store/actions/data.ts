@@ -3,6 +3,7 @@ import {
   DataActionFilterOn,
   DataActionRegisterFirstLoad,
   DataActionSetDptIssues,
+  DataActionSetFilter,
   DataActionSetLoading,
   DataActionSetProjects,
   DataActionSetTickets,
@@ -43,6 +44,16 @@ export const registerDataFirstLoad = (
   return {
     type: "REGISTER_DATA_FIRST_LOAD",
     payload: { value },
+  };
+};
+
+export const setFilter = (
+  filterKey: keyof DataState["filters"],
+  filterValue: string[]
+): DataActionSetFilter => {
+  return {
+    type: "SET_FILTER",
+    payload: { filterKey, filterValue },
   };
 };
 

@@ -13,12 +13,10 @@ import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
 import Fb from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
-import useStateSlice from "../../hooks/useStateSlice";
 import { TicketDependantRoute } from "../../types";
 
 const TicketEditScreen: React.FC = () => {
   const department = useDepartment()!;
-  const { dptIssues } = useStateSlice("data");
 
   const { execGlobalLoading } = useGlobalLoading();
   const {
@@ -28,7 +26,7 @@ const TicketEditScreen: React.FC = () => {
   const msg = useFlashMessage();
 
   const [dpt, setDpt] = React.useState(department.displayName);
-  const [machine, setMachine] = React.useState("1");
+  const [machine, setMachine] = React.useState(department.getMachines()[0]?.id);
   const [description, setDescription] = React.useState("");
   const [stoppedLine, setStoppedLine] = React.useState(false);
   const [stoppedEquipment, setStoppedEquipment] = React.useState(false);
@@ -36,6 +34,17 @@ const TicketEditScreen: React.FC = () => {
   const [team, setTeam] = React.useState("mecanica");
   const [maintenanceType, setMaintenanceType] = React.useState("preventiva");
   const [cause, setCause] = React.useState("mecanica");
+
+  console.log(department.getMachines());
+
+  const machineIssues = React.useMemo(
+    () =>
+      department
+        .getMachines()
+        .find((machineData) => machineData.id === machine)!
+        .issues.sort((a, b) => a.localeCompare(b)),
+    [department, machine]
+  );
 
   const loadTicketData = () => {
     execGlobalLoading(async () => {
@@ -74,7 +83,7 @@ const TicketEditScreen: React.FC = () => {
                 id: ticket.id,
                 username: department!.username,
                 dpt,
-                machine,
+                machine: machine!,
                 description,
                 interruptions: {
                   line: stoppedLine,
@@ -132,9 +141,9 @@ const TicketEditScreen: React.FC = () => {
             />
             <Dropdown
               label="Máquina"
-              items={department.getMachineNames().map((label, value) => ({
-                label,
-                value: (value + 1).toString(),
+              items={department.getMachines().map((machineData) => ({
+                label: `${machineData.name} (${machineData.id})`,
+                value: machineData.id,
               }))}
               value={machine}
               onValueChange={(val) => setMachine(val)}
@@ -159,7 +168,7 @@ const TicketEditScreen: React.FC = () => {
                 <Dropdown
                   label="Problema"
                   items={[
-                    ...[...dptIssues].sort().map((issue) => ({
+                    ...machineIssues.map((issue) => ({
                       label: issue.toUpperCase(),
                       value: issue,
                     })),
@@ -169,7 +178,7 @@ const TicketEditScreen: React.FC = () => {
                   onValueChange={(val) => setDescription(val)}
                   style={styles.formField}
                 />
-                {(!description || !dptIssues.includes(description)) &&
+                {(!description || !machineIssues.includes(description)) &&
                   description !== "[placeholder]" && (
                     <TextInput
                       mode="outlined"

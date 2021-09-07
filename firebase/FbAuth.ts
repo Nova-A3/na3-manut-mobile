@@ -6,6 +6,7 @@ import { Alert, Platform } from "react-native";
 import Database from "../db";
 import { Department } from "../types";
 import { fsCollectionId } from "../utils";
+import { Na3Dpt } from "./../types/Na3/Na3Dpt";
 import FbFirestore from "./FbFirestore";
 
 type AuthCredentials = { username: string; password: string };
@@ -38,7 +39,8 @@ class FbAuth {
 
       return { user, error: null };
     } catch (e) {
-      switch (e.code) {
+      const error = e as { code: string };
+      switch (error.code) {
         case "auth/wrong-password":
           return {
             error: {
@@ -59,7 +61,7 @@ class FbAuth {
           return {
             error: {
               title: "Algo deu errado",
-              description: `Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações. Código do erro: ${e.code}`,
+              description: `Um erro inesperado ocorreu. Por favor, entre em contato com o administrador do aplicativo para mais informações. Código do erro: ${error.code}`,
             },
             user: null,
           };
@@ -68,10 +70,59 @@ class FbAuth {
   }
 
   async signOut(department: Department): Promise<void> {
+    const currPushToken = (await Notifications.getExpoPushTokenAsync()).data;
+
+    const dptDoc = firebase
+      .firestore()
+      .collection(fsCollectionId("departments"))
+      .doc(department.original.id);
+
+    let update: Na3Dpt = { ...department.original };
+
+    if (department.isPerson) {
+      const currPerson = department.original.people.find(
+        (p) => p.id === department.username
+      )!;
+
+      update = {
+        ...update,
+        people: [
+          ...update.people.filter((p) => p.id !== currPerson.id),
+          {
+            ...currPerson,
+            apps: {
+              ...currPerson.apps,
+              manut: {
+                ...currPerson.apps.manut!,
+                pushTokens: currPerson.apps.manut!.pushTokens.filter(
+                  (tk) => tk !== currPushToken
+                ),
+              },
+            },
+          },
+        ],
+      };
+    } else {
+      update = {
+        ...update,
+        apps: {
+          ...update.apps,
+          manut: {
+            ...update.apps.manut!,
+            pushTokens: update.apps.manut!.pushTokens.filter(
+              (tk) => tk !== currPushToken
+            ),
+          },
+        },
+      };
+    }
+
+    await dptDoc.update(update);
+
     const userPushTokens = (
       await firebase
         .firestore()
-        .collection("push-tokens")
+        .collection(fsCollectionId("push-tokens"))
         .doc(department.username)
         .get()
     ).data()?.tokens as string[] | null;
@@ -79,7 +130,7 @@ class FbAuth {
       const currPushToken = (await Notifications.getExpoPushTokenAsync()).data;
       await firebase
         .firestore()
-        .collection("push-tokens")
+        .collection(fsCollectionId("push-tokens"))
         .doc(department.username)
         .update({
           tokens: userPushTokens.filter((pT) => pT !== currPushToken),
@@ -121,6 +172,61 @@ class FbAuth {
       }
 
       const token = (await Notifications.getExpoPushTokenAsync()).data;
+
+      const dpt = Database.getDepartment(username);
+
+      if (dpt) {
+        const dptDoc = firebase
+          .firestore()
+          .collection(fsCollectionId("departments"))
+          .doc(dpt.original.id);
+
+        let update: Na3Dpt = { ...dpt.original };
+
+        if (dpt.isPerson) {
+          const currPerson = dpt.original.people.find(
+            (p) => p.id === dpt.username
+          )!;
+
+          update = {
+            ...update,
+            people: [
+              ...update.people.filter((p) => p.id !== currPerson.id),
+              {
+                ...currPerson,
+                apps: {
+                  ...currPerson.apps,
+                  manut: {
+                    ...currPerson.apps.manut!,
+                    pushTokens: [
+                      ...currPerson.apps.manut!.pushTokens.filter(
+                        (tk) => tk !== token
+                      ),
+                      token,
+                    ],
+                  },
+                },
+              },
+            ],
+          };
+        } else {
+          update = {
+            ...update,
+            apps: {
+              ...update.apps,
+              manut: {
+                ...update.apps.manut!,
+                pushTokens: [
+                  ...update.apps.manut!.pushTokens.filter((tk) => tk !== token),
+                  token,
+                ],
+              },
+            },
+          };
+        }
+
+        await dptDoc.update(update);
+      }
 
       const docsWithToken = await firebase
         .firestore()

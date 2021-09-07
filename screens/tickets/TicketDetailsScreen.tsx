@@ -511,8 +511,9 @@ const TicketDetailsScreen: React.FC = () => {
             ...styles.header,
             backgroundColor:
               department.isMaintenance() || department.isViewOnly()
-                ? Database.getDepartment(ticket.username)!.color
-                : department.color,
+                ? Database.getDepartment(ticket.username)!.original.style.colors
+                    .background
+                : department.original.style.colors.background,
           }}
         >
           <Badge
@@ -529,9 +530,13 @@ const TicketDetailsScreen: React.FC = () => {
           <Headline
             style={[
               styles.title,
-              ["off-set", "ekoplasto"].includes(ticket.username)
-                ? { color: "#333" }
-                : undefined,
+              {
+                color:
+                  department.isMaintenance() || department.isViewOnly()
+                    ? Database.getDepartment(ticket.username)!.original.style
+                        .colors.text
+                    : department.original.style.colors.text,
+              },
             ]}
           >
             {ticket.description}

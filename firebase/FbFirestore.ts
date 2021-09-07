@@ -74,6 +74,7 @@ class FbFirestore {
 
     Notifications.setBadgeCountAsync(urgentTickets.length);
 
+
     return [...urgentTickets, ...nonUrgentTickets];
   }
 

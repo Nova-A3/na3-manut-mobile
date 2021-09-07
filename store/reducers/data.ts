@@ -1,5 +1,10 @@
-import Db from "../../db";
-import { DataAction, DataActionFilterControl, DataState } from "../../types";
+import {
+  DataAction,
+  DataActionFilterOff,
+  DataActionFilterOn,
+  DataActionToggleFilter,
+  DataState,
+} from "../../types";
 
 const initialState: DataState = {
   tickets: [],
@@ -7,9 +12,7 @@ const initialState: DataState = {
   loading: false,
   didFirstLoad: false,
   filters: {
-    departments: Db.getDepartments()
-      .filter((d) => d.isOperator())
-      .map((d) => d.username),
+    departments: [],
     problems: [],
     teams: ["mecanica", "eletrica", "predial"],
     maintenanceTypes: ["preventiva", "corretiva", "preditiva"],
@@ -20,7 +23,9 @@ const initialState: DataState = {
 
 const handleFilterOn = (
   state: DataState,
-  { payload: { filterKey, filterValue } }: DataActionFilterControl
+  {
+    payload: { filterKey, filterValue },
+  }: DataActionFilterOn | DataActionToggleFilter
 ) => {
   if (state.filters[filterKey].includes(filterValue)) return state;
 
@@ -35,7 +40,9 @@ const handleFilterOn = (
 
 const handleFilterOff = (
   state: DataState,
-  { payload: { filterKey, filterValue } }: DataActionFilterControl
+  {
+    payload: { filterKey, filterValue },
+  }: DataActionFilterOff | DataActionToggleFilter
 ) => {
   if (!state.filters[filterKey].includes(filterValue)) return state;
 
@@ -69,6 +76,14 @@ const dataReducer = (state = initialState, action: DataAction) => {
       return {
         ...state,
         didFirstLoad: action.payload.value,
+      };
+    case "SET_FILTER":
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          [action.payload.filterKey]: action.payload.filterValue,
+        },
       };
     case "TOGGLE_FILTER":
       if (

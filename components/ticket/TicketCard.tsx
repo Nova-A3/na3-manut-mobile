@@ -42,9 +42,10 @@ const TicketCard: React.FC<TicketCardProps> = ({ data, style }) => {
           department.isMaintenance() || department.isViewOnly()
             ? Database.getDepartment(data.username)!.color
             : department.color,
-        textColor: ["off-set", "ekoplasto"].includes(data.username)
-          ? "#333"
-          : "white",
+        textColor:
+          department.isMaintenance() || department.isViewOnly()
+            ? Database.getDepartment(data.username)!.original.style.colors.text
+            : department.original.style.colors.text,
       };
     }
   };

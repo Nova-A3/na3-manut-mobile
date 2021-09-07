@@ -1,15 +1,15 @@
 import * as Notifications from "expo-notifications";
-import * as Random from "expo-random";
-import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
+import * as Updates from "expo-updates";
 import React from "react";
+import { Alert } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import { Provider as PaperProvider } from "react-native-paper";
 import { OverflowMenuProvider } from "react-navigation-header-buttons";
 import { Provider } from "react-redux";
 import { GlobalLoading } from "./components";
 import Firebase from "./firebase";
-import { useDepartment, useDevice } from "./hooks";
+import { useDepartment } from "./hooks";
 import { AuthNav, MainNav, SuperNav, ViewOnlyNav } from "./nav";
 import { LoadingScreen } from "./screens";
 import store from "./store";
@@ -50,6 +50,13 @@ Notifications.setNotificationHandler({
   }),
 });
 
+Updates.addListener((ev) => {
+  if (ev.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
+    Alert.alert("Nova versão disponível", 'Pressione "OK" para atualizar');
+    Updates.reloadAsync();
+  }
+});
+
 Firebase.init();
 
 const UI: React.FC = () => {
@@ -64,15 +71,6 @@ const UI: React.FC = () => {
 
 const App: React.FC = () => {
   const department = useDepartment();
-  const device = useDevice();
-
-  const generateDeviceId = async () => {
-    if (await SecureStore.getItemAsync("device_id")) {
-      return;
-    }
-    const generatedDeviceId = Random.getRandomBytes(16).join("");
-    SecureStore.setItemAsync("device_id", generatedDeviceId);
-  };
 
   let Content: React.FC;
 
@@ -87,12 +85,6 @@ const App: React.FC = () => {
   } else {
     Content = () => <MainNav />;
   }
-
-  React.useEffect(() => {
-    if (device && department) {
-      Firebase.Firestore.registerDevice(device, department);
-    }
-  }, [device, department]);
 
   return <Content />;
 };

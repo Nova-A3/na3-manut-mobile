@@ -1,4 +1,4 @@
-import { Department as IDepartment } from "../types";
+import { Department as IDepartment, Na3Dpt, Na3DptMachine } from "../types";
 
 class Department implements IDepartment {
   type: IDepartment["type"];
@@ -6,24 +6,36 @@ class Department implements IDepartment {
   displayName: IDepartment["displayName"];
   color: IDepartment["color"];
   machines: IDepartment["machines"];
+  isPerson: IDepartment["isPerson"];
   swappableWith?: IDepartment["swappableWith"];
 
-  constructor({
-    type,
-    username,
-    displayName,
-    color,
-    machines,
-    swappableWith,
-  }: Pick<
-    IDepartment,
-    "type" | "username" | "displayName" | "color" | "machines" | "swappableWith"
-  >) {
+  constructor(
+    readonly original: Na3Dpt,
+    {
+      type,
+      username,
+      displayName,
+      color,
+      machines,
+      isPerson,
+      swappableWith,
+    }: Pick<
+      IDepartment,
+      | "type"
+      | "username"
+      | "displayName"
+      | "color"
+      | "machines"
+      | "isPerson"
+      | "swappableWith"
+    >
+  ) {
     this.type = type;
     this.username = username.trim().toLowerCase();
     this.displayName = displayName.trim().toUpperCase();
     this.color = color;
     this.machines = machines;
+    this.isPerson = isPerson;
     this.swappableWith = swappableWith;
   }
 
@@ -44,162 +56,106 @@ class Department implements IDepartment {
   }
 
   getMachineNames(): string[] {
-    if (!this.machines) {
+    if (!("machines" in this.original)) {
       return [];
-    } else if (this.username === "ekoplasto") {
-      return [
-        "Aglutinador",
-        "Extrusora recicladora",
-        "Moinho a seco",
-        "Moinho da lavagem",
-        "Secadora",
-        "Tanque de lavagem",
-        "Ventoinhas/Sem-fins",
-        "Elétrica...",
-      ];
     } else {
-      const machineNames: string[] = [];
-      for (let i = 0; i < this.machines; i++) {
-        machineNames.push(`Máquina ${i + 1}`);
-      }
-      return machineNames;
+      const { machines } = this.original;
+      return Object.values(machines)
+        .sort((a, b) => a.number - b.number)
+        .map((machineData) => `${machineData.name} (${machineData.id})`);
+    }
+  }
+
+  getMachines(): Na3DptMachine[] {
+    if (!("machines" in this.original)) {
+      return [];
+    } else {
+      return Object.values(this.original.machines).sort(
+        (a, b) => a.number - b.number
+      );
     }
   }
 }
 
 export class Db {
-  private static departments = [
-    new Department({
-      type: "operator",
-      username: "kit-automatico",
-      displayName: "KIT AUTOMÁTICO",
-      color: "#C377E0",
-      machines: 7,
-    }),
-    new Department({
-      type: "operator",
-      username: "flexografia",
-      displayName: "FLEXOGRAFIA",
-      color: "#0579BF",
-      machines: 4,
-    }),
-    new Department({
-      type: "operator",
-      username: "extrusao",
-      displayName: "EXTRUSÃO",
-      color: "#08C2E0",
-      machines: 4,
-      swappableWith: "reciclagem",
-    }),
-    new Department({
-      type: "operator",
-      username: "corte-solda-luva",
-      displayName: "CORTE & SOLDA – LUVA",
-      color: "#F58F29",
-      machines: 4,
-      swappableWith: ["corte-solda-saco", "super-kit"],
-    }),
-    new Department({
-      type: "operator",
-      username: "corte-solda-saco",
-      displayName: "CORTE & SOLDA – SACO",
-      color: "#FF78CB",
-      machines: 4,
-      swappableWith: ["corte-solda-luva", "super-kit"],
-    }),
-    new Department({
-      type: "operator",
-      username: "reciclagem",
-      displayName: "RECICLAGEM",
-      color: "#D5573B",
-      machines: 1,
-      swappableWith: "extrusao",
-    }),
-    new Department({
-      type: "operator",
-      username: "dobra",
-      displayName: "DOBRA",
-      color: "#885053",
-      machines: 7,
-      swappableWith: "corte",
-    }),
-    new Department({
-      type: "operator",
-      username: "off-set",
-      displayName: "OFF-SET",
-      color: "#C6ECAE",
-      machines: 4,
-    }),
-    new Department({
-      type: "operator",
-      username: "corte",
-      displayName: "CORTE",
-      color: "#04E762",
-      machines: 1,
-      swappableWith: "dobra",
-    }),
-    new Department({
-      type: "operator",
-      username: "super-kit",
-      displayName: "SUPER KIT",
-      color: "#F5B700",
-      machines: 2,
-      swappableWith: ["corte-solda-saco", "corte-solda-luva"],
-    }),
-    new Department({
-      type: "operator",
-      username: "kit-manual",
-      displayName: "KIT MANUAL",
-      color: "#FF6663",
-      machines: 2,
-    }),
-    new Department({
-      type: "operator",
-      username: "ekoplasto",
-      displayName: "EKOPLASTO",
-      color: "#E0FF4F",
-      machines: 4,
-    }),
+  private static departments: Department[] = [];
 
-    new Department({
-      type: "maintenance",
-      username: "manutencao",
-      displayName: "MANUTENÇÃO",
-      color: "#191923",
-    }),
+  static setDepartments(dpts: Na3Dpt[]) {
+    function getDptSwappableWith(
+      dptId: typeof dpts[number]["id"]
+    ): string | string[] | undefined {
+      switch (dptId) {
+        case "extrusao":
+          return "reciclagem";
+        case "reciclagem":
+          return "extrusao";
+        case "corte-solda-luva":
+          return ["corte-solda-saco", "super-kit"];
+        case "corte-solda-saco":
+          return ["corte-solda-luva", "super-kit"];
+        case "super-kit":
+          return ["corte-solda-saco", "corte-solda-luva"];
+        case "flexografia-plastico":
+          return "flexografia-papel";
+        case "flexografia-papel":
+          return "flexografia-plastico";
+        default:
+          return undefined;
+      }
+    }
 
-    new Department({
-      type: "viewOnly",
-      username: "gsantos",
-      displayName: "GLADSTONE J DOS SANTOS JR",
-      color: "#333",
-    }),
-    new Department({
-      type: "viewOnly",
-      username: "mvieira",
-      displayName: "MARCUS M VIEIRA",
-      color: "#333",
-    }),
-    new Department({
-      type: "viewOnly",
-      username: "agomes",
-      displayName: "ARTHUR GOMES",
-      color: "#333",
-    }),
-    new Department({
-      type: "viewOnly",
-      username: "msantos",
-      displayName: "MARCO SANTOS",
-      color: "#333",
-    }),
+    const manutDpts = dpts.filter(
+      (dpt) =>
+        Object.keys(dpt.apps).includes("manut") &&
+        (dpt.type === "shop-floor" || dpt.id === "manutencao")
+    );
 
-    new Department({
-      type: "viewOnly",
-      username: "visitante",
-      displayName: "VISITANTE",
-      color: "#333",
-    }),
-  ];
+    const appDpts = manutDpts.map(
+      (dpt) =>
+        new Department(dpt, {
+          type:
+            dpt.type === "shop-floor"
+              ? "operator"
+              : dpt.id === "manutencao"
+              ? "maintenance"
+              : "viewOnly",
+          username: dpt.id,
+          displayName: dpt.displayName,
+          color: dpt.style.colors.background,
+          swappableWith: getDptSwappableWith(dpt.id),
+        })
+    );
+
+    const appUsers = dpts
+      .filter(
+        (dpt) =>
+          Object.keys(dpt.apps).includes("manut") && dpt.people.length > 0
+      )
+      .map(
+        (dpt) =>
+          [
+            dpt,
+            dpt.people.filter((person) =>
+              Object.keys(person.apps).includes("manut")
+            ),
+          ] as [Na3Dpt, Na3Dpt["people"]]
+      )
+      .map(([dpt, people]) =>
+        people.map(
+          (person) =>
+            new Department(dpt, {
+              type: "viewOnly",
+              username: person.id,
+              displayName: person.displayName,
+              color: dpt.style.colors.background,
+              isPerson: true,
+            })
+        )
+      )
+      .flat();
+
+    Db.departments = [...appDpts, ...appUsers];
+  }
 
   static getDepartments() {
     return Db.departments;

@@ -1,7 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import * as React from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
-import { Caption, Divider, TextInput } from "react-native-paper";
+import { Platform, StyleSheet, View } from "react-native";
+import { Caption, Divider, Text, TextInput } from "react-native-paper";
 import { COLORS } from "../../constants";
 import Db from "../../db";
 import Fb from "../../firebase";
@@ -217,9 +217,19 @@ const TicketDetailsSummary: React.FC<TicketDetailsSummaryProps> = ({
         <View style={styles.summaryItem}>
           <Caption style={styles.itemKey}>Máquina:</Caption>
           <Text style={styles.itemValue}>
-            {username === "ekoplasto"
-              ? Db.getDepartment(username)?.getMachineNames()[+machine - 1]
-              : machine}
+            {
+              Db.getDepartment(username)
+                ?.getMachines()
+                .find((machineData) => machineData.id === machine)?.name
+            }
+            {!!Db.getDepartment(username)
+              ?.getMachines()
+              .find((machineData) => machineData.id === machine)?.name && (
+              <>
+                {" "}
+                <Caption style={{ fontStyle: "italic" }}>({machine})</Caption>
+              </>
+            )}
           </Text>
         </View>
 

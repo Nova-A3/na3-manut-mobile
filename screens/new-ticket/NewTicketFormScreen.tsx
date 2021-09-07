@@ -13,14 +13,12 @@ import { Divider, Switch, Text, TextInput } from "react-native-paper";
 import { Button, Dropdown, Header, HeaderButton } from "../../components";
 import Firebase from "../../firebase";
 import { useDepartment, useFlashMessage, useGlobalLoading } from "../../hooks";
-import useStateSlice from "../../hooks/useStateSlice";
 
 const NewTicketFormScreen: React.FC = () => {
   const department = useDepartment()!;
-  const { dptIssues } = useStateSlice("data");
 
   const [dpt, setDpt] = React.useState(department!.displayName);
-  const [machine, setMachine] = React.useState("1");
+  const [machine, setMachine] = React.useState(department.getMachines()[0]?.id);
   const [description, setDescription] = React.useState(
     department.username === "ekoplasto" ? "" : "[placeholder]"
   );
@@ -31,6 +29,15 @@ const NewTicketFormScreen: React.FC = () => {
   const [maintenanceType, setMaintenanceType] = React.useState("preventiva");
   const [cause, setCause] = React.useState("mecanica");
   const [additionalInfo, setAdditionalInfo] = React.useState("");
+
+  const machineIssues = React.useMemo(
+    () =>
+      department
+        .getMachines()
+        .find((machineData) => machineData.id === machine)!
+        .issues.sort((a, b) => a.localeCompare(b)),
+    [department, machine]
+  );
 
   const nav = useNavigation();
   const { execGlobalLoading } = useGlobalLoading();
@@ -63,7 +70,7 @@ const NewTicketFormScreen: React.FC = () => {
               await Firebase.Firestore.postTicket(nextTicketId, {
                 username: department!.username,
                 dpt,
-                machine,
+                machine: machine!,
                 description: description.trim(),
                 interruptions: {
                   line: stoppedLine,
@@ -119,9 +126,9 @@ const NewTicketFormScreen: React.FC = () => {
             />
             <Dropdown
               label="Máquina"
-              items={department.getMachineNames().map((label, value) => ({
-                label,
-                value: (value + 1).toString(),
+              items={department.getMachines().map((machineData) => ({
+                label: `${machineData.name} (${machineData.id})`,
+                value: machineData.id,
               }))}
               onValueChange={(val) => setMachine(val)}
               style={styles.formField}
@@ -147,7 +154,7 @@ const NewTicketFormScreen: React.FC = () => {
                   label="Problema"
                   items={[
                     { label: "Escolher...", value: "[placeholder]" },
-                    ...[...dptIssues].sort().map((issue) => ({
+                    ...machineIssues.map((issue) => ({
                       label: issue.toUpperCase(),
                       value: issue,
                     })),
@@ -156,7 +163,7 @@ const NewTicketFormScreen: React.FC = () => {
                   onValueChange={(val) => setDescription(val)}
                   style={styles.formField}
                 />
-                {(!description || !dptIssues.includes(description)) &&
+                {(!description || !machineIssues.includes(description)) &&
                   description !== "[placeholder]" && (
                     <TextInput
                       mode="outlined"

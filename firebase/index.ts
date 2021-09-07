@@ -1,7 +1,8 @@
 import firebase from "firebase/app";
 import Database from "../db";
 import store from "../store";
-import { setDepartment } from "../store/actions";
+import { setDepartment, setFilter } from "../store/actions";
+import { Na3Dpt } from "../types";
 import FbAuth from "./FbAuth";
 import FbFirestore from "./FbFirestore";
 
@@ -24,13 +25,34 @@ export class Fb {
     if (firebase.apps.length === 0) {
       firebase.initializeApp(FIREBASE_CONFIG);
 
-      firebase.auth().onAuthStateChanged((fbUser) => {
+      firebase.auth().onAuthStateChanged(async (fbUser) => {
+        const allDpts = await firebase
+          .firestore()
+          .collection("TEST-departments")
+          .get();
+        Database.setDepartments(allDpts.docs.map((d) => d.data() as Na3Dpt));
+
+        store.dispatch(
+          setFilter(
+            "departments",
+            Database.getDepartments()
+              .filter((d) => d.isOperator())
+              .map((d) => d.username)
+          )
+        );
+
         if (store.getState().auth.isSwapping) {
           return;
         }
 
         if (fbUser) {
-          const department = Database.getDepartment(fbUser.email!)!;
+          const department = Database.getDepartment(fbUser.email!);
+
+          if (!department) {
+            firebase.auth().signOut();
+            return;
+          }
+
           Fb.Firestore.registerRefreshTicketsListener(department);
           Fb.Firestore.registerRefreshProjectsListener();
           store.dispatch(setDepartment(department));
