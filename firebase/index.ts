@@ -3,6 +3,7 @@ import Database from "../db";
 import store from "../store";
 import { setDepartment, setFilter } from "../store/actions";
 import { Na3Dpt } from "../types";
+import { fsCollectionId } from "../utils";
 import FbAuth from "./FbAuth";
 import FbFirestore from "./FbFirestore";
 
@@ -28,7 +29,7 @@ export class Fb {
       firebase.auth().onAuthStateChanged(async (fbUser) => {
         const allDpts = await firebase
           .firestore()
-          .collection("TEST-departments")
+          .collection(fsCollectionId("departments"))
           .get();
         Database.setDepartments(allDpts.docs.map((d) => d.data() as Na3Dpt));
 
