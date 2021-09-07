@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import * as React from "react";
 import {
   Keyboard,
@@ -8,10 +9,9 @@ import {
 } from "react-native";
 import { Text, TextInput, Title } from "react-native-paper";
 import { Button } from "../components";
+import { COLORS } from "../constants";
 import Firebase from "../firebase";
 import { useFlashMessage, useGlobalLoading } from "../hooks";
-import Constants from "expo-constants";
-import { COLORS } from "../constants";
 
 const SignInScreen: React.FC = () => {
   const [username, setUsername] = React.useState("");
@@ -24,6 +24,14 @@ const SignInScreen: React.FC = () => {
       const { error } = await Firebase.Auth.signIn({ username, password });
 
       if (error) {
+        if (username.trim().toLowerCase() === "flexografia") {
+          return msg.show({
+            type: "danger",
+            title: "Usuário redefinido",
+            text: 'O login "flexografia" foi dividido em "flexografia-papel" e "flexografia-plastico". Por favor, tente novamente usando o mesmo padrão de senha.',
+          });
+        }
+
         msg.show({
           type: "danger",
           title: error.title,
