@@ -2,7 +2,7 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import * as React from "react";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
 import { Divider, Subheading, Switch } from "react-native-paper";
-import { HeaderButton, ScreenContainer } from "../../components";
+import { HeaderButton } from "../../components";
 import { useFilters } from "../../hooks";
 import { AllTicketsStackParamList } from "../../types";
 
@@ -85,34 +85,37 @@ const FiltersSelectScreen: React.FC = () => {
   }, [key, filters]);
 
   return (
-    <ScreenContainer>
-      <FlatList
-        data={items
-          .map((i) => ({ ...i, key: i.value }))
-          .sort((a, b) => a.label.localeCompare(b.label))}
-        renderItem={({ item }) => (
-          <>
-            <View style={styles.itemContainer}>
-              <Subheading>{item.label.toUpperCase()}</Subheading>
-              <Switch
-                value={filters[key].includes(item.value)}
-                onValueChange={() => toggleFilter(key, item.value)}
-                disabled={
-                  filters[key].length === 1 && item.value === filters[key][0]
-                }
-              />
-            </View>
+    <FlatList
+      data={items
+        .map((i) => ({ ...i, key: i.value }))
+        .sort((a, b) => a.label.localeCompare(b.label))}
+      renderItem={({ item }) => (
+        <View style={styles.itemContainer}>
+          <View style={styles.item}>
+            <Subheading>{item.label.toUpperCase()}</Subheading>
+            <Switch
+              value={filters[key].includes(item.value)}
+              onValueChange={() => toggleFilter(key, item.value)}
+              disabled={
+                filters[key].length === 1 && item.value === filters[key][0]
+              }
+            />
+          </View>
 
-            <Divider style={styles.divider} />
-          </>
-        )}
-      />
-    </ScreenContainer>
+          <Divider style={styles.divider} />
+        </View>
+      )}
+      ListHeaderComponent={() => <View style={{ height: 20 }}></View>}
+      ListFooterComponent={() => <View style={{ height: 20 }}></View>}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   itemContainer: {
+    marginHorizontal: 20,
+  },
+  item: {
     marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
