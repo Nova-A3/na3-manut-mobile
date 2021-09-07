@@ -37,10 +37,22 @@ export type DataActionRegisterFirstLoad = {
   payload: { value: boolean };
 };
 
-export type DataActionToggleFilter = {
-  type: "TOGGLE_FILTER";
+export interface DataActionFilterControl {
+  type: "FILTER_ON" | "FILTER_OFF" | "TOGGLE_FILTER";
   payload: { filterKey: keyof DataState["filters"]; filterValue: string };
-};
+}
+
+export interface DataActionToggleFilter extends DataActionFilterControl {
+  type: "TOGGLE_FILTER";
+}
+
+export interface DataActionFilterOn extends DataActionFilterControl {
+  type: "FILTER_ON";
+}
+
+export interface DataActionFilterOff extends DataActionFilterControl {
+  type: "FILTER_OFF";
+}
 
 export type DataActionSetProjects = {
   type: "SET_PROJECTS";
@@ -53,4 +65,6 @@ export type DataAction =
   | DataActionSetLoading
   | DataActionRegisterFirstLoad
   | DataActionToggleFilter
+  | DataActionFilterOn
+  | DataActionFilterOff
   | DataActionSetProjects;

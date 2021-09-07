@@ -1,5 +1,5 @@
 import Db from "../../db";
-import { DataAction, DataState } from "../../types";
+import { DataAction, DataActionFilterControl, DataState } from "../../types";
 
 const initialState: DataState = {
   tickets: [],
@@ -16,6 +16,36 @@ const initialState: DataState = {
     causes: ["mecanica", "eletrica", "machineAdjustment"],
   },
   projects: [],
+};
+
+const handleFilterOn = (
+  state: DataState,
+  { payload: { filterKey, filterValue } }: DataActionFilterControl
+) => {
+  if (state.filters[filterKey].includes(filterValue)) return state;
+
+  return {
+    ...state,
+    filters: {
+      ...state.filters,
+      [filterKey]: [...state.filters[filterKey], filterValue],
+    },
+  };
+};
+
+const handleFilterOff = (
+  state: DataState,
+  { payload: { filterKey, filterValue } }: DataActionFilterControl
+) => {
+  if (!state.filters[filterKey].includes(filterValue)) return state;
+
+  return {
+    ...state,
+    filters: {
+      ...state.filters,
+      [filterKey]: state.filters[filterKey].filter((f) => f !== filterValue),
+    },
+  };
 };
 
 const dataReducer = (state = initialState, action: DataAction) => {
@@ -41,22 +71,19 @@ const dataReducer = (state = initialState, action: DataAction) => {
         didFirstLoad: action.payload.value,
       };
     case "TOGGLE_FILTER":
-      return {
-        ...state,
-        filters: {
-          ...state.filters,
-          [action.payload.filterKey]: state.filters[
-            action.payload.filterKey
-          ].includes(action.payload.filterValue)
-            ? state.filters[action.payload.filterKey].filter(
-                (f) => f !== action.payload.filterValue
-              )
-            : [
-                ...state.filters[action.payload.filterKey],
-                action.payload.filterValue,
-              ],
-        },
-      };
+      if (
+        state.filters[action.payload.filterKey].includes(
+          action.payload.filterValue
+        )
+      ) {
+        return handleFilterOff(state, action);
+      } else {
+        return handleFilterOn(state, action);
+      }
+    case "FILTER_ON":
+      return handleFilterOn(state, action);
+    case "FILTER_OFF":
+      return handleFilterOff(state, action);
     case "SET_PROJECTS":
       return {
         ...state,

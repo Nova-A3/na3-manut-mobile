@@ -1,4 +1,6 @@
 import {
+  DataActionFilterOff,
+  DataActionFilterOn,
   DataActionRegisterFirstLoad,
   DataActionSetDptIssues,
   DataActionSetLoading,
@@ -50,6 +52,26 @@ export const toggleFilter = (
 ): DataActionToggleFilter => {
   return {
     type: "TOGGLE_FILTER",
+    payload: { filterKey, filterValue },
+  };
+};
+
+export const filterOn = (
+  filterKey: keyof DataState["filters"],
+  filterValue: string
+): DataActionFilterOn => {
+  return {
+    type: "FILTER_ON",
+    payload: { filterKey, filterValue },
+  };
+};
+
+export const filterOff = (
+  filterKey: keyof DataState["filters"],
+  filterValue: string
+): DataActionFilterOff => {
+  return {
+    type: "FILTER_OFF",
     payload: { filterKey, filterValue },
   };
 };
