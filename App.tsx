@@ -7,12 +7,19 @@ import FlashMessage from "react-native-flash-message";
 import { Provider as PaperProvider } from "react-native-paper";
 import { OverflowMenuProvider } from "react-navigation-header-buttons";
 import { Provider } from "react-redux";
+import * as Sentry from "sentry-expo";
 import { GlobalLoading } from "./components";
 import Firebase from "./firebase";
 import { useDepartment } from "./hooks";
 import { AuthNav, MainNav, SuperNav, ViewOnlyNav } from "./nav";
 import { LoadingScreen } from "./screens";
 import store from "./store";
+
+Sentry.init({
+  dsn: "https://f9d6033271b24ef3b46efcfe89d887a9@o1008778.ingest.sentry.io/5972787",
+  enableInExpoDevelopment: true,
+  debug: false, // Sentry will try to print out useful debugging information if something goes wrong with sending an event. Set this to `false` in production.
+});
 
 const isAndroid = require("react-native").Platform.OS === "android";
 // @ts-ignore

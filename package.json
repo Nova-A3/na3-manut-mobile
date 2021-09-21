@@ -24,6 +24,7 @@
     "@types/react-native-vector-icons": "^6.4.8",
     "expo": "~42.0.1",
     "expo-app-loading": "^1.1.2",
+    "expo-application": "~3.2.0",
     "expo-barcode-scanner": "~10.2.2",
     "expo-constants": "~11.0.1",
     "expo-device": "~3.3.0",
@@ -57,7 +58,8 @@
     "react-navigation-header-buttons": "^7.0.2",
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
-    "redux-devtools-extension": "^2.13.9"
+    "redux-devtools-extension": "^2.13.9",
+    "sentry-expo": "^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
