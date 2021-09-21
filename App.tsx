@@ -1,8 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
-import * as Updates from "expo-updates";
 import React from "react";
-import { Alert } from "react-native";
 import FlashMessage from "react-native-flash-message";
 import { Provider as PaperProvider } from "react-native-paper";
 import { OverflowMenuProvider } from "react-navigation-header-buttons";
@@ -55,13 +53,6 @@ Notifications.setNotificationHandler({
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
-});
-
-Updates.addListener((ev) => {
-  if (ev.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
-    Alert.alert("Nova versão disponível", 'Pressione "OK" para atualizar');
-    Updates.reloadAsync();
-  }
 });
 
 Firebase.init();
