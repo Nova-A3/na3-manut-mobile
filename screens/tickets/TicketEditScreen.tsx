@@ -35,8 +35,6 @@ const TicketEditScreen: React.FC = () => {
   const [maintenanceType, setMaintenanceType] = React.useState("preventiva");
   const [cause, setCause] = React.useState("mecanica");
 
-  console.log(department.getMachines());
-
   const machineIssues = React.useMemo(
     () =>
       department
