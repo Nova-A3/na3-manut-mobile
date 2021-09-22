@@ -2,7 +2,6 @@ export const sendNotification = async ({
   to,
   title,
   body,
-  data,
 }: {
   to: string | string[];
   title: string;
