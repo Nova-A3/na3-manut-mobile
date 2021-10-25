@@ -104,10 +104,8 @@ export class Db {
       }
     }
 
-    const manutDpts = dpts.filter(
-      (dpt) =>
-        Object.keys(dpt.apps).includes("manut") &&
-        (dpt.type === "shop-floor" || dpt.id === "manutencao")
+    const manutDpts = dpts.filter((dpt) =>
+      Object.keys(dpt.apps).includes("manut")
     );
 
     const appDpts = manutDpts.map(

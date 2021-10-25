@@ -16,7 +16,7 @@ import {
   getTicketChanges,
   sendNotification,
   timestamp,
-  translatePriority,
+  translatePriority
 } from "../utils";
 class FbFirestore {
   private static snapshotUnsubscribeFns: (() => void)[] = [];
